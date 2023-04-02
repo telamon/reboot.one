@@ -40,16 +40,9 @@
           Det finns många namn på "nya internet", så många att ordboken börjar kännas tunn.<br/>
           Men många aktörer missar att det nya internet till viss grad redan är här.<br/>
           Det är per definition decentraliserat, alltså inte bara ett namn eller ett bolag.<br/>
-          Snarare ett ofrivilligt samarbete emellan många parter. Det är ok.
+          Snarare ett ofrivilligt samarbete emellan många parter.
           <br/> <em>- ett nätverk utan en supernod.</em><br/>
           <br/>
-          <!--
-          - för mångfald av subkulturer
-          - centralisering inflation i nischer.
-          - skapande glädjen försvinner
-          - konsumerismen; man delar det andra gör istället för att skapa själv
-          - vi skapar små scener.
-          -->
         </p>
       </row>
     </section>
@@ -68,11 +61,11 @@
           <li><a href="https://pico.pub/">Pico.pub</a> - Typ tinder (öppet Tors kl 20:00-23:00)</li>
         </ul>
 
-        <h3>WIP-area <span class="blinky">🚧👨‍💻</span></h3>
+        <h3>Under utveckling <span class="blinky">🚧👨‍💻</span></h3>
         <ul>
           <li><a href="https://github.com/decentlabs-north/pyra">Pyra.se</a> - Pico webhotell</li>
           <li><a href="https://github.com/telamon/picostack">PicoStack</a> - Myntfritt ramverk</li>
-          <li><span style="color: black">Proof of Honor</span></li>
+          <!--<li><span style="color: black">Proof of Honor</span></li>-->
         </ul>
         <!--
         Delta I jakten på reboot knappen.<br/>
@@ -90,7 +83,7 @@
         så kommer du hamna på nya-internet.<br/>Det är till viss grad
         decenteraliserat och till viss grad omodererat, det är privat men inte anonymt.<br/>
         <br/>
-        <quote><i>§1 Keep calm and apply sunt förnuft 👍</i></quote>
+        <quote><i>Var artig och tillämpa sunt förnuft 👍</i></quote>
         <br/>
         <br/>
         <br/>
@@ -99,8 +92,8 @@
           Jag har läst och accepterar.
         </label><br/>
         <label for="scenic-route">
-          <input type="checkbox" id="scenic-route">
-          Jag önskar ta den natursköna vägen.
+          <input type="checkbox" id="scenic-route" disabled>
+          Jag har tid för omvägar
         </label>
         <br/>
         <div class="flex col xcenter space-around">
@@ -109,6 +102,10 @@
         <script>
           document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('the-way').style.display = 'none'
+            if (window.location.hash === '#early_access') {
+
+              document.getElementById('scenic-route').disabled = false
+            }
             document.getElementById('btn-reboot').addEventListener('click', () => {
               ulazy()
               function ulazy (iter=40) {
@@ -127,18 +124,15 @@
       </p>
     </section>
 
-    &lt;/internet&gt;
-    <div style="border-bottom: 3px dashed purple">&nbsp;</div>
-    <div style="border-bottom: 9px dashed purple; background-image: url('glitch.png');" class="flex row center">
+    <span style="color: #333">&lt;/internet&gt;</span>
+    <div style="border-bottom: 3px dashed purple;">&nbsp;</div>
+    <div style="border-bottom: 3px dashed purple; background-image: url('glitch.png');" class="flex row center">
       <h3 style="font-family: monospace; text-shadow: 0 0 2px red;">
-        $ ./jailbreak --reboot<br/>
-        <!--0xFEED04376D overload<br/> -->
-        1: modem rebooting... err0!
-        <!--<br/>f4lLINg 3ack to root prompt-->
+        Rebooting...
       </h3>
     </div>
     <img src="/glitch1.png" style="width: 100%"/>
-<scenic id="the-way"> <!-- watch this -->
+<scenic id="the-way" style="display: none"> <!-- watch this; no wait isn't ready -->
     <div style="width: 100%; height: 1024px; background-color: lime">&nbsp;</div>
     <div style="width: 100%; height: 768px; background-color: green">&nbsp;</div>
     <div style="width: 100%; height: 320px; background-color: darkgreen">&nbsp;</div>
@@ -164,12 +158,12 @@
     </div>
     <img style="width: 100%" src="/glitch0xb0.png" />
     <div style="width: 100%; height: 400px; background-image: linear-gradient(lime, black)">&nbsp;</div>
-    <div class="flex row center">
+    <!--<div class="flex row center">
         <samp>
           $ killall jailbreak -9 \<br/>&amp;&amp; /sbin/broadcast --agenda=202X --resume \<br/>
           &amp;&amp; <strong>cat</strong> /dev/stdout &gt; /dev/null
         </samp>
-    </div>
+    </div>-->
     <div style="width: 100%; height: 400px;">&nbsp;</div>
     <div style="width: 100%; height: 4px; background-color: blue;">&nbsp;</div>
     <div style="width: 100%; height: 780px; background-color: #008080;">
@@ -305,10 +299,9 @@
     <div id="neointernet" class="pwa-mode-enabled js-permitted" style="border: 6px double var(--xorcery)">
       <section id="newintro" class="flex column xcenter">
         <h1>Välkommen</h1>
-        <img src="/glitch0xf2.png" style="max-width: 30vw; border-radius: 100%"/>
+        <img src="/glitch0xf1.png" style="max-width: 30vw; border-radius: 100%"/>
         <p>
-          Vi hoppas att övergången gick bra och att ni får ett trevligt äventyr.<br/>
-          Lämna gärna en kommentar i gästboken, vad gillar du med det gamla och vad skulle du önska se I det nya?<br/>
+          Lämna gärna en kommentar i gästboken, så hoppas vi att det finns lite mer att bjuda på nästa gång ni har vägarna förbi.<br/>
           <!--Om du känner ett starkt behov att lämna en arg lapp så finns det snart en plats för det:  <a href="https://arglapp.se">arglapp.se</a> <small>vi jobbar på det..</small>-->
         </p>
       </section>

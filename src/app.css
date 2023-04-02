@@ -73,10 +73,11 @@ footer, footer a {
 
 #btn-reboot {
   color: #fdedec;
-  font-size: 2em;
+  font-size: 1.2em;
+  font-family: monospace;
   padding: 0.5em 1em;
   display: inline-block;
-  background-color: #5b2c6f;
+  background-color: var(--xorcery); /* #5b2c6f;*/
   border: 1px solid #a569bd;
   border-radius: 10px;
   margin-top: 1em;
