@@ -108,7 +108,7 @@
             }
             document.getElementById('btn-reboot').addEventListener('click', () => {
               ulazy()
-              function ulazy (iter=40) {
+              function ulazy (iter=20) {
                 window.scrollBy({ top: 100, behaviour: 'smooth' })
                 if (--iter) setTimeout(ulazy.bind(null, iter), 50)
               }
@@ -125,14 +125,14 @@
     </section>
 
     <span style="color: #333">&lt;/internet&gt;</span>
-    <div style="border-bottom: 3px dashed purple;">&nbsp;</div>
-    <div style="border-bottom: 3px dashed purple; background-image: url('glitch.png');" class="flex row center">
-      <h3 style="font-family: monospace; text-shadow: 0 0 2px red;">
+    <div style="border-bottom: 1px dashed purple;">&nbsp;</div>
+<scenic id="the-way" style="display: none"> <!-- watch this; no wait isn't ready -->
+    <div style="border-bottom: 1px dashed purple; background-image: url('glitch.png');" class="flex row center">
+      <!---<h3 style="font-family: monospace; text-shadow: 0 0 2px red;">
         Rebooting...
-      </h3>
+      </h3>-->
     </div>
     <img src="/glitch1.png" style="width: 100%"/>
-<scenic id="the-way" style="display: none"> <!-- watch this; no wait isn't ready -->
     <div style="width: 100%; height: 1024px; background-color: lime">&nbsp;</div>
     <div style="width: 100%; height: 768px; background-color: green">&nbsp;</div>
     <div style="width: 100%; height: 320px; background-color: darkgreen">&nbsp;</div>
@@ -301,7 +301,10 @@
         <h1>Välkommen</h1>
         <img src="/glitch0xf1.png" style="max-width: 30vw; border-radius: 100%"/>
         <p>
-          Lämna gärna en kommentar i gästboken, så hoppas vi att det finns lite mer att bjuda på nästa gång ni har vägarna förbi.<br/>
+          Det finns inte så mycket att bjuda på här ännu.<br/>
+          Och det kommer vara så ett tag framöver tills teknologierna stabiliseras,<br/>
+          men en gästbok utan registrering, det tycker vi är lite tufft och värt att visa upp.<br/>
+          Så lämna gärna en kommentar.<br/>
           <!--Om du känner ett starkt behov att lämna en arg lapp så finns det snart en plats för det:  <a href="https://arglapp.se">arglapp.se</a> <small>vi jobbar på det..</small>-->
         </p>
       </section>

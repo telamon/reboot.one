@@ -72,14 +72,14 @@ footer, footer a {
 #neointernet a, #neointernet a:visted { color: var(--xorcery); }
 
 #btn-reboot {
-  color: #fdedec;
+  color: white;
   font-size: 1.2em;
   font-family: monospace;
-  padding: 0.5em 1em;
+  padding: 0.5em 2em;
   display: inline-block;
   background-color: var(--xorcery); /* #5b2c6f;*/
   border: 1px solid #a569bd;
-  border-radius: 10px;
+  border-radius: 2px;
   margin-top: 1em;
   margin-bottom: 2em;
 }
