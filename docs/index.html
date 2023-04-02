@@ -7,8 +7,8 @@
     <title>Rebooting...</title>
     <style>
     </style>
-    <script type="module" crossorigin src="/assets/index-69c3c3bb.js"></script>
-    <link rel="stylesheet" href="/assets/index-786a6774.css">
+    <script type="module" crossorigin src="/assets/index-6fa364d7.js"></script>
+    <link rel="stylesheet" href="/assets/index-c2b55833.css">
   </head>
   <body>
     <section id="logo" class="flex col xcenter">
@@ -42,7 +42,8 @@
           Det finns många namn på "nya internet", så många att ordboken börjar kännas tunn.<br/>
           Men många aktörer missar att det nya internet till viss grad redan är här.<br/>
           Det är per definition decentraliserat, alltså inte bara ett namn eller ett bolag.<br/>
-          Snarare ett ofrivilligt samarbete emellan många parter - ett nätverk utan en supernod.<br/>
+          Snarare ett ofrivilligt samarbete emellan många parter. Det är ok.
+          <br/> <em>- ett nätverk utan en supernod.</em><br/>
           <br/>
           <!--
           - för mångfald av subkulturer
@@ -88,17 +89,49 @@
       <h2>Nät-gränsen</h2>
       <p>
         Du lämnar nu internet, om du fortsätter scrolla
-        så kommer du att hamna på nya-internet, det är till viss grad
+        så kommer du hamna på nya-internet.<br/>Det är till viss grad
         decenteraliserat och till viss grad omodererat, det är privat men inte anonymt.<br/>
         <br/>
-        <quote><i>Keep calm - tillämpa sunt förnuft 👍</i></quote>
+        <quote><i>§1 Keep calm and apply sunt förnuft 👍</i></quote>
+        <br/>
+        <br/>
+        <br/>
+        <label for="accept">
+          <input type="checkbox" id="accept">
+          Jag har läst och accepterar.
+        </label><br/>
+        <label for="scenic-route">
+          <input type="checkbox" id="scenic-route">
+          Jag önskar ta den natursköna vägen.
+        </label>
+        <br/>
+        <div class="flex col xcenter space-around">
+          <button id="btn-reboot" style="">REBOOT</button>
+        </div>
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('the-way').style.display = 'none'
+            document.getElementById('btn-reboot').addEventListener('click', () => {
+              ulazy()
+              function ulazy (iter=40) {
+                window.scrollBy({ top: 100, behaviour: 'smooth' })
+                if (--iter) setTimeout(ulazy.bind(null, iter), 50)
+              }
+            })
+            document.getElementById('scenic-route')
+              .addEventListener('change', ({ target }) => {
+                const s = document.getElementById('the-way')
+                if (target.checked) s.style.display = 'block'
+                else s.style.display = 'none'
+              })
+          });
+        </script>
       </p>
     </section>
 
-    &lt;/gamla-internet&gt;
-    <div style="border-bottom: 3px dashed purple">
-    </div>
-    <div style="border-bottom: 3px dashed purple; background-image: url('glitch.png');" class="flex row center">
+    &lt;/internet&gt;
+    <div style="border-bottom: 3px dashed purple">&nbsp;</div>
+    <div style="border-bottom: 9px dashed purple; background-image: url('glitch.png');" class="flex row center">
       <h3 style="font-family: monospace; text-shadow: 0 0 2px red;">
         $ ./jailbreak --reboot<br/>
         <!--0xFEED04376D overload<br/> -->
@@ -106,40 +139,196 @@
         <!--<br/>f4lLINg 3ack to root prompt-->
       </h3>
     </div>
-    &lt;nya-internet&gt;
+    <img src="/glitch1.png" style="width: 100%"/>
+<scenic id="the-way"> <!-- watch this -->
+    <div style="width: 100%; height: 1024px; background-color: lime">&nbsp;</div>
+    <div style="width: 100%; height: 768px; background-color: green">&nbsp;</div>
+    <div style="width: 100%; height: 320px; background-color: darkgreen">&nbsp;</div>
+    <div style="width: 100%; height: 64px;">&nbsp;</div>
+    <div style="width: 100%; height: 8px; background-color: hotpink">&nbsp;</div>
+    <div style="width: 100%; height: 4px; background-color: black">&nbsp;</div>
+    <div style="width: 100%; height: 64px; background-color: hotpink">&nbsp;</div>
+    <div style="width: 100%; height: 16px; background-color: black">&nbsp;</div>
+    <div style="width: 100%; height: 2px; background-color: red">&nbsp;</div>
+    <div style="width: 100%; height: 1024px;">&nbsp;</div>
+    <div class="flex row center"><img src="/glitch0xa0.png"></div>
+    <div style="width: 100%; height: 1024px;">&nbsp;</div>
+    <div class="flex row center"><img src="/glitch0xa1.png"></div>
+    <div style="width: 100%; height: 1024px;">&nbsp;</div>
+    <img style="width: 100%;" src="/glitch0xa02.png" />
+    <div style="width: 100%; height: 480px;">&nbsp;</div>
 
-    <section id="guestbook" class="flex column xcenter">
-      <h2>Gästboken</h2>
-      <p>
-      <!--Delta I jakten på reboot knappen.<br/>-->
-        Lämna en kommentar i gästboken, vad gillar du med gamla internet och vad skulle du önska se I det nya?
+    <div style="border-bottom: 3px dashed purple">&nbsp;</div>
+    <div style="background-image: url('glitch.png');" class="flex row center">
+      <h3 style="font-family: monospace; text-shadow: 0 0 2px red;">
+        $! We are supervised!
+      </h3>
+    </div>
+    <img style="width: 100%" src="/glitch0xb0.png" />
+    <div style="width: 100%; height: 400px; background-image: linear-gradient(lime, black)">&nbsp;</div>
+    <div class="flex row center">
+        <samp>
+          $ killall jailbreak -9 \<br/>&amp;&amp; /sbin/broadcast --agenda=202X --resume \<br/>
+          &amp;&amp; <strong>cat</strong> /dev/stdout &gt; /dev/null
+        </samp>
+    </div>
+    <div style="width: 100%; height: 400px;">&nbsp;</div>
+    <div style="width: 100%; height: 4px; background-color: blue;">&nbsp;</div>
+    <div style="width: 100%; height: 780px; background-color: #008080;">
+      <img src="/the-internet-vintage.png" />
+      &nbsp;
+    </div>
+    <div style="width: 100%; height: 16px;">&nbsp;</div>
+    <div style="width: 100%; height: 2px; background-color: red">&nbsp;</div>
+    <div style="width: 100%; height: 16px;">&nbsp;</div>
+    <div style="width: 100%; height: 4px; background-color: blue;">&nbsp;</div>
+    <div style="width: 100%; height: 16px;">&nbsp;</div>
+    <!--- Thank you chatty! -->
+    <style>
+      .blue-div {background-color: blue;}
+      .red-div {background-color: red;}
+      .black-div {background-color: black;}
+    </style>
 
-        <!--<br/>
-        Men vi ber er att vara artiga, för den här funktionen är på gott och ont decentraliserad.<br/>
-        Det innebär att den inte kräver login, är lagom anonym och vi som utgivare har väldigt begränsad kontroll över den.<br/>
-        Kul! =)<br/>-->
+<div style="width: 100%; height: 16px;">&nbsp;</div>
 
-        <!-- Om du känner ett starkt behov att lämna en arg lapp så finns det snart en plats för det:  <a href="https://arglapp.se">Arglapp.se</a> -->
-        <!--
-        <script
-            src="https://nostri.chat/bundle.js"
-            data-website-owner-pubkey="YOUR_PUBKEY"
-            data-chat-type="GLOBAL"
-            data-chat-tags="reboot"
-            data-relays="wss://relay.f7z.io,wss://nos.lol,wss://relay.nostr.info,wss://nostr-pub.wellorder.net,wss://relay.current.fyi,wss://relay.nostr.band"
-            ></script> -->
-        <!-- <link rel="stylesheet" href="https://nostri.chat/public/bundle.css">-->
-      </p>
-        <div id="app"></div>
-        
+<div style="width: 100%; height: 2px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 3px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 5px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 8px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 13px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 21px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 34px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 55px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 89px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 144px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 233px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 377px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 610px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 16px;">&nbsp;</div>
+
+
+    <div class="flex row center xcenter">
+      <div><img src="glitch0xb2.png"/></div>
+    </div>
+<div style="width: 100%; height: 240px; background-color: #400000;"></div>
+<div style="width: 100%; height: 16px; background-color: black;">&nbsp;</div>
+
+<div style="width: 100%; height: 610px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 377px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 233px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 144px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 89px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 55px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 34px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 21px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 13px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 8px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 5px;" class="blue-div">&nbsp;</div>
+<div style="width: 100%; height: 3px;" class="red-div">&nbsp;</div>
+<div style="width: 100%; height: 2px;" class="blue-div">&nbsp;</div>
+<div class="flex row center">
+<img style="width: 80%" src="glitch0xb3.png"/>
+</div>
+<!-- Damn chatty, you good. -->
+<style>#div-pyramid div { padding: 4vw; border-radius: 4px; }</style>
+<div class="red-div" id="div-pyramid">
+    <div class="blue-div">
+        <div class="red-div">
+            <div class="blue-div">
+                <div class="red-div">
+                    <div class="blue-div">
+                        <div class="red-div">
+                            <div class="blue-div">
+                                <div class="red-div">
+                                    <div class="blue-div">
+                                      <div style="background-color: purple;">&nbsp;</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- eoc -->
+    <div style="width: 100%; height: 1024px; background-color: var(--xorcery);">&nbsp;</div>
+    <img style="width: 100%;" src="/glitch0xb4.png" />
+    <div style="width: 100%; height: 1024px; background: var(--xorcery);">&nbsp;</div>
+    <div style="width: 100%; height: 1024px; background: linear-gradient(var(--xorcery), black);">&nbsp;</div>
+    <div style="width: 100%; height: 200px;">&nbsp;</div>
+    <div class="flex row center">
+      <samp>We will be back 😾</samp>
+    </div>
+    <div style="width: 100%; height: calc(1658px / 2);">&nbsp;</div>
+    <!-- It's over, you're free -->
+    <pre style="color: var(--xorcery); font-size: 1.2em;">
+    |&gt; Signal stabilizing (-30dB)
+    |&gt; Bootstrap complete
+
+    |o&gt; Searching for peers...
+    </pre>
+    <div style="width: 100%; height: calc(1658px / 1.5);">&nbsp;</div>
+
+    <img style="width: 100%; box-shadow: 0 0 17em 0 var(--xorcery);" src="/glitch0xd0.png" />
+    <div style="width: 100%; height: calc(1658px / 1);">&nbsp;</div>
+    <pre style="color: var(--xorcery); font-size: 1.2em;">
+      |o&gt; Searching...
+      |&gt; Scanning slower frequencies
+    </pre>
+    <div style="width: 100%; height: calc(1658px / 1);">&nbsp;</div>
+    <img style="width: 100%; box-shadow: 0 0 17em 0 var(--xorcery);" src="/glitch0xf0.png" />
+    <div style="width: 100%; height: calc(1658px / 1);">&nbsp;</div>
+    <pre style="color: var(--xorcery); font-size: 1.2em;">
+      |o&gt; Vibes detected!
+      |&gt; WARN! temperature high!
+    </pre>
+    <div style="width: 100%; height: 400px;">&nbsp;</div>
+    <img style="width: 100%;" src="/release.png" />
+    <pre style="color: var(--xorcery); font-size: 1.2em;">
+      |&gt; Overheat protection activated
+      |&gt; Analyzing vibe samples...
+    </pre>
+    <div style="width: 100%; height: 400px;">&nbsp;</div>
+    <div class="flex row center">
+      <img style="max-width: 50vw; border-radius: 100%; box-shadow: 0 0 40px var(--xorcery);" src="/glitch0xf1.png" />
+    </div>
+    <div style="width: 100%; height: 100px;">&nbsp;</div>
+    <pre style="color: var(--xorcery); font-size: 1.2em;">
+      |o&gt; Vibe samples <span class="blinky" title="Goooooood">👌</span>
+      |&gt; Establishing bidirectional link
+    </pre>
+</scenic>
+    <div style="width: 100%; height: 500px;">&nbsp;</div>
+
+    <img style="width: 100%; margin-bottom: -5px" src="/glitch-eof.png" />
+    <div id="neointernet" class="pwa-mode-enabled js-permitted" style="border: 6px double var(--xorcery)">
+      <section id="newintro" class="flex column xcenter">
+        <h1>Välkommen</h1>
+        <img src="/glitch0xf2.png" style="max-width: 30vw; border-radius: 100%"/>
+        <p>
+          Vi hoppas att övergången gick bra och att ni får ett trevligt äventyr.<br/>
+          Lämna gärna en kommentar i gästboken, vad gillar du med det gamla och vad skulle du önska se I det nya?<br/>
+          <!--Om du känner ett starkt behov att lämna en arg lapp så finns det snart en plats för det:  <a href="https://arglapp.se">arglapp.se</a> <small>vi jobbar på det..</small>-->
+        </p>
       </section>
-    <section style="display: none" id="english">
-      <h1>Reboot the Internet</h1>
-      <h2>It's time to start over</h2>
-      <p>The internet has become a mess. It's time to start over and build something better. Something that truly puts the user first. Something that is built on the principles of privacy, security, and accessibility for all. Something that is decentralized and not controlled by a handful of tech giants.</p> <a href="#" class="btn">Reboot Now</a>
-    </section>
+      <section id="guestbook" class="flex column xcenter">
+        <h2>Gästbok</h2>
+          <div id="app"></div>
+          
+        </section>
+
+      <section style="display: none" id="english">
+        <!-- these are gpt-words, not mine -->
+        <h1>Reboot the Internet</h1>
+        <h2>It's time to start over</h2>
+        <p>The internet has become a mess. It's time to start over and build something better. Something that truly puts the user first. Something that is built on the principles of privacy, security, and accessibility for all. Something that is decentralized and not controlled by a handful of tech giants.</p> <a href="#" class="btn">Reboot Now</a>
+      </section>
+    </div>
     <footer class="flex row center xcenter">
-      <p>2015-2023 🄯 <a href="https://github.com/decentlabs-north">DLNorth</a>, All wrongs reversed</p>
+      <p><a href="https://decentlabs.se/">2015</a>-2023 🄯 <a href="https://github.com/decentlabs-north">DLNorth</a>, All wrongs reversed</p>
     </footer>
   </body>
 </html>
