@@ -14,6 +14,7 @@
     "vite": "^4.2.0"
   },
   "dependencies": {
-    "nostr-tools": "^1.8.1"
+    "nostr-tools": "^1.8.1",
+    "powmem": "^1.1.2"
   }
 }

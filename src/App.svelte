@@ -1,6 +1,6 @@
 <script>
-/*
 import { writable } from 'svelte/store'
+import { decodeASL, flagOf } from 'powmem'
 import {
   generatePrivateKey,
   getPublicKey,
@@ -9,7 +9,50 @@ import {
   signEvent,
   SimplePool
 } from 'nostr-tools'
+let pool = null
+import Widget from '../../nostr-chat-widget/src/Widget.svelte'
+const relays = 'wss://relay.f7z.io,wss://nos.lol,wss://relay.nostr.info,wss://nostr-pub.wellorder.net,wss://relay.current.fyi,wss://relay.nostr.band'.split(',')
 
+const chatTags = ['reboot']
+/*const relays = [
+  'wss://relay.f7z.io',
+  'wss://relay.nostr.info',
+  'wss://nostr-pub.wellorder.net',
+  'wss://relay.current.fyi',
+  'wss://relay.damus.io',
+  'wss://relay.snort.social',
+  'wss://nos.lol'
+]*/
+const TAGS = ['reboot']
+const posts = writable([])
+/**
+ * Connects to nostr network
+ */
+function initPool () {
+  if (pool) return pool
+  console.info('Connecting to relays', relays)
+  pool = new SimplePool()
+
+  const filters = [
+    { kinds: [1], '#t': TAGS }
+  ]
+  const sub = pool.sub(relays, filters)
+
+  sub.on('event', event => {
+    const { pubkey, tags } = event
+    const hashtag = tags.find(t => t[0] === 't' && ~TAGS.indexOf(t[1]))
+    if (hashtag) {
+      console.info('post', hashtag, pubkey, event)
+      const { age, sex, location } = decodeASL(event.pubkey)
+      event.age = [16, 24, 32, 48][age]
+      event.sex = ['F', 'P', 'IB', 'R'][sex] // ['👩', '👨', '🧑', '🤖'][sex]
+      event.flag = flagOf(location)
+      posts.update(ps => [...ps, event])
+    }
+  })
+  return pool
+}
+/*
 let relay, sk, pk
 const posts = writable([])
 
@@ -22,64 +65,15 @@ function loadId2 () {
   pk = getPublicKey(sk) // `pk` is a hex string
   console.log('Interdimensional Identity (id²)', typeof sk, sk, pk)
 }
-
-// const relays = ['wss://relay.example.com', 'wss://relay.example2.com']
-async function loadNoint () {
-  console.log('Connecting noint')
-  const relays = ['wss://relay.damus.io', 'wss://eden.nostr.land']
-  relay = relayInit(relays[0]) // TODO: math.random()
-  relay.on('connect', () => {
-    console.log(`connected to ${relay.url}`)
-  })
-  relay.on('error', () => {
-    console.log(`failed to connect to ${relay.url}`)
-  })
-
-  await relay.connect()
-
-  let sub = relay.sub([
-    {
-      kinds: [1],
-      authors: ['#reboot']
-    }
-  ])
-
-  sub.on('event', event => {
-    console.log('we got the event we wanted:', event)
-  })
-  sub.on('eose', () => { sub.unsub() })
-
-
-  sub.on('event', event => {
-    console.log('got event:', event)
-  })
-  // let event = {
-  //   kind: 1,
-  //   pubkey: pk,
-  //   created_at: Math.floor(Date.now() / 1000),
-  //   tags: [],
-  //   content: 'hello world'
-  // }
-  // event.id = getEventHash(event)
-  // event.sig = signEvent(event, sk)
-}
-
-async function main () {
-loadId2()
-await loadNoint()
-console.log('Kernel booted')
-}
-
 main()
 */
-
-import Widget from '../../nostr-chat-widget/src/Widget.svelte'
-const relays = 'wss://relay.f7z.io,wss://nos.lol,wss://relay.nostr.info,wss://nostr-pub.wellorder.net,wss://relay.current.fyi,wss://relay.nostr.band'.split(',')
-
-const chatTags = ['reboot']
+initPool()
 </script>
 
 <main>
+<h1>Nyheter</h1>
+<!-- [{$posts.length} inlägg] -->
+
   <Widget
     websiteOwnerPubkey="npub1q9y3wrl83vrpeek8990l7td2xqlhzzap0m7clt7cxsef9dpft6zq9lwty4"
     chatType="GLOBAL"
@@ -89,7 +83,11 @@ const chatTags = ['reboot']
     />
 <!--
 {#each $posts as item}
-  <li>{item}</li>
+  <article>
+    <samp>Skrivet av {item.sex}{item.age}</samp>
+    <date>{new Date(item.created_at)}</date>
+    <p>{item.content}</p>
+  </article>
 {/each}
 -->
 </main>
