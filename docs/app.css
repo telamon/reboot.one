@@ -2,10 +2,19 @@
   --counterborder: #0f0000;
   --xorcery: #8a2be2;
 }
+
+nav {
+  border: 5px double var(--xorcery);
+  padding: 4px 0;
+}
+nav, nav a {
+  color: pink;
+  font-family: monospace;
+}
+nav .sep { padding: 0 2em; }
 counter d {
   display: inline-block;
   background: rgba(0,0,0) linear-gradient(#054146 0%, #010811 100%) no-repeat;
-
   color: lime; /* A drop of lime to bring out the annoyumami */
   margin: 0;
   padding: 0.2em 0.4em;
@@ -18,33 +27,10 @@ counter d {
 h2 { font-size: 1.9em; }
 h3 { font-weight: normal; }
 
-counter d:first-child {
-  border: 1px solid var(--counterborder);
-}
-
-.mush {
-  filter: sepia(100%) hue-rotate(214deg);
-  /* animation: rotate-hue 5s linear infinite;*/
-}
-
-@keyframes rotate-hue {
-  from {filter: sepia(100%) hue-rotate(0deg);}
-  to {filter: sepia(100%) hue-rotate(360deg);}
-}
-.blinky {
-  filter: sepia(100%) hue-rotate(214deg);
-  /*animation:  blink-cursor 3.14s linear infinite;*/
-}
-@keyframes blink-cursor {
-  from, 49% {opacity: 1;}
-  50%, to {opacity: 0;}
-}
-
 body {
   font-family: Arial, sans-serif;
   background-color: #000;
   color: white;
-  font-size: 1.3em;
   margin: 0;
   padding: 0;
 }
@@ -61,6 +47,11 @@ p, h1, h2, h3, .bounds {
 }*/
 #logo {
   background-image: linear-gradient(to bottom, #000, #171516 51%);
+  background-image: url('/glitch-eof.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: 0 75%;
+  font-size: 1.3em;
 }
 section { padding: 4em 2em; }
 
@@ -110,13 +101,63 @@ footer, footer a {
 @media (max-width: 499px) {
   #hero { font-size: 2em; }
   section { padding: 2em; }
+  nav { flex-direction: column; }
+  nav .sep { display: none; }
+}
+/*
+counter d:first-child {
+  border: 1px solid var(--counterborder);
 }
 
+.mush {
+  filter: sepia(100%) hue-rotate(214deg);
+}
+
+@keyframes rotate-hue {
+  from {filter: sepia(100%) hue-rotate(0deg);}
+  to {filter: sepia(100%) hue-rotate(360deg);}
+}
+.blinky {
+  filter: sepia(100%) hue-rotate(214deg);
+}
+@keyframes blink-cursor {
+  from, 49% {opacity: 1;}
+  50%, to {opacity: 0;}
+}
+*/
+
 /*guestbook*/
-guest-book .avatar img { border-radius: 100%; max-width: 4em; }
-guest-book {display: block; max-width: 500px; }
-guest-book .avatar { padding-right: 2em; }
-guest-book .inlagg { border: 1px solid #333; margin: 1em 0; padding: 1em; }
+guest-book { display: block; }
+guest-book .post { margin: 2em 0; max-width: 500px; overflow-x: hidden; }
+guest-book .post .portrait img,
+guest-book .post .portrait .placeholder {
+  border-radius: 5px;
+  border: 1px solid #ff00ff;
+  max-width: 3em;
+}
+guest-book .post .portrait .placeholder { width: 3em; height: 3em; }
+guest-book .gutter { padding-right: 1em; }
+guest-book .alias { font-size: larger; }
+guest-book .post .content {
+  max-height: 16em;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  white-space: pre-line;
+}
+guest-book .post .images img.preview {
+  max-width: 4em;
+  max-height: 4em;
+  border: 1px solid #555;
+  filter: grayscale() blur(2px);
+}
+guest-book .post .images dialog img { max-width: 100%; }
+guest-book .post .images dialog { padding: 0; background-color: transparent; }
+guest-book .post time { color: #888; }
+@media (max-width: 499px) {
+  section#guestbook { padding: 0.5em; }
+  guest-book .post .portrait img,
+  guest-book .post .portrait .placeholder { max-width: 2em; max-height: 2em; }
+}
 
 /* picoflex.css */
 row, column, column-reverse, row-reverse, .flex {display:flex;}
