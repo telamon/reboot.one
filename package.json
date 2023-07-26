@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "esbuild --bundle index.js --format=esm --outfile=docs/index.b.js --servedir=docs/",
-    "build": "esbuild --bundle index.js --format=esm --outfile=index.esm.js"
+    "build": "esbuild --bundle index.js --format=esm --outfile=docs/index.b.js"
   },
   "devDependencies": {
     "esbuild-cli": "^0.0.1"
