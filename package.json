@@ -8,6 +8,7 @@
     "build": "esbuild --bundle index.js --format=esm --outfile=docs/index.b.js"
   },
   "devDependencies": {
+    "esbuild": "^0.18.17",
     "esbuild-cli": "^0.0.1"
   },
   "dependencies": {
