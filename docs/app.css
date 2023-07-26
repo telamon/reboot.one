@@ -40,7 +40,7 @@ p, h1, h2, h3, .bounds {
   max-width: 720px;
 }
 
-section#propaganda p { color: var(--lov); }
+section#propaganda p { color: var(--lov); font-size: larger; }
 /*#logo {
   background-image: url('/public/culture.png');
   background-size: 100% auto;
@@ -83,7 +83,8 @@ footer, footer a {
   font-weight: bold;
   font-size: 3em;
   color: var(--xorcery);
-  text-shadow: 1px 3px 2px #530070;
+  /* text-shadow: 1px 3px 2px #530070; */
+  text-shadow: 1px 3px 2px #fe36fb;
 }
 #hero .arg {
   font-weight: normal;
