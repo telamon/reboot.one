@@ -1,11 +1,12 @@
 :root {
   --counterborder: #0f0000;
   --xorcery: #8a2be2;
+  --lov: #b0f;
 }
 
 nav {
   border: 5px double var(--xorcery);
-  padding: 4px 0;
+  padding: 4px 1em;
 }
 nav, nav a {
   color: pink;
@@ -39,6 +40,7 @@ p, h1, h2, h3, .bounds {
   max-width: 720px;
 }
 
+section#propaganda p { color: var(--lov); }
 /*#logo {
   background-image: url('/public/culture.png');
   background-size: 100% auto;

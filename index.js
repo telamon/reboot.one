@@ -30,9 +30,8 @@ Tonic.add(class GuestBook extends Tonic {
       <book-post event=${p}></book-post>
     `)
     return this.html`
-      <h2>Inlägg</h2>
+      <h3>Senaste Inlägg (${this.#posts.length + ''}st)</h3>
       <post-form></post-form>
-      <div>Tidigare inlägg: ${this.#posts.length + ''}st</div>
       ${posts}
     `
   }
@@ -178,7 +177,7 @@ Tonic.add(class PostForm extends Tonic {
       </div>
     `
     return this.html`
-      <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Skriv ditt inlägg här"></textarea>
+      <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
       <button id="submit">Skicka</button>
       <dialog>
         ${identity}
