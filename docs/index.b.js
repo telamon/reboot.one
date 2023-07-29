@@ -1,12 +1,7 @@
 var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
 };
 
 // node_modules/@socketsupply/tonic/index.js
@@ -24,7 +19,15 @@ var TonicTemplate = class {
     return this.rawText;
   }
 };
-var _Tonic = class extends window.HTMLElement {
+var Tonic = class _Tonic extends window.HTMLElement {
+  static _tags = "";
+  static _refIds = [];
+  static _data = {};
+  static _states = {};
+  static _children = {};
+  static _reg = {};
+  static _stylesheetRegistry = [];
+  static _index = 0;
   // eslint-disable-next-line no-undef
   static get version() {
     return "15.1.1";
@@ -379,15 +382,6 @@ var _Tonic = class extends window.HTMLElement {
     delete _Tonic._children[this._id];
   }
 };
-var Tonic = _Tonic;
-__publicField(Tonic, "_tags", "");
-__publicField(Tonic, "_refIds", []);
-__publicField(Tonic, "_data", {});
-__publicField(Tonic, "_states", {});
-__publicField(Tonic, "_children", {});
-__publicField(Tonic, "_reg", {});
-__publicField(Tonic, "_stylesheetRegistry", []);
-__publicField(Tonic, "_index", 0);
 var tonic_default = Tonic;
 
 // node_modules/@noble/hashes/esm/_assert.js
@@ -405,11 +399,11 @@ function bytes(b, ...lengths) {
   if (lengths.length > 0 && !lengths.includes(b.length))
     throw new Error(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
 }
-function hash(hash2) {
-  if (typeof hash2 !== "function" || typeof hash2.create !== "function")
+function hash(hash3) {
+  if (typeof hash3 !== "function" || typeof hash3.create !== "function")
     throw new Error("Hash should be wrapped by utils.wrapConstructor");
-  number(hash2.outputLen);
-  number(hash2.blockLen);
+  number(hash3.outputLen);
+  number(hash3.blockLen);
 }
 function exists(instance, checkFinished = true) {
   if (instance.destroyed)
@@ -445,12 +439,12 @@ var isLE = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
 if (!isLE)
   throw new Error("Non little-endian hardware is not supported");
 var hexes = Array.from({ length: 256 }, (v, i) => i.toString(16).padStart(2, "0"));
-function bytesToHex(bytes2) {
-  if (!u8a(bytes2))
+function bytesToHex(bytes3) {
+  if (!u8a(bytes3))
     throw new Error("Uint8Array expected");
   let hex2 = "";
-  for (let i = 0; i < bytes2.length; i++) {
-    hex2 += hexes[bytes2[i]];
+  for (let i = 0; i < bytes3.length; i++) {
+    hex2 += hexes[bytes3[i]];
   }
   return hex2;
 }
@@ -500,13 +494,6 @@ var Hash = class {
     return this._cloneInto();
   }
 };
-var isPlainObject = (obj) => Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object;
-function checkOpts(defaults, opts) {
-  if (opts !== void 0 && (typeof opts !== "object" || !isPlainObject(opts)))
-    throw new Error("Options should be object or undefined");
-  const merged = Object.assign(defaults, opts);
-  return merged;
-}
 function wrapConstructor(hashCons) {
   const hashC = (msg) => hashCons().update(toBytes(msg)).digest();
   const tmp = hashCons();
@@ -523,25 +510,25 @@ function randomBytes(bytesLength = 32) {
 }
 
 // node_modules/@noble/hashes/esm/_sha2.js
-function setBigUint64(view, byteOffset, value, isLE2) {
+function setBigUint64(view, byteOffset, value, isLE3) {
   if (typeof view.setBigUint64 === "function")
-    return view.setBigUint64(byteOffset, value, isLE2);
-  const _32n2 = BigInt(32);
+    return view.setBigUint64(byteOffset, value, isLE3);
+  const _32n3 = BigInt(32);
   const _u32_max = BigInt(4294967295);
-  const wh = Number(value >> _32n2 & _u32_max);
+  const wh = Number(value >> _32n3 & _u32_max);
   const wl = Number(value & _u32_max);
-  const h = isLE2 ? 4 : 0;
-  const l = isLE2 ? 0 : 4;
-  view.setUint32(byteOffset + h, wh, isLE2);
-  view.setUint32(byteOffset + l, wl, isLE2);
+  const h = isLE3 ? 4 : 0;
+  const l = isLE3 ? 0 : 4;
+  view.setUint32(byteOffset + h, wh, isLE3);
+  view.setUint32(byteOffset + l, wl, isLE3);
 }
 var SHA2 = class extends Hash {
-  constructor(blockLen, outputLen, padOffset, isLE2) {
+  constructor(blockLen, outputLen, padOffset, isLE3) {
     super();
     this.blockLen = blockLen;
     this.outputLen = outputLen;
     this.padOffset = padOffset;
-    this.isLE = isLE2;
+    this.isLE = isLE3;
     this.finished = false;
     this.length = 0;
     this.pos = 0;
@@ -578,7 +565,7 @@ var SHA2 = class extends Hash {
     assert_default.exists(this);
     assert_default.output(out, this);
     this.finished = true;
-    const { buffer, view, blockLen, isLE: isLE2 } = this;
+    const { buffer, view, blockLen, isLE: isLE3 } = this;
     let { pos } = this;
     buffer[pos++] = 128;
     this.buffer.subarray(pos).fill(0);
@@ -588,7 +575,7 @@ var SHA2 = class extends Hash {
     }
     for (let i = pos; i < blockLen; i++)
       buffer[i] = 0;
-    setBigUint64(view, blockLen - 8, BigInt(this.length * 8), isLE2);
+    setBigUint64(view, blockLen - 8, BigInt(this.length * 8), isLE3);
     this.process(view, 0);
     const oview = createView(out);
     const len = this.outputLen;
@@ -599,7 +586,7 @@ var SHA2 = class extends Hash {
     if (outLen > state.length)
       throw new Error("_sha2: outputLen bigger than state");
     for (let i = 0; i < outLen; i++)
-      oview.setUint32(4 * i, state[i], isLE2);
+      oview.setUint32(4 * i, state[i], isLE3);
   }
   digest() {
     const { buffer, outputLen } = this;
@@ -817,12 +804,12 @@ var _1n = BigInt(1);
 var _2n = BigInt(2);
 var u8a2 = (a) => a instanceof Uint8Array;
 var hexes2 = Array.from({ length: 256 }, (v, i) => i.toString(16).padStart(2, "0"));
-function bytesToHex2(bytes2) {
-  if (!u8a2(bytes2))
+function bytesToHex2(bytes3) {
+  if (!u8a2(bytes3))
     throw new Error("Uint8Array expected");
   let hex2 = "";
-  for (let i = 0; i < bytes2.length; i++) {
-    hex2 += hexes2[bytes2[i]];
+  for (let i = 0; i < bytes3.length; i++) {
+    hex2 += hexes2[bytes3[i]];
   }
   return hex2;
 }
@@ -852,13 +839,13 @@ function hexToBytes2(hex2) {
   }
   return array;
 }
-function bytesToNumberBE(bytes2) {
-  return hexToNumber(bytesToHex2(bytes2));
+function bytesToNumberBE(bytes3) {
+  return hexToNumber(bytesToHex2(bytes3));
 }
-function bytesToNumberLE(bytes2) {
-  if (!u8a2(bytes2))
+function bytesToNumberLE(bytes3) {
+  if (!u8a2(bytes3))
     throw new Error("Uint8Array expected");
-  return hexToNumber(bytesToHex2(Uint8Array.from(bytes2).reverse()));
+  return hexToNumber(bytesToHex2(Uint8Array.from(bytes3).reverse()));
 }
 function numberToBytesBE(n, len) {
   return hexToBytes2(n.toString(16).padStart(len * 2, "0"));
@@ -1039,11 +1026,11 @@ function pow2(x, power, modulo) {
   }
   return res;
 }
-function invert(number2, modulo) {
-  if (number2 === _0n2 || modulo <= _0n2) {
-    throw new Error(`invert: expected positive integers, got n=${number2} mod=${modulo}`);
+function invert(number3, modulo) {
+  if (number3 === _0n2 || modulo <= _0n2) {
+    throw new Error(`invert: expected positive integers, got n=${number3} mod=${modulo}`);
   }
-  let a = mod(number2, modulo);
+  let a = mod(number3, modulo);
   let b = modulo;
   let x = _0n2, y = _1n2, u = _1n2, v = _0n2;
   while (a !== _0n2) {
@@ -1198,7 +1185,7 @@ function nLength(n, nBitLength) {
   const nByteLength = Math.ceil(_nBitLength / 8);
   return { nBitLength: _nBitLength, nByteLength };
 }
-function Field(ORDER, bitLen2, isLE2 = false, redef = {}) {
+function Field(ORDER, bitLen2, isLE3 = false, redef = {}) {
   if (ORDER <= _0n2)
     throw new Error(`Expected Fp ORDER > 0, got ${ORDER}`);
   const { nBitLength: BITS, nByteLength: BYTES } = nLength(ORDER, bitLen2);
@@ -1239,22 +1226,22 @@ function Field(ORDER, bitLen2, isLE2 = false, redef = {}) {
     // TODO: do we really need constant cmov?
     // We don't have const-time bigints anyway, so probably will be not very useful
     cmov: (a, b, c) => c ? b : a,
-    toBytes: (num) => isLE2 ? numberToBytesLE(num, BYTES) : numberToBytesBE(num, BYTES),
-    fromBytes: (bytes2) => {
-      if (bytes2.length !== BYTES)
-        throw new Error(`Fp.fromBytes: expected ${BYTES}, got ${bytes2.length}`);
-      return isLE2 ? bytesToNumberLE(bytes2) : bytesToNumberBE(bytes2);
+    toBytes: (num) => isLE3 ? numberToBytesLE(num, BYTES) : numberToBytesBE(num, BYTES),
+    fromBytes: (bytes3) => {
+      if (bytes3.length !== BYTES)
+        throw new Error(`Fp.fromBytes: expected ${BYTES}, got ${bytes3.length}`);
+      return isLE3 ? bytesToNumberLE(bytes3) : bytesToNumberBE(bytes3);
     }
   });
   return Object.freeze(f2);
 }
-function hashToPrivateScalar(hash2, groupOrder, isLE2 = false) {
-  hash2 = ensureBytes("privateHash", hash2);
-  const hashLen = hash2.length;
+function hashToPrivateScalar(hash3, groupOrder, isLE3 = false) {
+  hash3 = ensureBytes("privateHash", hash3);
+  const hashLen = hash3.length;
   const minLen = nLength(groupOrder).nByteLength + 8;
   if (minLen < 24 || hashLen < minLen || hashLen > 1024)
     throw new Error(`hashToPrivateScalar: expected ${minLen}-1024 bytes of input, got ${hashLen}`);
-  const num = isLE2 ? bytesToNumberLE(hash2) : bytesToNumberBE(hash2);
+  const num = isLE3 ? bytesToNumberLE(hash3) : bytesToNumberBE(hash3);
   return mod(num, groupOrder - _1n2) + _1n2;
 }
 
@@ -1463,12 +1450,12 @@ var _4n2 = BigInt(4);
 function weierstrassPoints(opts) {
   const CURVE = validatePointOpts(opts);
   const { Fp: Fp2 } = CURVE;
-  const toBytes2 = CURVE.toBytes || ((c, point, isCompressed) => {
+  const toBytes3 = CURVE.toBytes || ((c, point, isCompressed) => {
     const a = point.toAffine();
     return concatBytes2(Uint8Array.from([4]), Fp2.toBytes(a.x), Fp2.toBytes(a.y));
   });
-  const fromBytes = CURVE.fromBytes || ((bytes2) => {
-    const tail = bytes2.subarray(1);
+  const fromBytes = CURVE.fromBytes || ((bytes3) => {
+    const tail = bytes3.subarray(1);
     const x = Fp2.fromBytes(tail.subarray(0, Fp2.BYTES));
     const y = Fp2.fromBytes(tail.subarray(Fp2.BYTES, 2 * Fp2.BYTES));
     return { x, y };
@@ -1831,7 +1818,7 @@ function weierstrassPoints(opts) {
     }
     toRawBytes(isCompressed = true) {
       this.assertValidity();
-      return toBytes2(Point3, this, isCompressed);
+      return toBytes3(Point3, this, isCompressed);
     }
     toHex(isCompressed = true) {
       return bytesToHex2(this.toRawBytes(isCompressed));
@@ -1888,10 +1875,10 @@ function weierstrass(curveDef) {
         return cat(Uint8Array.from([4]), x, Fp2.toBytes(a.y));
       }
     },
-    fromBytes(bytes2) {
-      const len = bytes2.length;
-      const head = bytes2[0];
-      const tail = bytes2.subarray(1);
+    fromBytes(bytes3) {
+      const len = bytes3.length;
+      const head = bytes3[0];
+      const tail = bytes3.subarray(1);
       if (len === compressedLen && (head === 2 || head === 3)) {
         const x = bytesToNumberBE(tail);
         if (!isValidFieldElement(x))
@@ -1913,9 +1900,9 @@ function weierstrass(curveDef) {
     }
   });
   const numToNByteStr = (num) => bytesToHex2(numberToBytesBE(num, CURVE.nByteLength));
-  function isBiggerThanHalfOrder(number2) {
+  function isBiggerThanHalfOrder(number3) {
     const HALF = CURVE_ORDER >> _1n4;
-    return number2 > HALF;
+    return number3 > HALF;
   }
   function normalizeS(s) {
     return isBiggerThanHalfOrder(s) ? modN2(-s) : s;
@@ -2046,13 +2033,13 @@ function weierstrass(curveDef) {
     const b = Point3.fromHex(publicB);
     return b.multiply(normPrivateKeyToScalar(privateA)).toRawBytes(isCompressed);
   }
-  const bits2int = CURVE.bits2int || function(bytes2) {
-    const num = bytesToNumberBE(bytes2);
-    const delta = bytes2.length * 8 - CURVE.nBitLength;
+  const bits2int = CURVE.bits2int || function(bytes3) {
+    const num = bytesToNumberBE(bytes3);
+    const delta = bytes3.length * 8 - CURVE.nBitLength;
     return delta > 0 ? num >> BigInt(delta) : num;
   };
-  const bits2int_modN = CURVE.bits2int_modN || function(bytes2) {
-    return modN2(bits2int(bytes2));
+  const bits2int_modN = CURVE.bits2int_modN || function(bytes3) {
+    return modN2(bits2int(bytes3));
   };
   const ORDER_MASK = bitMask(CURVE.nBitLength);
   function int2octets(num) {
@@ -2065,18 +2052,18 @@ function weierstrass(curveDef) {
   function prepSig(msgHash, privateKey, opts = defaultSigOpts) {
     if (["recovered", "canonical"].some((k) => k in opts))
       throw new Error("sign() legacy options not supported");
-    const { hash: hash2, randomBytes: randomBytes2 } = CURVE;
+    const { hash: hash3, randomBytes: randomBytes3 } = CURVE;
     let { lowS, prehash, extraEntropy: ent } = opts;
     if (lowS == null)
       lowS = true;
     msgHash = ensureBytes("msgHash", msgHash);
     if (prehash)
-      msgHash = ensureBytes("prehashed msgHash", hash2(msgHash));
+      msgHash = ensureBytes("prehashed msgHash", hash3(msgHash));
     const h1int = bits2int_modN(msgHash);
     const d = normPrivateKeyToScalar(privateKey);
     const seedArgs = [int2octets(d), int2octets(h1int)];
     if (ent != null) {
-      const e = ent === true ? randomBytes2(Fp2.BYTES) : ent;
+      const e = ent === true ? randomBytes3(Fp2.BYTES) : ent;
       seedArgs.push(ensureBytes("extraEntropy", e, Fp2.BYTES));
     }
     const seed = concatBytes2(...seedArgs);
@@ -2171,24 +2158,24 @@ function weierstrass(curveDef) {
 
 // node_modules/@noble/hashes/esm/hmac.js
 var HMAC = class extends Hash {
-  constructor(hash2, _key) {
+  constructor(hash3, _key) {
     super();
     this.finished = false;
     this.destroyed = false;
-    assert_default.hash(hash2);
+    assert_default.hash(hash3);
     const key = toBytes(_key);
-    this.iHash = hash2.create();
+    this.iHash = hash3.create();
     if (typeof this.iHash.update !== "function")
       throw new Error("Expected instance of class which extends utils.Hash");
     this.blockLen = this.iHash.blockLen;
     this.outputLen = this.iHash.outputLen;
     const blockLen = this.blockLen;
     const pad = new Uint8Array(blockLen);
-    pad.set(key.length > blockLen ? hash2.create().update(key).digest() : key);
+    pad.set(key.length > blockLen ? hash3.create().update(key).digest() : key);
     for (let i = 0; i < pad.length; i++)
       pad[i] ^= 54;
     this.iHash.update(pad);
-    this.oHash = hash2.create();
+    this.oHash = hash3.create();
     for (let i = 0; i < pad.length; i++)
       pad[i] ^= 54 ^ 92;
     this.oHash.update(pad);
@@ -2231,19 +2218,19 @@ var HMAC = class extends Hash {
     this.iHash.destroy();
   }
 };
-var hmac = (hash2, key, message) => new HMAC(hash2, key).update(message).digest();
-hmac.create = (hash2, key) => new HMAC(hash2, key);
+var hmac = (hash3, key, message) => new HMAC(hash3, key).update(message).digest();
+hmac.create = (hash3, key) => new HMAC(hash3, key);
 
 // node_modules/@noble/curves/esm/_shortw_utils.js
-function getHash(hash2) {
+function getHash(hash3) {
   return {
-    hash: hash2,
-    hmac: (key, ...msgs) => hmac(hash2, key, concatBytes(...msgs)),
+    hash: hash3,
+    hmac: (key, ...msgs) => hmac(hash3, key, concatBytes(...msgs)),
     randomBytes
   };
 }
 function createCurve(curveDef, defHash) {
-  const create = (hash2) => weierstrass({ ...curveDef, ...getHash(hash2) });
+  const create = (hash3) => weierstrass({ ...curveDef, ...getHash(hash3) });
   return Object.freeze({ ...create(defHash), create });
 }
 
@@ -2414,120 +2401,6 @@ var schnorr = /* @__PURE__ */ (() => ({
     mod
   }
 }))();
-
-// node_modules/powmem/index.js
-var GHM = "0123456789bcdefghjkmnpqrstuvwxyz";
-var GHU = GHM.split("").reduce((h, l, i) => {
-  h[l] = i;
-  return h;
-}, {});
-var SANE_DEFAULT = 15;
-function decodeASL(publicKey, geobits = SANE_DEFAULT) {
-  if (typeof publicKey === "string")
-    publicKey = hexToBytes(publicKey);
-  const cpy = new Uint8Array(roundByte(4 + geobits));
-  for (let i = 0; i < cpy.length; i++)
-    cpy[i] = publicKey[i];
-  const age = unshift(cpy) | unshift(cpy) << 1;
-  const sex = unshift(cpy) | unshift(cpy) << 1;
-  const location = unpackGeo(cpy, geobits);
-  return { age, sex, location };
-}
-function unpackGeo(buf, nBits = SANE_DEFAULT) {
-  const nBytes = roundByte(nBits);
-  if (buf.length < nBytes)
-    throw new Error("BufferUnderflow, dst buffer too small");
-  const cpy = [];
-  for (let i = 0; i < nBytes; i++)
-    cpy[i] = buf[i];
-  let str = "";
-  let tmp = [0];
-  for (let n = 0; n < nBits; n++) {
-    if (n && !(n % 5)) {
-      const v2 = tmp[0] >> 3;
-      str += GHM.charAt(v2);
-      tmp = [0];
-    }
-    unshift(tmp, unshift(cpy));
-  }
-  const v = tmp[0] >> 3;
-  str += GHM.charAt(v);
-  return str.replace(/0+$/, "");
-}
-function packGeo(hash2, nBits = SANE_DEFAULT, buf = void 0) {
-  nBits = Math.min(hash2.length * 5, nBits);
-  if (nBits < 5)
-    throw new Error("precision has to be at least 5");
-  const nBytes = roundByte(nBits);
-  if (!buf)
-    buf = new Uint8Array(nBytes);
-  let w = 0;
-  const tail = Math.ceil(nBits / 5) - 1;
-  for (let i = tail; i > -1; i--) {
-    const v = GHU[hash2[i]];
-    const bits = [v << 3];
-    let x = 5;
-    if (i === tail && nBits % 5) {
-      x = nBits % 5;
-      for (let y = 0; y < 5 - x; y++)
-        shift(bits);
-    }
-    for (let j = 0; j < x; j++) {
-      shift(buf, shift(bits));
-      if (++w >= nBits)
-        break;
-    }
-  }
-  return buf;
-}
-function roundByte(b) {
-  return (b >> 3) + (b % 8 ? 1 : 0);
-}
-function shift(x, inp = 0) {
-  let c = inp ? 1 : 0;
-  for (let i = 0; i < x.length; i++) {
-    const nc = x[i] >> 7 & 1;
-    x[i] = x[i] << 1 | c;
-    c = nc;
-  }
-  return c;
-}
-function unshift(x, inp = 0) {
-  let i = x.length;
-  let c = (inp ? 1 : 0) << 7;
-  while (i--) {
-    const nc = (x[i] & 1) << 7;
-    x[i] = c | x[i] >> 1;
-    c = nc;
-  }
-  return c ? 1 : 0;
-}
-function xorDistance(a, b) {
-  const out = new Uint8Array(4);
-  const ac = Array.from(new Array(4)).map((_, i) => a[i] || 0);
-  const bc = Array.from(new Array(4)).map((_, i) => b[i] || 0);
-  for (let i = 0; i < 4 * 8; i++)
-    shift(out, unshift(ac) ^ unshift(bc));
-  const dv = new DataView(out.buffer);
-  return dv.getUint32(0, true);
-}
-function flagOf(geohash, bits = SANE_DEFAULT) {
-  const flags = initLUT();
-  const src = packGeo(geohash, bits);
-  const sorted = flags.map((f2) => [f2[0], xorDistance(src, f2[1])]).sort((a, b) => a[1] - b[1]);
-  return sorted[0][0];
-}
-var FLUT = null;
-function initLUT() {
-  if (FLUT)
-    return FLUT;
-  FLUT = POI.split("|").map((p) => {
-    const [flag, hash2] = p.split(":");
-    return [flag, packGeo(hash2, 40)];
-  });
-  return FLUT;
-}
-var POI = "\u{1F1E6}\u{1F1E8}:7wtfc36k7311|\u{1F1E6}\u{1F1E9}:sp91fdh1hs8k|\u{1F1E6}\u{1F1EA}:thnm324z28tz|\u{1F1E6}\u{1F1EB}:tw01hf2vt6g3|\u{1F1E6}\u{1F1EC}:deh11cc4re8k|\u{1F1E6}\u{1F1EE}:de5psufyen52|\u{1F1E6}\u{1F1F1}:srq64gwp77nk|\u{1F1E6}\u{1F1F2}:tp05by7g6jeg|\u{1F1E6}\u{1F1F4}:kqh8q8x7s13g|\u{1F1E6}\u{1F1F6}:d00000000000|\u{1F1E6}\u{1F1F7}:69y7pkxff4gc|\u{1F1E6}\u{1F1F8}:2jrnbd192kuc|\u{1F1E6}\u{1F1F9}:u2edk85115y4|\u{1F1E6}\u{1F1FA}:qgx0hnujcy27|\u{1F1E6}\u{1F1FC}:d6nppz6ssqnn|\u{1F1E6}\u{1F1FD}:u6wnm5nj5j7x|\u{1F1E6}\u{1F1FF}:tp5myu215xkz|\u{1F1E7}\u{1F1E6}:sru9f69s8vh7|\u{1F1E7}\u{1F1E7}:ddmej1cunchp|\u{1F1E7}\u{1F1E9}:wh0r3qs35cw7|\u{1F1E7}\u{1F1EA}:u151710b3yyw|\u{1F1E7}\u{1F1EB}:efnvs7yvk06x|\u{1F1E7}\u{1F1EC}:sx8dfsy|\u{1F1E7}\u{1F1ED}:theuq9k98ch6|\u{1F1E7}\u{1F1EE}:kxmkbcfq2bsf|\u{1F1E7}\u{1F1EF}:s19suwqm6119|\u{1F1E7}\u{1F1F1}:ddgr4pyhjupw|\u{1F1E7}\u{1F1F2}:dt9zy3rns6qt|\u{1F1E7}\u{1F1F3}:w8c9f9whj1jw|\u{1F1E7}\u{1F1F4}:6mpe3fmn9q87|\u{1F1E7}\u{1F1F6}:d6pmqkkjbffu|\u{1F1E7}\u{1F1F7}:6vjyjr7428nh|\u{1F1E7}\u{1F1F8}:dk2yqv3er7zb|\u{1F1E7}\u{1F1F9}:tuzkt0b9cdxk|\u{1F1E7}\u{1F1FB}:u4f7hb8nybjt|\u{1F1E7}\u{1F1FC}:ks18cxnzpcgt|\u{1F1E7}\u{1F1FE}:u9e9e98dm27k|\u{1F1E7}\u{1F1FF}:d50cgcqdqv95|\u{1F1E8}\u{1F1E6}:f244mkwzrmk9|\u{1F1E8}\u{1F1E8}:mjz6zc867uv2|\u{1F1E8}\u{1F1E9}:krr3p0u5nqqd|\u{1F1E8}\u{1F1EB}:s3jjwed8kn27|\u{1F1E8}\u{1F1EC}:krgq8nmru1sx|\u{1F1E8}\u{1F1ED}:u0m636zpbcpc|\u{1F1E8}\u{1F1EE}:eck4cu8exjy7|\u{1F1E8}\u{1F1F0}:2hppntbx22nn|\u{1F1E8}\u{1F1F1}:66jc8m77rmc3|\u{1F1E8}\u{1F1F2}:s28jvsx84r5q|\u{1F1E8}\u{1F1F3}:wx4g0bm6c408|\u{1F1E8}\u{1F1F4}:d2g6f3qmdzxh|\u{1F1E8}\u{1F1F5}:dezuwjygz2zm|\u{1F1E8}\u{1F1F7}:d1u0qxq7q7gp|\u{1F1E8}\u{1F1FA}:dhj7mxwqrp7d|\u{1F1E8}\u{1F1FB}:e6xjyz50ncp1|\u{1F1E8}\u{1F1FC}:d6nvnp7j03z7|\u{1F1E8}\u{1F1FD}:6w5u8fhdbscd|\u{1F1E8}\u{1F1FE}:swpzbdwfj5s1|\u{1F1E8}\u{1F1FF}:u2fkbecqcjgb|\u{1F1E9}\u{1F1EA}:u33dc0cppjs7|\u{1F1E9}\u{1F1EF}:sfng60dq5n6m|\u{1F1E9}\u{1F1F0}:u3butzxby979|\u{1F1E9}\u{1F1F2}:ddsreqpn63sh|\u{1F1E9}\u{1F1F4}:d7q686tr7797|\u{1F1E9}\u{1F1FF}:snd3hfudmhfh|\u{1F1EA}\u{1F1E8}:6r8jw6tkrxxd|\u{1F1EA}\u{1F1EA}:ud3t76cn2etg|\u{1F1EA}\u{1F1EC}:stq4yv3jkd44|\u{1F1EA}\u{1F1ED}:sf9yqg763t70|\u{1F1EA}\u{1F1F7}:sfew7gr6kj38|\u{1F1EA}\u{1F1F8}:ezjmgtwuzjwe|\u{1F1EA}\u{1F1F9}:sces1by96pw3|\u{1F1EA}\u{1F1FA}:u0wucrykkwgr|\u{1F1EB}\u{1F1EE}:ue423bvq08ck|\u{1F1EB}\u{1F1EF}:ruye5zqgznzm|\u{1F1EB}\u{1F1F0}:2hvbc3rtt2sk|\u{1F1EB}\u{1F1F2}:x3741zg9rbhv|\u{1F1EB}\u{1F1F4}:gg504enyx2uk|\u{1F1EB}\u{1F1F7}:u09tvw0f64r7|\u{1F1EC}\u{1F1E6}:s20k84m9yss1|\u{1F1EC}\u{1F1E7}:gcpvj0eh6eq9|\u{1F1EC}\u{1F1E9}:ddhkgmxpdrk1|\u{1F1EC}\u{1F1EA}:szrv76120d38|\u{1F1EC}\u{1F1EB}:dbdnrh4uxhh7|\u{1F1EC}\u{1F1EC}:gby0veyw3xz3|\u{1F1EC}\u{1F1ED}:ebzzgu07bt6h|\u{1F1EC}\u{1F1EE}:eykjw5jxkj6t|\u{1F1EC}\u{1F1F1}:gh9xytb6zygr|\u{1F1EC}\u{1F1F2}:edmh7x782f45|\u{1F1EC}\u{1F1F3}:ecc0e6e1kf4y|\u{1F1EC}\u{1F1F5}:dffhx0fyrpu2|\u{1F1EC}\u{1F1F6}:s0r33ssbe7mj|\u{1F1EC}\u{1F1F7}:swbb5ftzdvd2|\u{1F1EC}\u{1F1F8}:5nmf2e2sx54h|\u{1F1EC}\u{1F1F9}:9fz9u3qcs3eu|\u{1F1EC}\u{1F1FA}:x4quqz7w9z0j|\u{1F1EC}\u{1F1FC}:edj5nsccx11m|\u{1F1EC}\u{1F1FE}:d8y5ehb3fu4p|\u{1F1ED}\u{1F1F0}:wecpkthh2pd1|\u{1F1ED}\u{1F1F2}:rs390dkzeh03|\u{1F1ED}\u{1F1F3}:d4dwmwbsd4fq|\u{1F1ED}\u{1F1F7}:u24b9fhq99m7|\u{1F1ED}\u{1F1F9}:d7kecvwe3010|\u{1F1ED}\u{1F1FA}:u2mw1q8xkf61|\u{1F1EE}\u{1F1E8}:ethbvwk4db3x|\u{1F1EE}\u{1F1E9}:qqguwvtzpgcc|\u{1F1EE}\u{1F1EA}:gc7x9813h7tc|\u{1F1EE}\u{1F1F1}:sv9h9r1zf8mg|\u{1F1EE}\u{1F1F2}:gcsu892hjtff|\u{1F1EE}\u{1F1F3}:ttng692md2nf|\u{1F1EE}\u{1F1F4}:2m2qv1952vkh|\u{1F1EE}\u{1F1F6}:svzt98f7j53u|\u{1F1EE}\u{1F1F7}:tjy0mxq6jndq|\u{1F1EE}\u{1F1F8}:ge83tf0mkzed|\u{1F1EE}\u{1F1F9}:sr2yjyx33xus|\u{1F1EF}\u{1F1EA}:gbwrzx0n9j5e|\u{1F1EF}\u{1F1F2}:d71rh2cb4dng|\u{1F1EF}\u{1F1F4}:sv9tcfy9kwbu|\u{1F1EF}\u{1F1F5}:xn774c06kt10|\u{1F1F0}\u{1F1EA}:kzf0tuuburne|\u{1F1F0}\u{1F1EC}:txm4mm5102uu|\u{1F1F0}\u{1F1ED}:w64xmps09230|\u{1F1F0}\u{1F1EE}:80pxx3cvfz81|\u{1F1F0}\u{1F1F2}:mjcu3wjp1gd1|\u{1F1F0}\u{1F1F3}:de56em6bskhd|\u{1F1F0}\u{1F1F5}:wz4tmxdhbwmu|\u{1F1F0}\u{1F1F7}:wydveqv08x1t|\u{1F1F0}\u{1F1FC}:tj1yb2p1n0uj|\u{1F1F0}\u{1F1FE}:de7vbgu|\u{1F1F0}\u{1F1FF}:v2x94vsq7npx|\u{1F1F1}\u{1F1E6}:w78buqdzq685|\u{1F1F1}\u{1F1E7}:sy188541ujmp|\u{1F1F1}\u{1F1E8}:ddkxhkh|\u{1F1F1}\u{1F1EE}:u0qu36q1bgwt|\u{1F1F1}\u{1F1F0}:tc3ky120pk5q|\u{1F1F1}\u{1F1F7}:ec1k96jwksxn|\u{1F1F1}\u{1F1F8}:kdspd3xjfdd4|\u{1F1F1}\u{1F1F9}:u9c3zg7901e9|\u{1F1F1}\u{1F1FA}:u0u77kx7nhcp|\u{1F1F1}\u{1F1FB}:ud17xfee8jgw|\u{1F1F1}\u{1F1FE}:sksmb41m06rw|\u{1F1F2}\u{1F1E6}:evdsg7920f6v|\u{1F1F2}\u{1F1E8}:spv2bdmfdu8q|\u{1F1F2}\u{1F1E9}:u8kjtx42ddfd|\u{1F1F2}\u{1F1EA}:srtfbyuh0nxx|\u{1F1F2}\u{1F1EB}:s4fsxbyqrrg2|\u{1F1F2}\u{1F1EC}:mh9kde1h9njc|\u{1F1F2}\u{1F1ED}:xc2bx6nrzxgn|\u{1F1F2}\u{1F1F0}:srrkwyd7wjny|\u{1F1F2}\u{1F1F1}:egj5vndh9zck|\u{1F1F2}\u{1F1F2}:w5uhxt9p0gg3|\u{1F1F2}\u{1F1F3}:y23fe54cg7pv|\u{1F1F2}\u{1F1F4}:webwrc0hu9s7|\u{1F1F2}\u{1F1F5}:x4xtcsmp8uw3|\u{1F1F2}\u{1F1F6}:ddse737scj6m|\u{1F1F2}\u{1F1F7}:eg8px035uukh|\u{1F1F2}\u{1F1F8}:de5fbbsd8scd|\u{1F1F2}\u{1F1F9}:sq6hrn5z55e1|\u{1F1F2}\u{1F1FA}:mk2ujxsjzrq9|\u{1F1F2}\u{1F1FB}:t8s60xp99t0w|\u{1F1F2}\u{1F1FC}:kv8kse1s4gkh|\u{1F1F2}\u{1F1FD}:9g3w81t7j50q|\u{1F1F2}\u{1F1FE}:w28xbw2xbq5d|\u{1F1F2}\u{1F1FF}:ku9mb6pb7tmf|\u{1F1F3}\u{1F1E6}:k7vjku8q391t|\u{1F1F3}\u{1F1E8}:rsn9r5pzx34w|\u{1F1F3}\u{1F1EA}:s5jspvkuv7b6|\u{1F1F3}\u{1F1EB}:r8xrmfkbspt3|\u{1F1F3}\u{1F1EC}:s1w5tmm1vhu|\u{1F1F3}\u{1F1EE}:d473jn442k6s|\u{1F1F3}\u{1F1F1}:u173zmtys2gg|\u{1F1F3}\u{1F1F4}:u4y008wfgtve|\u{1F1F3}\u{1F1F5}:tv5cd31hr30b|\u{1F1F3}\u{1F1F7}:rxyth8z4rpj8|\u{1F1F3}\u{1F1FA}:rdydz1rcp6d8|\u{1F1F3}\u{1F1FF}:rbsr7dk08zd9|\u{1F1F4}\u{1F1F2}:t7cdjjj|\u{1F1F5}\u{1F1E6}:d1x2wd38yegj|\u{1F1F5}\u{1F1EA}:6q35wz50uwkx|\u{1F1F5}\u{1F1EB}:2svg2jt231p3|\u{1F1F5}\u{1F1EC}:rqbs5f6j0c2f|\u{1F1F5}\u{1F1ED}:wdq9709jey5e|\u{1F1F5}\u{1F1F0}:tt3kccxscyq6|\u{1F1F5}\u{1F1F1}:u3qcnhhs59zb|\u{1F1F5}\u{1F1F2}:fbr541922uru|\u{1F1F5}\u{1F1F3}:35e3rkzg7k31|\u{1F1F5}\u{1F1F7}:de0xssyxf5q9|\u{1F1F5}\u{1F1F8}:sv9jcb8p11f1|\u{1F1F5}\u{1F1F9}:eyckrcntwxuk|\u{1F1F5}\u{1F1FC}:wcrdy2pcrwck|\u{1F1F5}\u{1F1FE}:6ey6wh6t8c20|\u{1F1F6}\u{1F1E6}:ths2hxwyrm61|\u{1F1F7}\u{1F1EA}:mhprzu07euj6|\u{1F1F7}\u{1F1F4}:u81v25sq895r|\u{1F1F7}\u{1F1F8}:srywc9q8751q|\u{1F1F7}\u{1F1FA}:ucfv0n031d7w|\u{1F1F7}\u{1F1FC}:kxthzyc8bmf7|\u{1F1F8}\u{1F1E6}:th0pcu39mqrz|\u{1F1F8}\u{1F1E7}:rw390shcep0q|\u{1F1F8}\u{1F1E8}:mppmqspemem6|\u{1F1F8}\u{1F1E9}:sdz0hvv6hevj|\u{1F1F8}\u{1F1EA}:u6sce0t4hzhe|\u{1F1F8}\u{1F1EC}:w21zdqpk89ty|\u{1F1F8}\u{1F1ED}:5wmg3bkn7fg0|\u{1F3F4}\u200D\u2620\uFE0F:1n7";
 
 // node_modules/@scure/base/lib/esm/index.js
 function assertNumber(n) {
@@ -2707,10 +2580,10 @@ function convertRadix2(data, from, to, padding2) {
 function radix(num) {
   assertNumber(num);
   return {
-    encode: (bytes2) => {
-      if (!(bytes2 instanceof Uint8Array))
+    encode: (bytes3) => {
+      if (!(bytes3 instanceof Uint8Array))
         throw new Error("radix.encode input should be Uint8Array");
-      return convertRadix(Array.from(bytes2), 2 ** 8, num);
+      return convertRadix(Array.from(bytes3), 2 ** 8, num);
     },
     decode: (digits) => {
       if (!Array.isArray(digits) || digits.length && typeof digits[0] !== "number")
@@ -2726,10 +2599,10 @@ function radix2(bits, revPadding = false) {
   if (radix2carry(8, bits) > 32 || radix2carry(bits, 8) > 32)
     throw new Error("radix2: carry overflow");
   return {
-    encode: (bytes2) => {
-      if (!(bytes2 instanceof Uint8Array))
+    encode: (bytes3) => {
+      if (!(bytes3 instanceof Uint8Array))
         throw new Error("radix2.encode input should be Uint8Array");
-      return convertRadix2(Array.from(bytes2), 8, bits, !revPadding);
+      return convertRadix2(Array.from(bytes3), 8, bits, !revPadding);
     },
     decode: (digits) => {
       if (!Array.isArray(digits) || digits.length && typeof digits[0] !== "number")
@@ -2811,7 +2684,7 @@ var base58xmr = {
     return Uint8Array.from(res);
   }
 };
-var base58check = (sha2562) => chain(checksum(4, (data) => sha2562(sha2562(data))), base58);
+var base58check = (sha2563) => chain(checksum(4, (data) => sha2563(sha2563(data))), base58);
 var BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join(""));
 var POLYMOD_GENERATORS = [996825010, 642813549, 513874426, 1027748829, 705979059];
 function bech32Polymod(pre) {
@@ -4961,20 +4834,180 @@ zero
 zone
 zoo`.split("\n");
 
-// node_modules/@noble/hashes/esm/pbkdf2.js
-function pbkdf2Init(hash2, _password, _salt, _opts) {
-  assert_default.hash(hash2);
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/_assert.js
+function number2(n) {
+  if (!Number.isSafeInteger(n) || n < 0)
+    throw new Error(`Wrong positive integer: ${n}`);
+}
+function bool2(b) {
+  if (typeof b !== "boolean")
+    throw new Error(`Expected boolean, not ${b}`);
+}
+function bytes2(b, ...lengths) {
+  if (!(b instanceof Uint8Array))
+    throw new TypeError("Expected Uint8Array");
+  if (lengths.length > 0 && !lengths.includes(b.length))
+    throw new TypeError(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
+}
+function hash2(hash3) {
+  if (typeof hash3 !== "function" || typeof hash3.create !== "function")
+    throw new Error("Hash should be wrapped by utils.wrapConstructor");
+  number2(hash3.outputLen);
+  number2(hash3.blockLen);
+}
+function exists2(instance, checkFinished = true) {
+  if (instance.destroyed)
+    throw new Error("Hash instance has been destroyed");
+  if (checkFinished && instance.finished)
+    throw new Error("Hash#digest() has already been called");
+}
+function output2(out, instance) {
+  bytes2(out);
+  const min = instance.outputLen;
+  if (out.length < min) {
+    throw new Error(`digestInto() expects output buffer of length at least ${min}`);
+  }
+}
+var assert2 = {
+  number: number2,
+  bool: bool2,
+  bytes: bytes2,
+  hash: hash2,
+  exists: exists2,
+  output: output2
+};
+var assert_default2 = assert2;
+
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/crypto.js
+var crypto3 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
+
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/utils.js
+var createView2 = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+var rotr2 = (word, shift2) => word << 32 - shift2 | word >>> shift2;
+var isLE2 = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+if (!isLE2)
+  throw new Error("Non little-endian hardware is not supported");
+var hexes3 = Array.from({ length: 256 }, (v, i) => i.toString(16).padStart(2, "0"));
+function utf8ToBytes3(str) {
+  if (typeof str !== "string") {
+    throw new TypeError(`utf8ToBytes expected string, got ${typeof str}`);
+  }
+  return new TextEncoder().encode(str);
+}
+function toBytes2(data) {
+  if (typeof data === "string")
+    data = utf8ToBytes3(data);
+  if (!(data instanceof Uint8Array))
+    throw new TypeError(`Expected input type is Uint8Array (got ${typeof data})`);
+  return data;
+}
+var Hash2 = class {
+  // Safe version that clones internal state
+  clone() {
+    return this._cloneInto();
+  }
+};
+var isPlainObject = (obj) => Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object;
+function checkOpts(defaults, opts) {
+  if (opts !== void 0 && (typeof opts !== "object" || !isPlainObject(opts)))
+    throw new TypeError("Options should be object or undefined");
+  const merged = Object.assign(defaults, opts);
+  return merged;
+}
+function wrapConstructor2(hashConstructor) {
+  const hashC = (message) => hashConstructor().update(toBytes2(message)).digest();
+  const tmp = hashConstructor();
+  hashC.outputLen = tmp.outputLen;
+  hashC.blockLen = tmp.blockLen;
+  hashC.create = () => hashConstructor();
+  return hashC;
+}
+function randomBytes2(bytesLength = 32) {
+  if (crypto3 && typeof crypto3.getRandomValues === "function") {
+    return crypto3.getRandomValues(new Uint8Array(bytesLength));
+  }
+  throw new Error("crypto.getRandomValues must be defined");
+}
+
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/hmac.js
+var HMAC2 = class extends Hash2 {
+  constructor(hash3, _key) {
+    super();
+    this.finished = false;
+    this.destroyed = false;
+    assert_default2.hash(hash3);
+    const key = toBytes2(_key);
+    this.iHash = hash3.create();
+    if (typeof this.iHash.update !== "function")
+      throw new TypeError("Expected instance of class which extends utils.Hash");
+    this.blockLen = this.iHash.blockLen;
+    this.outputLen = this.iHash.outputLen;
+    const blockLen = this.blockLen;
+    const pad = new Uint8Array(blockLen);
+    pad.set(key.length > blockLen ? hash3.create().update(key).digest() : key);
+    for (let i = 0; i < pad.length; i++)
+      pad[i] ^= 54;
+    this.iHash.update(pad);
+    this.oHash = hash3.create();
+    for (let i = 0; i < pad.length; i++)
+      pad[i] ^= 54 ^ 92;
+    this.oHash.update(pad);
+    pad.fill(0);
+  }
+  update(buf) {
+    assert_default2.exists(this);
+    this.iHash.update(buf);
+    return this;
+  }
+  digestInto(out) {
+    assert_default2.exists(this);
+    assert_default2.bytes(out, this.outputLen);
+    this.finished = true;
+    this.iHash.digestInto(out);
+    this.oHash.update(out);
+    this.oHash.digestInto(out);
+    this.destroy();
+  }
+  digest() {
+    const out = new Uint8Array(this.oHash.outputLen);
+    this.digestInto(out);
+    return out;
+  }
+  _cloneInto(to) {
+    to || (to = Object.create(Object.getPrototypeOf(this), {}));
+    const { oHash, iHash, finished, destroyed, blockLen, outputLen } = this;
+    to = to;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    to.blockLen = blockLen;
+    to.outputLen = outputLen;
+    to.oHash = oHash._cloneInto(to.oHash);
+    to.iHash = iHash._cloneInto(to.iHash);
+    return to;
+  }
+  destroy() {
+    this.destroyed = true;
+    this.oHash.destroy();
+    this.iHash.destroy();
+  }
+};
+var hmac2 = (hash3, key, message) => new HMAC2(hash3, key).update(message).digest();
+hmac2.create = (hash3, key) => new HMAC2(hash3, key);
+
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/pbkdf2.js
+function pbkdf2Init(hash3, _password, _salt, _opts) {
+  assert_default2.hash(hash3);
   const opts = checkOpts({ dkLen: 32, asyncTick: 10 }, _opts);
   const { c, dkLen, asyncTick } = opts;
-  assert_default.number(c);
-  assert_default.number(dkLen);
-  assert_default.number(asyncTick);
+  assert_default2.number(c);
+  assert_default2.number(dkLen);
+  assert_default2.number(asyncTick);
   if (c < 1)
     throw new Error("PBKDF2: iterations (c) should be >= 1");
-  const password = toBytes(_password);
-  const salt2 = toBytes(_salt);
+  const password = toBytes2(_password);
+  const salt2 = toBytes2(_salt);
   const DK = new Uint8Array(dkLen);
-  const PRF = hmac.create(hash2, password);
+  const PRF = hmac2.create(hash3, password);
   const PRFSalt = PRF._cloneInto().update(salt2);
   return { c, dkLen, asyncTick, DK, PRF, PRFSalt };
 }
@@ -4986,11 +5019,11 @@ function pbkdf2Output(PRF, PRFSalt, DK, prfW, u) {
   u.fill(0);
   return DK;
 }
-function pbkdf2(hash2, password, salt2, opts) {
-  const { c, dkLen, DK, PRF, PRFSalt } = pbkdf2Init(hash2, password, salt2, opts);
+function pbkdf2(hash3, password, salt2, opts) {
+  const { c, dkLen, DK, PRF, PRFSalt } = pbkdf2Init(hash3, password, salt2, opts);
   let prfW;
   const arr = new Uint8Array(4);
-  const view = createView(arr);
+  const view = createView2(arr);
   const u = new Uint8Array(PRF.outputLen);
   for (let ti = 1, pos = 0; pos < dkLen; ti++, pos += PRF.outputLen) {
     const Ti = DK.subarray(pos, pos + PRF.outputLen);
@@ -5006,7 +5039,274 @@ function pbkdf2(hash2, password, salt2, opts) {
   return pbkdf2Output(PRF, PRFSalt, DK, prfW, u);
 }
 
-// node_modules/@noble/hashes/esm/_u64.js
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/_sha2.js
+function setBigUint642(view, byteOffset, value, isLE3) {
+  if (typeof view.setBigUint64 === "function")
+    return view.setBigUint64(byteOffset, value, isLE3);
+  const _32n3 = BigInt(32);
+  const _u32_max = BigInt(4294967295);
+  const wh = Number(value >> _32n3 & _u32_max);
+  const wl = Number(value & _u32_max);
+  const h = isLE3 ? 4 : 0;
+  const l = isLE3 ? 0 : 4;
+  view.setUint32(byteOffset + h, wh, isLE3);
+  view.setUint32(byteOffset + l, wl, isLE3);
+}
+var SHA22 = class extends Hash2 {
+  constructor(blockLen, outputLen, padOffset, isLE3) {
+    super();
+    this.blockLen = blockLen;
+    this.outputLen = outputLen;
+    this.padOffset = padOffset;
+    this.isLE = isLE3;
+    this.finished = false;
+    this.length = 0;
+    this.pos = 0;
+    this.destroyed = false;
+    this.buffer = new Uint8Array(blockLen);
+    this.view = createView2(this.buffer);
+  }
+  update(data) {
+    assert_default2.exists(this);
+    const { view, buffer, blockLen } = this;
+    data = toBytes2(data);
+    const len = data.length;
+    for (let pos = 0; pos < len; ) {
+      const take = Math.min(blockLen - this.pos, len - pos);
+      if (take === blockLen) {
+        const dataView = createView2(data);
+        for (; blockLen <= len - pos; pos += blockLen)
+          this.process(dataView, pos);
+        continue;
+      }
+      buffer.set(data.subarray(pos, pos + take), this.pos);
+      this.pos += take;
+      pos += take;
+      if (this.pos === blockLen) {
+        this.process(view, 0);
+        this.pos = 0;
+      }
+    }
+    this.length += data.length;
+    this.roundClean();
+    return this;
+  }
+  digestInto(out) {
+    assert_default2.exists(this);
+    assert_default2.output(out, this);
+    this.finished = true;
+    const { buffer, view, blockLen, isLE: isLE3 } = this;
+    let { pos } = this;
+    buffer[pos++] = 128;
+    this.buffer.subarray(pos).fill(0);
+    if (this.padOffset > blockLen - pos) {
+      this.process(view, 0);
+      pos = 0;
+    }
+    for (let i = pos; i < blockLen; i++)
+      buffer[i] = 0;
+    setBigUint642(view, blockLen - 8, BigInt(this.length * 8), isLE3);
+    this.process(view, 0);
+    const oview = createView2(out);
+    const len = this.outputLen;
+    if (len % 4)
+      throw new Error("_sha2: outputLen should be aligned to 32bit");
+    const outLen = len / 4;
+    const state = this.get();
+    if (outLen > state.length)
+      throw new Error("_sha2: outputLen bigger than state");
+    for (let i = 0; i < outLen; i++)
+      oview.setUint32(4 * i, state[i], isLE3);
+  }
+  digest() {
+    const { buffer, outputLen } = this;
+    this.digestInto(buffer);
+    const res = buffer.slice(0, outputLen);
+    this.destroy();
+    return res;
+  }
+  _cloneInto(to) {
+    to || (to = new this.constructor());
+    to.set(...this.get());
+    const { blockLen, buffer, length, finished, destroyed, pos } = this;
+    to.length = length;
+    to.pos = pos;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    if (length % blockLen)
+      to.buffer.set(buffer);
+    return to;
+  }
+};
+
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/sha256.js
+var Chi2 = (a, b, c) => a & b ^ ~a & c;
+var Maj2 = (a, b, c) => a & b ^ a & c ^ b & c;
+var SHA256_K2 = new Uint32Array([
+  1116352408,
+  1899447441,
+  3049323471,
+  3921009573,
+  961987163,
+  1508970993,
+  2453635748,
+  2870763221,
+  3624381080,
+  310598401,
+  607225278,
+  1426881987,
+  1925078388,
+  2162078206,
+  2614888103,
+  3248222580,
+  3835390401,
+  4022224774,
+  264347078,
+  604807628,
+  770255983,
+  1249150122,
+  1555081692,
+  1996064986,
+  2554220882,
+  2821834349,
+  2952996808,
+  3210313671,
+  3336571891,
+  3584528711,
+  113926993,
+  338241895,
+  666307205,
+  773529912,
+  1294757372,
+  1396182291,
+  1695183700,
+  1986661051,
+  2177026350,
+  2456956037,
+  2730485921,
+  2820302411,
+  3259730800,
+  3345764771,
+  3516065817,
+  3600352804,
+  4094571909,
+  275423344,
+  430227734,
+  506948616,
+  659060556,
+  883997877,
+  958139571,
+  1322822218,
+  1537002063,
+  1747873779,
+  1955562222,
+  2024104815,
+  2227730452,
+  2361852424,
+  2428436474,
+  2756734187,
+  3204031479,
+  3329325298
+]);
+var IV2 = new Uint32Array([
+  1779033703,
+  3144134277,
+  1013904242,
+  2773480762,
+  1359893119,
+  2600822924,
+  528734635,
+  1541459225
+]);
+var SHA256_W2 = new Uint32Array(64);
+var SHA2562 = class extends SHA22 {
+  constructor() {
+    super(64, 32, 8, false);
+    this.A = IV2[0] | 0;
+    this.B = IV2[1] | 0;
+    this.C = IV2[2] | 0;
+    this.D = IV2[3] | 0;
+    this.E = IV2[4] | 0;
+    this.F = IV2[5] | 0;
+    this.G = IV2[6] | 0;
+    this.H = IV2[7] | 0;
+  }
+  get() {
+    const { A, B, C, D, E, F, G, H } = this;
+    return [A, B, C, D, E, F, G, H];
+  }
+  // prettier-ignore
+  set(A, B, C, D, E, F, G, H) {
+    this.A = A | 0;
+    this.B = B | 0;
+    this.C = C | 0;
+    this.D = D | 0;
+    this.E = E | 0;
+    this.F = F | 0;
+    this.G = G | 0;
+    this.H = H | 0;
+  }
+  process(view, offset) {
+    for (let i = 0; i < 16; i++, offset += 4)
+      SHA256_W2[i] = view.getUint32(offset, false);
+    for (let i = 16; i < 64; i++) {
+      const W15 = SHA256_W2[i - 15];
+      const W2 = SHA256_W2[i - 2];
+      const s0 = rotr2(W15, 7) ^ rotr2(W15, 18) ^ W15 >>> 3;
+      const s1 = rotr2(W2, 17) ^ rotr2(W2, 19) ^ W2 >>> 10;
+      SHA256_W2[i] = s1 + SHA256_W2[i - 7] + s0 + SHA256_W2[i - 16] | 0;
+    }
+    let { A, B, C, D, E, F, G, H } = this;
+    for (let i = 0; i < 64; i++) {
+      const sigma1 = rotr2(E, 6) ^ rotr2(E, 11) ^ rotr2(E, 25);
+      const T1 = H + sigma1 + Chi2(E, F, G) + SHA256_K2[i] + SHA256_W2[i] | 0;
+      const sigma0 = rotr2(A, 2) ^ rotr2(A, 13) ^ rotr2(A, 22);
+      const T2 = sigma0 + Maj2(A, B, C) | 0;
+      H = G;
+      G = F;
+      F = E;
+      E = D + T1 | 0;
+      D = C;
+      C = B;
+      B = A;
+      A = T1 + T2 | 0;
+    }
+    A = A + this.A | 0;
+    B = B + this.B | 0;
+    C = C + this.C | 0;
+    D = D + this.D | 0;
+    E = E + this.E | 0;
+    F = F + this.F | 0;
+    G = G + this.G | 0;
+    H = H + this.H | 0;
+    this.set(A, B, C, D, E, F, G, H);
+  }
+  roundClean() {
+    SHA256_W2.fill(0);
+  }
+  destroy() {
+    this.set(0, 0, 0, 0, 0, 0, 0, 0);
+    this.buffer.fill(0);
+  }
+};
+var SHA2242 = class extends SHA2562 {
+  constructor() {
+    super();
+    this.A = 3238371032 | 0;
+    this.B = 914150663 | 0;
+    this.C = 812702999 | 0;
+    this.D = 4144912697 | 0;
+    this.E = 4290775857 | 0;
+    this.F = 1750603025 | 0;
+    this.G = 1694076839 | 0;
+    this.H = 3204075428 | 0;
+    this.outputLen = 28;
+  }
+};
+var sha2562 = wrapConstructor2(() => new SHA2562());
+var sha2242 = wrapConstructor2(() => new SHA2242());
+
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/_u64.js
 var U32_MASK64 = BigInt(2 ** 32 - 1);
 var _32n = BigInt(32);
 function fromBig(n, le = false) {
@@ -5072,7 +5372,7 @@ var u64 = {
 };
 var u64_default = u64;
 
-// node_modules/@noble/hashes/esm/sha512.js
+// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/sha512.js
 var [SHA512_Kh, SHA512_Kl] = u64_default.split([
   "0x428a2f98d728ae22",
   "0x7137449123ef65cd",
@@ -5157,7 +5457,7 @@ var [SHA512_Kh, SHA512_Kl] = u64_default.split([
 ].map((n) => BigInt(n)));
 var SHA512_W_H = new Uint32Array(80);
 var SHA512_W_L = new Uint32Array(80);
-var SHA512 = class extends SHA2 {
+var SHA512 = class extends SHA22 {
   constructor() {
     super(128, 64, 16, false);
     this.Ah = 1779033703 | 0;
@@ -5335,10 +5635,10 @@ var SHA384 = class extends SHA512 {
     this.outputLen = 48;
   }
 };
-var sha512 = wrapConstructor(() => new SHA512());
-var sha512_224 = wrapConstructor(() => new SHA512_224());
-var sha512_256 = wrapConstructor(() => new SHA512_256());
-var sha384 = wrapConstructor(() => new SHA384());
+var sha512 = wrapConstructor2(() => new SHA512());
+var sha512_224 = wrapConstructor2(() => new SHA512_224());
+var sha512_256 = wrapConstructor2(() => new SHA512_256());
+var sha384 = wrapConstructor2(() => new SHA384());
 
 // node_modules/@scure/bip39/esm/index.js
 var isJapanese = (wordlist2) => wordlist2[0] === "\u3042\u3044\u3053\u304F\u3057\u3093";
@@ -5355,17 +5655,17 @@ function normalize2(str) {
   return { nfkd: norm, words };
 }
 function assertEntropy(entropy) {
-  assert_default.bytes(entropy, 16, 20, 24, 28, 32);
+  assert_default2.bytes(entropy, 16, 20, 24, 28, 32);
 }
 function generateMnemonic(wordlist2, strength = 128) {
-  assert_default.number(strength);
+  assert_default2.number(strength);
   if (strength % 32 !== 0 || strength > 256)
     throw new TypeError("Invalid entropy");
-  return entropyToMnemonic(randomBytes(strength / 8), wordlist2);
+  return entropyToMnemonic(randomBytes2(strength / 8), wordlist2);
 }
 var calcChecksum = (entropy) => {
   const bitsLeft = 8 - entropy.length / 4;
-  return new Uint8Array([sha256(entropy)[0] >> bitsLeft << bitsLeft]);
+  return new Uint8Array([sha2562(entropy)[0] >> bitsLeft << bitsLeft]);
 };
 function getCoder(wordlist2) {
   if (!Array.isArray(wordlist2) || wordlist2.length !== 2048 || typeof wordlist2[0] !== "string")
@@ -5485,11 +5785,345 @@ var RIPEMD160 = class extends SHA2 {
 };
 var ripemd160 = wrapConstructor(() => new RIPEMD160());
 
+// node_modules/@noble/hashes/esm/_u64.js
+var U32_MASK642 = BigInt(2 ** 32 - 1);
+var _32n2 = BigInt(32);
+function fromBig2(n, le = false) {
+  if (le)
+    return { h: Number(n & U32_MASK642), l: Number(n >> _32n2 & U32_MASK642) };
+  return { h: Number(n >> _32n2 & U32_MASK642) | 0, l: Number(n & U32_MASK642) | 0 };
+}
+function split2(lst, le = false) {
+  let Ah = new Uint32Array(lst.length);
+  let Al = new Uint32Array(lst.length);
+  for (let i = 0; i < lst.length; i++) {
+    const { h, l } = fromBig2(lst[i], le);
+    [Ah[i], Al[i]] = [h, l];
+  }
+  return [Ah, Al];
+}
+var toBig2 = (h, l) => BigInt(h >>> 0) << _32n2 | BigInt(l >>> 0);
+var shrSH2 = (h, l, s) => h >>> s;
+var shrSL2 = (h, l, s) => h << 32 - s | l >>> s;
+var rotrSH2 = (h, l, s) => h >>> s | l << 32 - s;
+var rotrSL2 = (h, l, s) => h << 32 - s | l >>> s;
+var rotrBH2 = (h, l, s) => h << 64 - s | l >>> s - 32;
+var rotrBL2 = (h, l, s) => h >>> s - 32 | l << 64 - s;
+var rotr32H2 = (h, l) => l;
+var rotr32L2 = (h, l) => h;
+var rotlSH2 = (h, l, s) => h << s | l >>> 32 - s;
+var rotlSL2 = (h, l, s) => l << s | h >>> 32 - s;
+var rotlBH2 = (h, l, s) => l << s - 32 | h >>> 64 - s;
+var rotlBL2 = (h, l, s) => h << s - 32 | l >>> 64 - s;
+function add2(Ah, Al, Bh, Bl) {
+  const l = (Al >>> 0) + (Bl >>> 0);
+  return { h: Ah + Bh + (l / 2 ** 32 | 0) | 0, l: l | 0 };
+}
+var add3L2 = (Al, Bl, Cl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
+var add3H2 = (low, Ah, Bh, Ch) => Ah + Bh + Ch + (low / 2 ** 32 | 0) | 0;
+var add4L2 = (Al, Bl, Cl, Dl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
+var add4H2 = (low, Ah, Bh, Ch, Dh) => Ah + Bh + Ch + Dh + (low / 2 ** 32 | 0) | 0;
+var add5L2 = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
+var add5H2 = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
+var u642 = {
+  fromBig: fromBig2,
+  split: split2,
+  toBig: toBig2,
+  shrSH: shrSH2,
+  shrSL: shrSL2,
+  rotrSH: rotrSH2,
+  rotrSL: rotrSL2,
+  rotrBH: rotrBH2,
+  rotrBL: rotrBL2,
+  rotr32H: rotr32H2,
+  rotr32L: rotr32L2,
+  rotlSH: rotlSH2,
+  rotlSL: rotlSL2,
+  rotlBH: rotlBH2,
+  rotlBL: rotlBL2,
+  add: add2,
+  add3L: add3L2,
+  add3H: add3H2,
+  add4L: add4L2,
+  add4H: add4H2,
+  add5H: add5H2,
+  add5L: add5L2
+};
+var u64_default2 = u642;
+
+// node_modules/@noble/hashes/esm/sha512.js
+var [SHA512_Kh2, SHA512_Kl2] = u64_default2.split([
+  "0x428a2f98d728ae22",
+  "0x7137449123ef65cd",
+  "0xb5c0fbcfec4d3b2f",
+  "0xe9b5dba58189dbbc",
+  "0x3956c25bf348b538",
+  "0x59f111f1b605d019",
+  "0x923f82a4af194f9b",
+  "0xab1c5ed5da6d8118",
+  "0xd807aa98a3030242",
+  "0x12835b0145706fbe",
+  "0x243185be4ee4b28c",
+  "0x550c7dc3d5ffb4e2",
+  "0x72be5d74f27b896f",
+  "0x80deb1fe3b1696b1",
+  "0x9bdc06a725c71235",
+  "0xc19bf174cf692694",
+  "0xe49b69c19ef14ad2",
+  "0xefbe4786384f25e3",
+  "0x0fc19dc68b8cd5b5",
+  "0x240ca1cc77ac9c65",
+  "0x2de92c6f592b0275",
+  "0x4a7484aa6ea6e483",
+  "0x5cb0a9dcbd41fbd4",
+  "0x76f988da831153b5",
+  "0x983e5152ee66dfab",
+  "0xa831c66d2db43210",
+  "0xb00327c898fb213f",
+  "0xbf597fc7beef0ee4",
+  "0xc6e00bf33da88fc2",
+  "0xd5a79147930aa725",
+  "0x06ca6351e003826f",
+  "0x142929670a0e6e70",
+  "0x27b70a8546d22ffc",
+  "0x2e1b21385c26c926",
+  "0x4d2c6dfc5ac42aed",
+  "0x53380d139d95b3df",
+  "0x650a73548baf63de",
+  "0x766a0abb3c77b2a8",
+  "0x81c2c92e47edaee6",
+  "0x92722c851482353b",
+  "0xa2bfe8a14cf10364",
+  "0xa81a664bbc423001",
+  "0xc24b8b70d0f89791",
+  "0xc76c51a30654be30",
+  "0xd192e819d6ef5218",
+  "0xd69906245565a910",
+  "0xf40e35855771202a",
+  "0x106aa07032bbd1b8",
+  "0x19a4c116b8d2d0c8",
+  "0x1e376c085141ab53",
+  "0x2748774cdf8eeb99",
+  "0x34b0bcb5e19b48a8",
+  "0x391c0cb3c5c95a63",
+  "0x4ed8aa4ae3418acb",
+  "0x5b9cca4f7763e373",
+  "0x682e6ff3d6b2b8a3",
+  "0x748f82ee5defb2fc",
+  "0x78a5636f43172f60",
+  "0x84c87814a1f0ab72",
+  "0x8cc702081a6439ec",
+  "0x90befffa23631e28",
+  "0xa4506cebde82bde9",
+  "0xbef9a3f7b2c67915",
+  "0xc67178f2e372532b",
+  "0xca273eceea26619c",
+  "0xd186b8c721c0c207",
+  "0xeada7dd6cde0eb1e",
+  "0xf57d4f7fee6ed178",
+  "0x06f067aa72176fba",
+  "0x0a637dc5a2c898a6",
+  "0x113f9804bef90dae",
+  "0x1b710b35131c471b",
+  "0x28db77f523047d84",
+  "0x32caab7b40c72493",
+  "0x3c9ebe0a15c9bebc",
+  "0x431d67c49c100d4c",
+  "0x4cc5d4becb3e42b6",
+  "0x597f299cfc657e2a",
+  "0x5fcb6fab3ad6faec",
+  "0x6c44198c4a475817"
+].map((n) => BigInt(n)));
+var SHA512_W_H2 = new Uint32Array(80);
+var SHA512_W_L2 = new Uint32Array(80);
+var SHA5122 = class extends SHA2 {
+  constructor() {
+    super(128, 64, 16, false);
+    this.Ah = 1779033703 | 0;
+    this.Al = 4089235720 | 0;
+    this.Bh = 3144134277 | 0;
+    this.Bl = 2227873595 | 0;
+    this.Ch = 1013904242 | 0;
+    this.Cl = 4271175723 | 0;
+    this.Dh = 2773480762 | 0;
+    this.Dl = 1595750129 | 0;
+    this.Eh = 1359893119 | 0;
+    this.El = 2917565137 | 0;
+    this.Fh = 2600822924 | 0;
+    this.Fl = 725511199 | 0;
+    this.Gh = 528734635 | 0;
+    this.Gl = 4215389547 | 0;
+    this.Hh = 1541459225 | 0;
+    this.Hl = 327033209 | 0;
+  }
+  // prettier-ignore
+  get() {
+    const { Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl } = this;
+    return [Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl];
+  }
+  // prettier-ignore
+  set(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl) {
+    this.Ah = Ah | 0;
+    this.Al = Al | 0;
+    this.Bh = Bh | 0;
+    this.Bl = Bl | 0;
+    this.Ch = Ch | 0;
+    this.Cl = Cl | 0;
+    this.Dh = Dh | 0;
+    this.Dl = Dl | 0;
+    this.Eh = Eh | 0;
+    this.El = El | 0;
+    this.Fh = Fh | 0;
+    this.Fl = Fl | 0;
+    this.Gh = Gh | 0;
+    this.Gl = Gl | 0;
+    this.Hh = Hh | 0;
+    this.Hl = Hl | 0;
+  }
+  process(view, offset) {
+    for (let i = 0; i < 16; i++, offset += 4) {
+      SHA512_W_H2[i] = view.getUint32(offset);
+      SHA512_W_L2[i] = view.getUint32(offset += 4);
+    }
+    for (let i = 16; i < 80; i++) {
+      const W15h = SHA512_W_H2[i - 15] | 0;
+      const W15l = SHA512_W_L2[i - 15] | 0;
+      const s0h = u64_default2.rotrSH(W15h, W15l, 1) ^ u64_default2.rotrSH(W15h, W15l, 8) ^ u64_default2.shrSH(W15h, W15l, 7);
+      const s0l = u64_default2.rotrSL(W15h, W15l, 1) ^ u64_default2.rotrSL(W15h, W15l, 8) ^ u64_default2.shrSL(W15h, W15l, 7);
+      const W2h = SHA512_W_H2[i - 2] | 0;
+      const W2l = SHA512_W_L2[i - 2] | 0;
+      const s1h = u64_default2.rotrSH(W2h, W2l, 19) ^ u64_default2.rotrBH(W2h, W2l, 61) ^ u64_default2.shrSH(W2h, W2l, 6);
+      const s1l = u64_default2.rotrSL(W2h, W2l, 19) ^ u64_default2.rotrBL(W2h, W2l, 61) ^ u64_default2.shrSL(W2h, W2l, 6);
+      const SUMl = u64_default2.add4L(s0l, s1l, SHA512_W_L2[i - 7], SHA512_W_L2[i - 16]);
+      const SUMh = u64_default2.add4H(SUMl, s0h, s1h, SHA512_W_H2[i - 7], SHA512_W_H2[i - 16]);
+      SHA512_W_H2[i] = SUMh | 0;
+      SHA512_W_L2[i] = SUMl | 0;
+    }
+    let { Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl } = this;
+    for (let i = 0; i < 80; i++) {
+      const sigma1h = u64_default2.rotrSH(Eh, El, 14) ^ u64_default2.rotrSH(Eh, El, 18) ^ u64_default2.rotrBH(Eh, El, 41);
+      const sigma1l = u64_default2.rotrSL(Eh, El, 14) ^ u64_default2.rotrSL(Eh, El, 18) ^ u64_default2.rotrBL(Eh, El, 41);
+      const CHIh = Eh & Fh ^ ~Eh & Gh;
+      const CHIl = El & Fl ^ ~El & Gl;
+      const T1ll = u64_default2.add5L(Hl, sigma1l, CHIl, SHA512_Kl2[i], SHA512_W_L2[i]);
+      const T1h = u64_default2.add5H(T1ll, Hh, sigma1h, CHIh, SHA512_Kh2[i], SHA512_W_H2[i]);
+      const T1l = T1ll | 0;
+      const sigma0h = u64_default2.rotrSH(Ah, Al, 28) ^ u64_default2.rotrBH(Ah, Al, 34) ^ u64_default2.rotrBH(Ah, Al, 39);
+      const sigma0l = u64_default2.rotrSL(Ah, Al, 28) ^ u64_default2.rotrBL(Ah, Al, 34) ^ u64_default2.rotrBL(Ah, Al, 39);
+      const MAJh = Ah & Bh ^ Ah & Ch ^ Bh & Ch;
+      const MAJl = Al & Bl ^ Al & Cl ^ Bl & Cl;
+      Hh = Gh | 0;
+      Hl = Gl | 0;
+      Gh = Fh | 0;
+      Gl = Fl | 0;
+      Fh = Eh | 0;
+      Fl = El | 0;
+      ({ h: Eh, l: El } = u64_default2.add(Dh | 0, Dl | 0, T1h | 0, T1l | 0));
+      Dh = Ch | 0;
+      Dl = Cl | 0;
+      Ch = Bh | 0;
+      Cl = Bl | 0;
+      Bh = Ah | 0;
+      Bl = Al | 0;
+      const All = u64_default2.add3L(T1l, sigma0l, MAJl);
+      Ah = u64_default2.add3H(All, T1h, sigma0h, MAJh);
+      Al = All | 0;
+    }
+    ({ h: Ah, l: Al } = u64_default2.add(this.Ah | 0, this.Al | 0, Ah | 0, Al | 0));
+    ({ h: Bh, l: Bl } = u64_default2.add(this.Bh | 0, this.Bl | 0, Bh | 0, Bl | 0));
+    ({ h: Ch, l: Cl } = u64_default2.add(this.Ch | 0, this.Cl | 0, Ch | 0, Cl | 0));
+    ({ h: Dh, l: Dl } = u64_default2.add(this.Dh | 0, this.Dl | 0, Dh | 0, Dl | 0));
+    ({ h: Eh, l: El } = u64_default2.add(this.Eh | 0, this.El | 0, Eh | 0, El | 0));
+    ({ h: Fh, l: Fl } = u64_default2.add(this.Fh | 0, this.Fl | 0, Fh | 0, Fl | 0));
+    ({ h: Gh, l: Gl } = u64_default2.add(this.Gh | 0, this.Gl | 0, Gh | 0, Gl | 0));
+    ({ h: Hh, l: Hl } = u64_default2.add(this.Hh | 0, this.Hl | 0, Hh | 0, Hl | 0));
+    this.set(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl);
+  }
+  roundClean() {
+    SHA512_W_H2.fill(0);
+    SHA512_W_L2.fill(0);
+  }
+  destroy() {
+    this.buffer.fill(0);
+    this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  }
+};
+var SHA512_2242 = class extends SHA5122 {
+  constructor() {
+    super();
+    this.Ah = 2352822216 | 0;
+    this.Al = 424955298 | 0;
+    this.Bh = 1944164710 | 0;
+    this.Bl = 2312950998 | 0;
+    this.Ch = 502970286 | 0;
+    this.Cl = 855612546 | 0;
+    this.Dh = 1738396948 | 0;
+    this.Dl = 1479516111 | 0;
+    this.Eh = 258812777 | 0;
+    this.El = 2077511080 | 0;
+    this.Fh = 2011393907 | 0;
+    this.Fl = 79989058 | 0;
+    this.Gh = 1067287976 | 0;
+    this.Gl = 1780299464 | 0;
+    this.Hh = 286451373 | 0;
+    this.Hl = 2446758561 | 0;
+    this.outputLen = 28;
+  }
+};
+var SHA512_2562 = class extends SHA5122 {
+  constructor() {
+    super();
+    this.Ah = 573645204 | 0;
+    this.Al = 4230739756 | 0;
+    this.Bh = 2673172387 | 0;
+    this.Bl = 3360449730 | 0;
+    this.Ch = 596883563 | 0;
+    this.Cl = 1867755857 | 0;
+    this.Dh = 2520282905 | 0;
+    this.Dl = 1497426621 | 0;
+    this.Eh = 2519219938 | 0;
+    this.El = 2827943907 | 0;
+    this.Fh = 3193839141 | 0;
+    this.Fl = 1401305490 | 0;
+    this.Gh = 721525244 | 0;
+    this.Gl = 746961066 | 0;
+    this.Hh = 246885852 | 0;
+    this.Hl = 2177182882 | 0;
+    this.outputLen = 32;
+  }
+};
+var SHA3842 = class extends SHA5122 {
+  constructor() {
+    super();
+    this.Ah = 3418070365 | 0;
+    this.Al = 3238371032 | 0;
+    this.Bh = 1654270250 | 0;
+    this.Bl = 914150663 | 0;
+    this.Ch = 2438529370 | 0;
+    this.Cl = 812702999 | 0;
+    this.Dh = 355462360 | 0;
+    this.Dl = 4144912697 | 0;
+    this.Eh = 1731405415 | 0;
+    this.El = 4290775857 | 0;
+    this.Fh = 2394180231 | 0;
+    this.Fl = 1750603025 | 0;
+    this.Gh = 3675008525 | 0;
+    this.Gl = 1694076839 | 0;
+    this.Hh = 1203062813 | 0;
+    this.Hl = 3204075428 | 0;
+    this.outputLen = 48;
+  }
+};
+var sha5122 = wrapConstructor(() => new SHA5122());
+var sha512_2242 = wrapConstructor(() => new SHA512_2242());
+var sha512_2562 = wrapConstructor(() => new SHA512_2562());
+var sha3842 = wrapConstructor(() => new SHA3842());
+
 // node_modules/@scure/bip32/lib/esm/index.js
 var Point2 = secp256k1.ProjectivePoint;
 var base58check2 = base58check(sha256);
-function bytesToNumber(bytes2) {
-  return BigInt(`0x${bytesToHex(bytes2)}`);
+function bytesToNumber(bytes3) {
+  return BigInt(`0x${bytesToHex(bytes3)}`);
 }
 function numberToBytes(num) {
   return hexToBytes(num.toString(16).padStart(64, "0"));
@@ -5507,7 +6141,7 @@ var toU32 = (n) => {
   createView(buf).setUint32(0, n, false);
   return buf;
 };
-var HDKey = class {
+var HDKey = class _HDKey {
   get fingerprint() {
     if (!this.pubHash) {
       throw new Error("No publicKey set!");
@@ -5544,8 +6178,8 @@ var HDKey = class {
     if (8 * seed.length < 128 || 8 * seed.length > 512) {
       throw new Error(`HDKey: wrong seed length=${seed.length}. Should be between 128 and 512 bits; 256 bits is advised)`);
     }
-    const I = hmac(sha512, MASTER_SECRET, seed);
-    return new HDKey({
+    const I = hmac(sha5122, MASTER_SECRET, seed);
+    return new _HDKey({
       versions,
       chainCode: I.slice(32),
       privateKey: I.slice(0, 32)
@@ -5568,13 +6202,13 @@ var HDKey = class {
       throw new Error("Version mismatch");
     }
     if (isPriv) {
-      return new HDKey({ ...opt, privateKey: key.slice(1) });
+      return new _HDKey({ ...opt, privateKey: key.slice(1) });
     } else {
-      return new HDKey({ ...opt, publicKey: key });
+      return new _HDKey({ ...opt, publicKey: key });
     }
   }
   static fromJSON(json) {
-    return HDKey.fromExtendedKey(json.xpriv);
+    return _HDKey.fromExtendedKey(json.xpriv);
   }
   constructor(opt) {
     this.depth = 0;
@@ -5650,7 +6284,7 @@ var HDKey = class {
     } else {
       data = concatBytes(this.pubKey, data);
     }
-    const I = hmac(sha512, this.chainCode, data);
+    const I = hmac(sha5122, this.chainCode, data);
     const childTweak = bytesToNumber(I.slice(0, 32));
     const chainCode = I.slice(32);
     if (!secp256k1.utils.isValidPrivateKey(childTweak)) {
@@ -5677,20 +6311,20 @@ var HDKey = class {
         }
         opt.publicKey = added.toRawBytes(true);
       }
-      return new HDKey(opt);
+      return new _HDKey(opt);
     } catch (err) {
       return this.deriveChild(index + 1);
     }
   }
-  sign(hash2) {
+  sign(hash3) {
     if (!this.privateKey) {
       throw new Error("No privateKey set!");
     }
-    bytes(hash2, 32);
-    return secp256k1.sign(hash2, this.privKey).toCompactRawBytes();
+    bytes(hash3, 32);
+    return secp256k1.sign(hash3, this.privKey).toCompactRawBytes();
   }
-  verify(hash2, signature) {
-    bytes(hash2, 32);
+  verify(hash3, signature) {
+    bytes(hash3, 32);
     bytes(signature, 64);
     if (!this.publicKey) {
       throw new Error("No publicKey set!");
@@ -5701,7 +6335,7 @@ var HDKey = class {
     } catch (error) {
       return false;
     }
-    return secp256k1.verify(sig, hash2, this.publicKey);
+    return secp256k1.verify(sig, hash3, this.publicKey);
   }
   wipePrivateData() {
     this.privKey = void 0;
@@ -6862,10 +7496,10 @@ __export2(nip13_exports, {
 function getPow(id) {
   return getLeadingZeroBits(hexToBytes(id));
 }
-function getLeadingZeroBits(hash2) {
+function getLeadingZeroBits(hash3) {
   let total, i, bits;
-  for (i = 0, total = 0; i < hash2.length; i++) {
-    bits = msb(hash2[i]);
+  for (i = 0, total = 0; i < hash3.length; i++) {
+    bits = msb(hash3[i]);
     total += bits;
     if (bits !== 8) {
       break;
@@ -7323,7 +7957,311 @@ async function validateToken(token, url, method) {
   return true;
 }
 
-// index.js
+// node_modules/powmem/index.js
+var GHM = "0123456789bcdefghjkmnpqrstuvwxyz";
+var GHU = GHM.split("").reduce((h, l, i) => {
+  h[l] = i;
+  return h;
+}, {});
+var SANE_DEFAULT = 15;
+function decodeASL(publicKey, geobits = SANE_DEFAULT) {
+  if (typeof publicKey === "string")
+    publicKey = hexToBytes(publicKey);
+  const cpy = new Uint8Array(roundByte(4 + geobits));
+  for (let i = 0; i < cpy.length; i++)
+    cpy[i] = publicKey[i];
+  const age = unshift(cpy) | unshift(cpy) << 1;
+  const sex = unshift(cpy) | unshift(cpy) << 1;
+  const location = unpackGeo(cpy, geobits);
+  return { age, sex, location };
+}
+function unpackGeo(buf, nBits = SANE_DEFAULT) {
+  const nBytes = roundByte(nBits);
+  if (buf.length < nBytes)
+    throw new Error("BufferUnderflow, dst buffer too small");
+  const cpy = [];
+  for (let i = 0; i < nBytes; i++)
+    cpy[i] = buf[i];
+  let str = "";
+  let tmp = [0];
+  for (let n = 0; n < nBits; n++) {
+    if (n && !(n % 5)) {
+      const v2 = tmp[0] >> 3;
+      str += GHM.charAt(v2);
+      tmp = [0];
+    }
+    unshift(tmp, unshift(cpy));
+  }
+  const v = tmp[0] >> 3;
+  str += GHM.charAt(v);
+  return str.replace(/0+$/, "");
+}
+function packGeo(hash3, nBits = SANE_DEFAULT, buf = void 0) {
+  nBits = Math.min(hash3.length * 5, nBits);
+  if (nBits < 5)
+    throw new Error("precision has to be at least 5");
+  const nBytes = roundByte(nBits);
+  if (!buf)
+    buf = new Uint8Array(nBytes);
+  let w = 0;
+  const tail = Math.ceil(nBits / 5) - 1;
+  for (let i = tail; i > -1; i--) {
+    const v = GHU[hash3[i]];
+    const bits = [v << 3];
+    let x = 5;
+    if (i === tail && nBits % 5) {
+      x = nBits % 5;
+      for (let y = 0; y < 5 - x; y++)
+        shift(bits);
+    }
+    for (let j = 0; j < x; j++) {
+      shift(buf, shift(bits));
+      if (++w >= nBits)
+        break;
+    }
+  }
+  return buf;
+}
+function roundByte(b) {
+  return (b >> 3) + (b % 8 ? 1 : 0);
+}
+function shift(x, inp = 0) {
+  let c = inp ? 1 : 0;
+  for (let i = 0; i < x.length; i++) {
+    const nc = x[i] >> 7 & 1;
+    x[i] = x[i] << 1 | c;
+    c = nc;
+  }
+  return c;
+}
+function unshift(x, inp = 0) {
+  let i = x.length;
+  let c = (inp ? 1 : 0) << 7;
+  while (i--) {
+    const nc = (x[i] & 1) << 7;
+    x[i] = c | x[i] >> 1;
+    c = nc;
+  }
+  return c ? 1 : 0;
+}
+function xorDistance(a, b) {
+  const out = new Uint8Array(4);
+  const ac = Array.from(new Array(4)).map((_, i) => a[i] || 0);
+  const bc = Array.from(new Array(4)).map((_, i) => b[i] || 0);
+  for (let i = 0; i < 4 * 8; i++)
+    shift(out, unshift(ac) ^ unshift(bc));
+  const dv = new DataView(out.buffer);
+  return dv.getUint32(0, true);
+}
+function flagOf(geohash, bits = SANE_DEFAULT) {
+  const flags = initLUT();
+  const src = packGeo(geohash, bits);
+  const sorted = flags.map((f2) => [f2[0], xorDistance(src, f2[1])]).sort((a, b) => a[1] - b[1]);
+  return sorted[0][0];
+}
+var FLUT = null;
+function initLUT() {
+  if (FLUT)
+    return FLUT;
+  FLUT = POI.split("|").map((p) => {
+    const [flag, hash3] = p.split(":");
+    return [flag, packGeo(hash3, 40)];
+  });
+  return FLUT;
+}
+var POI = "\u{1F1E6}\u{1F1E8}:7wtfc36k7311|\u{1F1E6}\u{1F1E9}:sp91fdh1hs8k|\u{1F1E6}\u{1F1EA}:thnm324z28tz|\u{1F1E6}\u{1F1EB}:tw01hf2vt6g3|\u{1F1E6}\u{1F1EC}:deh11cc4re8k|\u{1F1E6}\u{1F1EE}:de5psufyen52|\u{1F1E6}\u{1F1F1}:srq64gwp77nk|\u{1F1E6}\u{1F1F2}:tp05by7g6jeg|\u{1F1E6}\u{1F1F4}:kqh8q8x7s13g|\u{1F1E6}\u{1F1F6}:d00000000000|\u{1F1E6}\u{1F1F7}:69y7pkxff4gc|\u{1F1E6}\u{1F1F8}:2jrnbd192kuc|\u{1F1E6}\u{1F1F9}:u2edk85115y4|\u{1F1E6}\u{1F1FA}:qgx0hnujcy27|\u{1F1E6}\u{1F1FC}:d6nppz6ssqnn|\u{1F1E6}\u{1F1FD}:u6wnm5nj5j7x|\u{1F1E6}\u{1F1FF}:tp5myu215xkz|\u{1F1E7}\u{1F1E6}:sru9f69s8vh7|\u{1F1E7}\u{1F1E7}:ddmej1cunchp|\u{1F1E7}\u{1F1E9}:wh0r3qs35cw7|\u{1F1E7}\u{1F1EA}:u151710b3yyw|\u{1F1E7}\u{1F1EB}:efnvs7yvk06x|\u{1F1E7}\u{1F1EC}:sx8dfsy|\u{1F1E7}\u{1F1ED}:theuq9k98ch6|\u{1F1E7}\u{1F1EE}:kxmkbcfq2bsf|\u{1F1E7}\u{1F1EF}:s19suwqm6119|\u{1F1E7}\u{1F1F1}:ddgr4pyhjupw|\u{1F1E7}\u{1F1F2}:dt9zy3rns6qt|\u{1F1E7}\u{1F1F3}:w8c9f9whj1jw|\u{1F1E7}\u{1F1F4}:6mpe3fmn9q87|\u{1F1E7}\u{1F1F6}:d6pmqkkjbffu|\u{1F1E7}\u{1F1F7}:6vjyjr7428nh|\u{1F1E7}\u{1F1F8}:dk2yqv3er7zb|\u{1F1E7}\u{1F1F9}:tuzkt0b9cdxk|\u{1F1E7}\u{1F1FB}:u4f7hb8nybjt|\u{1F1E7}\u{1F1FC}:ks18cxnzpcgt|\u{1F1E7}\u{1F1FE}:u9e9e98dm27k|\u{1F1E7}\u{1F1FF}:d50cgcqdqv95|\u{1F1E8}\u{1F1E6}:f244mkwzrmk9|\u{1F1E8}\u{1F1E8}:mjz6zc867uv2|\u{1F1E8}\u{1F1E9}:krr3p0u5nqqd|\u{1F1E8}\u{1F1EB}:s3jjwed8kn27|\u{1F1E8}\u{1F1EC}:krgq8nmru1sx|\u{1F1E8}\u{1F1ED}:u0m636zpbcpc|\u{1F1E8}\u{1F1EE}:eck4cu8exjy7|\u{1F1E8}\u{1F1F0}:2hppntbx22nn|\u{1F1E8}\u{1F1F1}:66jc8m77rmc3|\u{1F1E8}\u{1F1F2}:s28jvsx84r5q|\u{1F1E8}\u{1F1F3}:wx4g0bm6c408|\u{1F1E8}\u{1F1F4}:d2g6f3qmdzxh|\u{1F1E8}\u{1F1F5}:dezuwjygz2zm|\u{1F1E8}\u{1F1F7}:d1u0qxq7q7gp|\u{1F1E8}\u{1F1FA}:dhj7mxwqrp7d|\u{1F1E8}\u{1F1FB}:e6xjyz50ncp1|\u{1F1E8}\u{1F1FC}:d6nvnp7j03z7|\u{1F1E8}\u{1F1FD}:6w5u8fhdbscd|\u{1F1E8}\u{1F1FE}:swpzbdwfj5s1|\u{1F1E8}\u{1F1FF}:u2fkbecqcjgb|\u{1F1E9}\u{1F1EA}:u33dc0cppjs7|\u{1F1E9}\u{1F1EF}:sfng60dq5n6m|\u{1F1E9}\u{1F1F0}:u3butzxby979|\u{1F1E9}\u{1F1F2}:ddsreqpn63sh|\u{1F1E9}\u{1F1F4}:d7q686tr7797|\u{1F1E9}\u{1F1FF}:snd3hfudmhfh|\u{1F1EA}\u{1F1E8}:6r8jw6tkrxxd|\u{1F1EA}\u{1F1EA}:ud3t76cn2etg|\u{1F1EA}\u{1F1EC}:stq4yv3jkd44|\u{1F1EA}\u{1F1ED}:sf9yqg763t70|\u{1F1EA}\u{1F1F7}:sfew7gr6kj38|\u{1F1EA}\u{1F1F8}:ezjmgtwuzjwe|\u{1F1EA}\u{1F1F9}:sces1by96pw3|\u{1F1EA}\u{1F1FA}:u0wucrykkwgr|\u{1F1EB}\u{1F1EE}:ue423bvq08ck|\u{1F1EB}\u{1F1EF}:ruye5zqgznzm|\u{1F1EB}\u{1F1F0}:2hvbc3rtt2sk|\u{1F1EB}\u{1F1F2}:x3741zg9rbhv|\u{1F1EB}\u{1F1F4}:gg504enyx2uk|\u{1F1EB}\u{1F1F7}:u09tvw0f64r7|\u{1F1EC}\u{1F1E6}:s20k84m9yss1|\u{1F1EC}\u{1F1E7}:gcpvj0eh6eq9|\u{1F1EC}\u{1F1E9}:ddhkgmxpdrk1|\u{1F1EC}\u{1F1EA}:szrv76120d38|\u{1F1EC}\u{1F1EB}:dbdnrh4uxhh7|\u{1F1EC}\u{1F1EC}:gby0veyw3xz3|\u{1F1EC}\u{1F1ED}:ebzzgu07bt6h|\u{1F1EC}\u{1F1EE}:eykjw5jxkj6t|\u{1F1EC}\u{1F1F1}:gh9xytb6zygr|\u{1F1EC}\u{1F1F2}:edmh7x782f45|\u{1F1EC}\u{1F1F3}:ecc0e6e1kf4y|\u{1F1EC}\u{1F1F5}:dffhx0fyrpu2|\u{1F1EC}\u{1F1F6}:s0r33ssbe7mj|\u{1F1EC}\u{1F1F7}:swbb5ftzdvd2|\u{1F1EC}\u{1F1F8}:5nmf2e2sx54h|\u{1F1EC}\u{1F1F9}:9fz9u3qcs3eu|\u{1F1EC}\u{1F1FA}:x4quqz7w9z0j|\u{1F1EC}\u{1F1FC}:edj5nsccx11m|\u{1F1EC}\u{1F1FE}:d8y5ehb3fu4p|\u{1F1ED}\u{1F1F0}:wecpkthh2pd1|\u{1F1ED}\u{1F1F2}:rs390dkzeh03|\u{1F1ED}\u{1F1F3}:d4dwmwbsd4fq|\u{1F1ED}\u{1F1F7}:u24b9fhq99m7|\u{1F1ED}\u{1F1F9}:d7kecvwe3010|\u{1F1ED}\u{1F1FA}:u2mw1q8xkf61|\u{1F1EE}\u{1F1E8}:ethbvwk4db3x|\u{1F1EE}\u{1F1E9}:qqguwvtzpgcc|\u{1F1EE}\u{1F1EA}:gc7x9813h7tc|\u{1F1EE}\u{1F1F1}:sv9h9r1zf8mg|\u{1F1EE}\u{1F1F2}:gcsu892hjtff|\u{1F1EE}\u{1F1F3}:ttng692md2nf|\u{1F1EE}\u{1F1F4}:2m2qv1952vkh|\u{1F1EE}\u{1F1F6}:svzt98f7j53u|\u{1F1EE}\u{1F1F7}:tjy0mxq6jndq|\u{1F1EE}\u{1F1F8}:ge83tf0mkzed|\u{1F1EE}\u{1F1F9}:sr2yjyx33xus|\u{1F1EF}\u{1F1EA}:gbwrzx0n9j5e|\u{1F1EF}\u{1F1F2}:d71rh2cb4dng|\u{1F1EF}\u{1F1F4}:sv9tcfy9kwbu|\u{1F1EF}\u{1F1F5}:xn774c06kt10|\u{1F1F0}\u{1F1EA}:kzf0tuuburne|\u{1F1F0}\u{1F1EC}:txm4mm5102uu|\u{1F1F0}\u{1F1ED}:w64xmps09230|\u{1F1F0}\u{1F1EE}:80pxx3cvfz81|\u{1F1F0}\u{1F1F2}:mjcu3wjp1gd1|\u{1F1F0}\u{1F1F3}:de56em6bskhd|\u{1F1F0}\u{1F1F5}:wz4tmxdhbwmu|\u{1F1F0}\u{1F1F7}:wydveqv08x1t|\u{1F1F0}\u{1F1FC}:tj1yb2p1n0uj|\u{1F1F0}\u{1F1FE}:de7vbgu|\u{1F1F0}\u{1F1FF}:v2x94vsq7npx|\u{1F1F1}\u{1F1E6}:w78buqdzq685|\u{1F1F1}\u{1F1E7}:sy188541ujmp|\u{1F1F1}\u{1F1E8}:ddkxhkh|\u{1F1F1}\u{1F1EE}:u0qu36q1bgwt|\u{1F1F1}\u{1F1F0}:tc3ky120pk5q|\u{1F1F1}\u{1F1F7}:ec1k96jwksxn|\u{1F1F1}\u{1F1F8}:kdspd3xjfdd4|\u{1F1F1}\u{1F1F9}:u9c3zg7901e9|\u{1F1F1}\u{1F1FA}:u0u77kx7nhcp|\u{1F1F1}\u{1F1FB}:ud17xfee8jgw|\u{1F1F1}\u{1F1FE}:sksmb41m06rw|\u{1F1F2}\u{1F1E6}:evdsg7920f6v|\u{1F1F2}\u{1F1E8}:spv2bdmfdu8q|\u{1F1F2}\u{1F1E9}:u8kjtx42ddfd|\u{1F1F2}\u{1F1EA}:srtfbyuh0nxx|\u{1F1F2}\u{1F1EB}:s4fsxbyqrrg2|\u{1F1F2}\u{1F1EC}:mh9kde1h9njc|\u{1F1F2}\u{1F1ED}:xc2bx6nrzxgn|\u{1F1F2}\u{1F1F0}:srrkwyd7wjny|\u{1F1F2}\u{1F1F1}:egj5vndh9zck|\u{1F1F2}\u{1F1F2}:w5uhxt9p0gg3|\u{1F1F2}\u{1F1F3}:y23fe54cg7pv|\u{1F1F2}\u{1F1F4}:webwrc0hu9s7|\u{1F1F2}\u{1F1F5}:x4xtcsmp8uw3|\u{1F1F2}\u{1F1F6}:ddse737scj6m|\u{1F1F2}\u{1F1F7}:eg8px035uukh|\u{1F1F2}\u{1F1F8}:de5fbbsd8scd|\u{1F1F2}\u{1F1F9}:sq6hrn5z55e1|\u{1F1F2}\u{1F1FA}:mk2ujxsjzrq9|\u{1F1F2}\u{1F1FB}:t8s60xp99t0w|\u{1F1F2}\u{1F1FC}:kv8kse1s4gkh|\u{1F1F2}\u{1F1FD}:9g3w81t7j50q|\u{1F1F2}\u{1F1FE}:w28xbw2xbq5d|\u{1F1F2}\u{1F1FF}:ku9mb6pb7tmf|\u{1F1F3}\u{1F1E6}:k7vjku8q391t|\u{1F1F3}\u{1F1E8}:rsn9r5pzx34w|\u{1F1F3}\u{1F1EA}:s5jspvkuv7b6|\u{1F1F3}\u{1F1EB}:r8xrmfkbspt3|\u{1F1F3}\u{1F1EC}:s1w5tmm1vhu|\u{1F1F3}\u{1F1EE}:d473jn442k6s|\u{1F1F3}\u{1F1F1}:u173zmtys2gg|\u{1F1F3}\u{1F1F4}:u4y008wfgtve|\u{1F1F3}\u{1F1F5}:tv5cd31hr30b|\u{1F1F3}\u{1F1F7}:rxyth8z4rpj8|\u{1F1F3}\u{1F1FA}:rdydz1rcp6d8|\u{1F1F3}\u{1F1FF}:rbsr7dk08zd9|\u{1F1F4}\u{1F1F2}:t7cdjjj|\u{1F1F5}\u{1F1E6}:d1x2wd38yegj|\u{1F1F5}\u{1F1EA}:6q35wz50uwkx|\u{1F1F5}\u{1F1EB}:2svg2jt231p3|\u{1F1F5}\u{1F1EC}:rqbs5f6j0c2f|\u{1F1F5}\u{1F1ED}:wdq9709jey5e|\u{1F1F5}\u{1F1F0}:tt3kccxscyq6|\u{1F1F5}\u{1F1F1}:u3qcnhhs59zb|\u{1F1F5}\u{1F1F2}:fbr541922uru|\u{1F1F5}\u{1F1F3}:35e3rkzg7k31|\u{1F1F5}\u{1F1F7}:de0xssyxf5q9|\u{1F1F5}\u{1F1F8}:sv9jcb8p11f1|\u{1F1F5}\u{1F1F9}:eyckrcntwxuk|\u{1F1F5}\u{1F1FC}:wcrdy2pcrwck|\u{1F1F5}\u{1F1FE}:6ey6wh6t8c20|\u{1F1F6}\u{1F1E6}:ths2hxwyrm61|\u{1F1F7}\u{1F1EA}:mhprzu07euj6|\u{1F1F7}\u{1F1F4}:u81v25sq895r|\u{1F1F7}\u{1F1F8}:srywc9q8751q|\u{1F1F7}\u{1F1FA}:ucfv0n031d7w|\u{1F1F7}\u{1F1FC}:kxthzyc8bmf7|\u{1F1F8}\u{1F1E6}:th0pcu39mqrz|\u{1F1F8}\u{1F1E7}:rw390shcep0q|\u{1F1F8}\u{1F1E8}:mppmqspemem6|\u{1F1F8}\u{1F1E9}:sdz0hvv6hevj|\u{1F1F8}\u{1F1EA}:u6sce0t4hzhe|\u{1F1F8}\u{1F1EC}:w21zdqpk89ty|\u{1F1F8}\u{1F1ED}:5wmg3bkn7fg0|\u{1F3F4}\u200D\u2620\uFE0F:1n7";
+
+// node_modules/latlon-geohash/latlon-geohash.js
+var base322 = "0123456789bcdefghjkmnpqrstuvwxyz";
+var Geohash = class _Geohash {
+  /**
+   * Encodes latitude/longitude to geohash, either to specified precision or to automatically
+   * evaluated precision.
+   *
+   * @param   {number} lat - Latitude in degrees.
+   * @param   {number} lon - Longitude in degrees.
+   * @param   {number} [precision] - Number of characters in resulting geohash.
+   * @returns {string} Geohash of supplied latitude/longitude.
+   * @throws  Invalid geohash.
+   *
+   * @example
+   *     const geohash = Geohash.encode(52.205, 0.119, 7); // => 'u120fxw'
+   */
+  static encode(lat, lon, precision) {
+    if (typeof precision == "undefined") {
+      for (let p = 1; p <= 12; p++) {
+        const hash3 = _Geohash.encode(lat, lon, p);
+        const posn = _Geohash.decode(hash3);
+        if (posn.lat == lat && posn.lon == lon)
+          return hash3;
+      }
+      precision = 12;
+    }
+    lat = Number(lat);
+    lon = Number(lon);
+    precision = Number(precision);
+    if (isNaN(lat) || isNaN(lon) || isNaN(precision))
+      throw new Error("Invalid geohash");
+    let idx = 0;
+    let bit = 0;
+    let evenBit = true;
+    let geohash = "";
+    let latMin = -90, latMax = 90;
+    let lonMin = -180, lonMax = 180;
+    while (geohash.length < precision) {
+      if (evenBit) {
+        const lonMid = (lonMin + lonMax) / 2;
+        if (lon >= lonMid) {
+          idx = idx * 2 + 1;
+          lonMin = lonMid;
+        } else {
+          idx = idx * 2;
+          lonMax = lonMid;
+        }
+      } else {
+        const latMid = (latMin + latMax) / 2;
+        if (lat >= latMid) {
+          idx = idx * 2 + 1;
+          latMin = latMid;
+        } else {
+          idx = idx * 2;
+          latMax = latMid;
+        }
+      }
+      evenBit = !evenBit;
+      if (++bit == 5) {
+        geohash += base322.charAt(idx);
+        bit = 0;
+        idx = 0;
+      }
+    }
+    return geohash;
+  }
+  /**
+   * Decode geohash to latitude/longitude (location is approximate centre of geohash cell,
+   *     to reasonable precision).
+   *
+   * @param   {string} geohash - Geohash string to be converted to latitude/longitude.
+   * @returns {{lat:number, lon:number}} (Center of) geohashed location.
+   * @throws  Invalid geohash.
+   *
+   * @example
+   *     const latlon = Geohash.decode('u120fxw'); // => { lat: 52.205, lon: 0.1188 }
+   */
+  static decode(geohash) {
+    const bounds = _Geohash.bounds(geohash);
+    const latMin = bounds.sw.lat, lonMin = bounds.sw.lon;
+    const latMax = bounds.ne.lat, lonMax = bounds.ne.lon;
+    let lat = (latMin + latMax) / 2;
+    let lon = (lonMin + lonMax) / 2;
+    lat = lat.toFixed(Math.floor(2 - Math.log(latMax - latMin) / Math.LN10));
+    lon = lon.toFixed(Math.floor(2 - Math.log(lonMax - lonMin) / Math.LN10));
+    return { lat: Number(lat), lon: Number(lon) };
+  }
+  /**
+   * Returns SW/NE latitude/longitude bounds of specified geohash.
+   *
+   * @param   {string} geohash - Cell that bounds are required of.
+   * @returns {{sw: {lat: number, lon: number}, ne: {lat: number, lon: number}}}
+   * @throws  Invalid geohash.
+   */
+  static bounds(geohash) {
+    if (geohash.length == 0)
+      throw new Error("Invalid geohash");
+    geohash = geohash.toLowerCase();
+    let evenBit = true;
+    let latMin = -90, latMax = 90;
+    let lonMin = -180, lonMax = 180;
+    for (let i = 0; i < geohash.length; i++) {
+      const chr = geohash.charAt(i);
+      const idx = base322.indexOf(chr);
+      if (idx == -1)
+        throw new Error("Invalid geohash");
+      for (let n = 4; n >= 0; n--) {
+        const bitN = idx >> n & 1;
+        if (evenBit) {
+          const lonMid = (lonMin + lonMax) / 2;
+          if (bitN == 1) {
+            lonMin = lonMid;
+          } else {
+            lonMax = lonMid;
+          }
+        } else {
+          const latMid = (latMin + latMax) / 2;
+          if (bitN == 1) {
+            latMin = latMid;
+          } else {
+            latMax = latMid;
+          }
+        }
+        evenBit = !evenBit;
+      }
+    }
+    const bounds = {
+      sw: { lat: latMin, lon: lonMin },
+      ne: { lat: latMax, lon: lonMax }
+    };
+    return bounds;
+  }
+  /**
+   * Determines adjacent cell in given direction.
+   *
+   * @param   geohash - Cell to which adjacent cell is required.
+   * @param   direction - Direction from geohash (N/S/E/W).
+   * @returns {string} Geocode of adjacent cell.
+   * @throws  Invalid geohash.
+   */
+  static adjacent(geohash, direction) {
+    geohash = geohash.toLowerCase();
+    direction = direction.toLowerCase();
+    if (geohash.length == 0)
+      throw new Error("Invalid geohash");
+    if ("nsew".indexOf(direction) == -1)
+      throw new Error("Invalid direction");
+    const neighbour = {
+      n: ["p0r21436x8zb9dcf5h7kjnmqesgutwvy", "bc01fg45238967deuvhjyznpkmstqrwx"],
+      s: ["14365h7k9dcfesgujnmqp0r2twvyx8zb", "238967debc01fg45kmstqrwxuvhjyznp"],
+      e: ["bc01fg45238967deuvhjyznpkmstqrwx", "p0r21436x8zb9dcf5h7kjnmqesgutwvy"],
+      w: ["238967debc01fg45kmstqrwxuvhjyznp", "14365h7k9dcfesgujnmqp0r2twvyx8zb"]
+    };
+    const border = {
+      n: ["prxz", "bcfguvyz"],
+      s: ["028b", "0145hjnp"],
+      e: ["bcfguvyz", "prxz"],
+      w: ["0145hjnp", "028b"]
+    };
+    const lastCh = geohash.slice(-1);
+    let parent = geohash.slice(0, -1);
+    const type = geohash.length % 2;
+    if (border[direction][type].indexOf(lastCh) != -1 && parent != "") {
+      parent = _Geohash.adjacent(parent, direction);
+    }
+    return parent + base322.charAt(neighbour[direction][type].indexOf(lastCh));
+  }
+  /**
+   * Returns all 8 adjacent cells to specified geohash.
+   *
+   * @param   {string} geohash - Geohash neighbours are required of.
+   * @returns {{n,ne,e,se,s,sw,w,nw: string}}
+   * @throws  Invalid geohash.
+   */
+  static neighbours(geohash) {
+    return {
+      "n": _Geohash.adjacent(geohash, "n"),
+      "ne": _Geohash.adjacent(_Geohash.adjacent(geohash, "n"), "e"),
+      "e": _Geohash.adjacent(geohash, "e"),
+      "se": _Geohash.adjacent(_Geohash.adjacent(geohash, "s"), "e"),
+      "s": _Geohash.adjacent(geohash, "s"),
+      "sw": _Geohash.adjacent(_Geohash.adjacent(geohash, "s"), "w"),
+      "w": _Geohash.adjacent(geohash, "w"),
+      "nw": _Geohash.adjacent(_Geohash.adjacent(geohash, "n"), "w")
+    };
+  }
+};
+var latlon_geohash_default = Geohash;
+
+// tools.js
+var pool = new SimplePool();
 var relays = [
   // TODO: Replace with european only
   "wss://relay.f7z.io",
@@ -7335,167 +8273,51 @@ var relays = [
   "wss://relay.snort.social",
   "wss://nos.lol"
 ];
-var TAGS = ["reboot"];
-var pool = new SimplePool();
-tonic_default.add(class GuestBook extends tonic_default {
-  #posts = [];
-  render() {
-    const posts = this.#posts.map((p) => this.html`
-      <book-post event=${p}></book-post>
-    `);
-    return this.html`
-      <h3>Senaste Inlägg (${this.#posts.length + ""}st)</h3>
-      <post-form></post-form>
-      ${posts}
-    `;
+function decoratePOP0101(event) {
+  if (event.flag)
+    return event;
+  const { age, sex, location } = decodeASL(event.pubkey);
+  event.age = [16, 24, 32, 48][age];
+  event.sex = ["F", "P", "IB", "R"][sex];
+  event.flag = flagOf(location);
+  return event;
+}
+async function nostrQuery(filters = []) {
+  const events = [];
+  for await (const event of nostrStream(filters))
+    events.push(event);
+  return events;
+}
+async function* nostrStream(filters = []) {
+  const sub = pool.sub(relays, filters);
+  let [ep, eset] = unpromise();
+  sub.on("eose", () => eset(null));
+  sub.on("event", (ev) => {
+    const next = unpromise();
+    const set = eset;
+    ep = next[0];
+    eset = next[1];
+    set(ev);
+  });
+  while (true) {
+    const event = await ep;
+    if (!event)
+      break;
+    yield event;
   }
-  disconnected() {
-    this.sub?.unsub();
-  }
-  async connected() {
-    const filters = [{ kinds: [1], "#t": TAGS }];
-    for await (const event of nQueryStream(filters)) {
-      const { pubkey, tags } = event;
-      const hashtag = tags.find((t) => t[0] === "t" && ~TAGS.indexOf(t[1]));
-      if (!hashtag)
-        return;
-      const { age, sex, location } = decodeASL(pubkey);
-      event.age = [16, 24, 32, 48][age];
-      event.sex = ["F", "P", "IB", "R"][sex];
-      event.flag = flagOf(location);
-      const idx = this.#posts.findIndex((p) => p.created_at < event.created_at);
-      if (!~idx)
-        this.#posts.push(event);
-      else
-        this.#posts.splice(idx, 0, event);
-      this.reRender();
-    }
-  }
-});
-tonic_default.add(class BookPost extends tonic_default {
-  populate(event, profile, replies = []) {
-    const name = profile ? profile.display_name || profile.name || profile.username : event.pubkey.slice(0, 8);
-    const color = event.pubkey.slice(0, 6);
-    const picture = profile ? this.html`<img src="${profile?.picture}" />` : this.html`<div class="placeholder" style="background-color: #${color}"></div> `;
-    const time = new Date(event.created_at * 1e3);
-    const pad = (n) => n.toString().padStart(2, "0");
-    const tstr = `${pad(time.getHours())}:${pad(time.getMinutes())} ${pad(time.getDate())}-${pad(time.getMonth())}-${pad(time.getFullYear())}`;
-    let { content, images } = parseContent(event.content);
-    const iattachments = images.map((src) => this.html`<post-img src="${src}"></post-img>`);
-    return this.html`
-      <div class="post flex column">
-        <div class="flex row start">
-          <div class="gutter flex column">
-            <div class="portrait"><a href="https://iris.to/${nip19_exports.npubEncode(event.pubkey)}" target="_blank">${picture}</a></div>
-            <div class="asl">${event.flag} <small>${event.sex + event.age}</small></div>
-          </div>
-          <div class="flex column" style="width: 100%">
-            <div class="alias"><strong><samp>${name}</samp></strong></div>
-            <samp><time datetime="${time.toISOString()}">${tstr}</time></samp>
-            <div class="images flex row wrap">${iattachments}</div>
-            <p class="content">${content}</p>
-            <div class="ctrls flex row space-between">
-              <samp><a href="">svara (${replies.length + ""})</a></samp>
-              <samp>
-                <a href="https://iris.to/${nip19_exports.noteEncode(event.id)}" target="_blank">dela</a>
-              </samp>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-  async *render() {
-    yield this.html`Loading...`;
-    const { event } = this.props;
-    yield this.populate(event, null);
-    let profile = void 0;
-    try {
-      profile = await pman.profileOf(event.pubkey);
-    } catch (error) {
-      console.error("profileOf:Error:", error);
-    }
-    const replies = await nman.list(event.id);
-    return this.populate(event, profile, replies);
-  }
-});
-tonic_default.add(class PostImg extends tonic_default {
-  click() {
-    const d = this.querySelector("dialog");
-    if (d.open)
-      d.close();
-    else
-      d.showModal();
-  }
-  render() {
-    return this.html`
-      <img class="preview" src="${this.props.src}" />
-      <dialog>
-        <img src="${this.props.src}"/>
-      </dialog>
-    `;
-  }
-});
-tonic_default.add(class PostForm extends tonic_default {
-  #pk = null;
-  #type = -1;
-  click(ev) {
-    if (tonic_default.match(ev.target, "#submit")) {
-      this.querySelector("dialog").showModal();
-    }
-    if (tonic_default.match(ev.target, "#abort")) {
-      this.querySelector("dialog").close();
-    }
-  }
-  render() {
-    let identity = this.html`
-      <h3>Skapa Identitet</h3>
-      <div>
-        <label for="sex">
-          Kön
-          <select name="sex" id="sex">
-            <option>Kvinna</option>
-            <option selected>Man</option>
-            <option>Icke-binär</option>
-          </select>
-        </label>
-        <br/>
-        <label for="age">
-          Ålder
-          <select name="age" id="age">
-            <option>16+</option>
-            <option selected>24+</option>
-            <option>32+</option>
-            <option>48+</option>
-          </select>
-        </label>
-        <br/>
-        <label for="location">
-          Plats
-          <select name="location" id="location">
-            <option>Stockholm</option>
-            <option selected>Göteborg</option>
-            <option>Malmö</option>
-            <option>Använd GPS</option>
-          </select>
-        </label>
-        <br/>
-        <br/>
-        <button id="generate">Generera Nyckel</button>
-      </div>
-    `;
-    return this.html`
-      <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
-      <button id="submit">Skicka</button>
-      <dialog>
-        ${identity}
-        <br />
-        <button id="abort">Avbryt</button>
-        <button id="kbk" disabled>Kör bara kör</button>
-      </dialog>
-    `;
-  }
-});
+  sub.unsub();
+}
+function unpromise() {
+  let set, abort;
+  return [
+    new Promise((resolve, reject) => {
+      set = resolve;
+      abort = reject;
+    }),
+    set,
+    abort
+  ];
+}
 function parseContent(content) {
   const links = [];
   const images = [];
@@ -7512,6 +8334,14 @@ function parseContent(content) {
     return "\n";
   }).trim();
   return { content, links, images };
+}
+function emoOf(sex, age = 1) {
+  return [
+    ["\u{1F467}", "\u{1F466}", "\u{1F9D2}", "\u{1F50B}"],
+    ["\u{1F469}", "\u{1F468}", "\u{1F9D1}", "\u{1F916}"],
+    ["\u{1F475}", "\u{1F474}", "\u{1F9D3}", "\u{1F4DF}"],
+    ["\u{1F483}", "\u{1F57A}", "\u{1F308}", "\u{1F4BE}"]
+  ][age][sex];
 }
 var ProfileFinder = class {
   profiles = {};
@@ -7578,55 +8408,317 @@ var ProfileFinder = class {
     return this.#p;
   }
 };
-var pman = new ProfileFinder();
-var NoteTracker = class {
-  #notes = [];
-  #lastSync = 0;
-  #ns = "root";
-  /** Attempt to fetch replies for given note-id */
-  async list(noteId) {
-    const subEvents = await nQuery([{ kinds: [1], "#e": [noteId] }]);
-    console.log("SubNotes", subEvents);
-    return subEvents;
-  }
-};
-var nman = new NoteTracker();
-async function nQuery(filters = []) {
-  const events = [];
-  for await (const event of nQueryStream(filters))
-    events.push(event);
-  return events;
-}
-async function* nQueryStream(filters = []) {
-  const sub = pool.sub(relays, filters);
-  let [ep, eset] = unpromise();
-  sub.on("eose", () => eset(null));
-  sub.on("event", (ev) => {
-    const next = unpromise();
-    const set = eset;
-    ep = next[0];
-    eset = next[1];
-    set(ev);
+function geoCode(hash3) {
+  const locations = [
+    /* { name: "Stockholm urban area", coordinates: [59.310087557972, 18.046331211663] },*/
+    { name: "Stockholm", coordinates: [59.33, 18.07] },
+    { name: "G\xF6teborg", coordinates: [57.72, 12.01] },
+    { name: "Malm\xF6", coordinates: [55.61, 13.02] },
+    { name: "Uppsala", coordinates: [59.86, 17.64] },
+    { name: "Norrk\xF6ping", coordinates: [58.6, 16.17] },
+    { name: "V\xE4ster\xE5s", coordinates: [59.620000000000005, 16.54] },
+    { name: "Ume\xE5", coordinates: [63.83, 20.240000000000002] },
+    { name: "\xD6rebro", coordinates: [59.28, 15.22] },
+    { name: "Link\xF6ping", coordinates: [58.410000000000004, 15.63] },
+    { name: "Helsingborg", coordinates: [56.050000000000004, 12.700000000000001] },
+    { name: "Jonkoping", coordinates: [57.78, 14.17] },
+    { name: "Lund", coordinates: [55.71, 13.200000000000001] },
+    { name: "G\xE4vle", coordinates: [60.69, 17.13] },
+    { name: "S\xF6dert\xE4lje", coordinates: [59.2, 17.63] },
+    { name: "Bor\xE5s", coordinates: [57.730000000000004, 12.94] },
+    { name: "Halmstad", coordinates: [56.67, 12.86] },
+    { name: "Karlstad", coordinates: [59.38, 13.51] },
+    { name: "Eskilstuna", coordinates: [59.348700525963, 16.44903294272] },
+    { name: "T\xE4by", coordinates: [59.433333333333, 18.083333333333] }
+  ].map(({ name, coordinates }) => {
+    return {
+      name,
+      coordinates,
+      packed: packGeo(latlon_geohash_default.encode(coordinates[0], coordinates[1], 6))
+    };
   });
-  while (true) {
-    const event = await ep;
-    if (!event)
-      break;
-    yield event;
+  const src = packGeo(hash3);
+  const sorted = locations.map((f2) => [f2, xorDistance(src, f2.packed)]).sort((a, b) => a[1] - b[1]);
+  const [location, distance] = sorted[0];
+  return location.name;
+}
+
+// index.js
+var pman = new ProfileFinder();
+var TAGS = ["reboot"];
+tonic_default.add(class GuestBook extends tonic_default {
+  #posts = [];
+  render() {
+    const posts = this.#posts.map((p) => this.html`
+      <book-post event=${p} rl="1"></book-post>
+    `);
+    return this.html`
+      ${this.renderPostDialog()}
+      <div class="flex row center"><button class="post-btn biff" data-parent="">Skapa Inlägg</button></div>
+      <h3>Senaste Inlägg (${this.#posts.length + ""}st)</h3>
+      ${posts}
+    `;
   }
-  sub.unsub();
-}
-function unpromise() {
-  let set, abort;
-  return [
-    new Promise((resolve, reject) => {
-      set = resolve;
-      abort = reject;
-    }),
-    set,
-    abort
-  ];
-}
+  renderPostDialog() {
+    return this.html`
+      <dialog id="postDialog">
+        <h2>Identitet</h2>
+        ${this.replyTo ? "Nytt Inl\xE4gg" : "Re:" + this.replyTo}
+        <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
+        <button id="submit">Skicka</button>
+      </dialog>
+    `;
+  }
+  disconnected() {
+    this.sub?.unsub();
+  }
+  async connected() {
+    const filters = [{ kinds: [1], "#t": TAGS }];
+    for await (const event of nostrStream(filters)) {
+      const { tags } = event;
+      const hashtag = tags.find((t) => t[0] === "t" && ~TAGS.indexOf(t[1]));
+      if (!hashtag)
+        return;
+      decoratePOP0101(event);
+      const idx = this.#posts.findIndex((p) => p.created_at < event.created_at);
+      if (!~idx)
+        this.#posts.push(event);
+      else
+        this.#posts.splice(idx, 0, event);
+      this.reRender();
+    }
+  }
+  click(ev) {
+    const postButton = tonic_default.match(ev.target, ".post-btn");
+    if (postButton) {
+      this.replyTo = postButton.dataset.parent;
+      this.querySelector("#postDialog").showModal();
+    } else {
+      console.log(ev.target);
+      this.querySelector("#postDialog").close();
+    }
+  }
+});
+tonic_default.add(class BookPost extends tonic_default {
+  populate(event, profile, replies = []) {
+    const name = profile ? profile.display_name || profile.name || profile.username : event.pubkey.slice(0, 8);
+    const color = event.pubkey.slice(0, 6);
+    const picture = profile ? this.html`<img src="${profile?.picture}" />` : this.html`<div class="placeholder" style="background-color: #${color}"></div> `;
+    const time = new Date(event.created_at * 1e3);
+    const pad = (n) => n.toString().padStart(2, "0");
+    const tstr = `${pad(time.getHours())}:${pad(time.getMinutes())} ${pad(time.getDate())}-${pad(time.getMonth())}-${pad(time.getFullYear())}`;
+    let { content, images } = parseContent(event.content);
+    const iattachments = images.map((src) => this.html`<post-img src="${src}"></post-img>`);
+    replies = replies.map((p) => this.html`
+      <book-post event=${decoratePOP0101(p)}></book-post>
+    `);
+    return this.html`
+      <div class="post flex column" style="--depth: ${(event.depth || 0) + ""};">
+        <div class="flex row start">
+          <div class="gutter flex column">
+            <div class="portrait"><a href="https://iris.to/${nip19_exports.npubEncode(event.pubkey)}" target="_blank">${picture}</a></div>
+            <div class="asl">${event.flag} <small>${event.sex + event.age}</small></div>
+          </div>
+          <div class="flex column" style="width: 100%">
+            <div class="alias"><strong><samp>${name}</samp></strong></div>
+            <samp><time datetime="${time.toISOString()}">${tstr}</time></samp>
+            <div class="images flex row wrap">${iattachments}</div>
+            <p class="content">${content}</p>
+            <div class="ctrls flex row space-between">
+              <samp><a href="">svara (${replies.length + ""})</a></samp>
+              <samp>
+                <a href="https://iris.to/${nip19_exports.noteEncode(event.id)}" target="_blank">dela</a>
+              </samp>
+            </div>
+          </div>
+        </div>
+        <div class="replies">${replies}</div>
+      </div>
+    `;
+  }
+  async *render() {
+    yield this.html`Loading...`;
+    let replies = [];
+    const { event, rl } = this.props;
+    let profile = void 0;
+    yield this.populate(event, profile, replies);
+    try {
+      profile = await pman.profileOf(event.pubkey);
+      yield this.populate(event, profile, replies);
+    } catch (error) {
+      console.error("profileOf:Error:", error);
+    }
+    if (rl) {
+      try {
+        replies = await nostrQuery([{ kinds: [1], "#e": [event.id] }]);
+        replies.sort((a, b) => b.created_at < a.created_at);
+        for (const e of replies) {
+          e.depth = 0;
+          for (const [type, id] of e.tags.reverse()) {
+            if (type !== "e")
+              continue;
+            e.depth++;
+            if (e.id === id)
+              break;
+          }
+        }
+      } catch (error) {
+        console.error("replies:Error:", error);
+      }
+    }
+    return this.populate(event, profile, replies);
+  }
+});
+tonic_default.add(class PostImg extends tonic_default {
+  click() {
+    const d = this.querySelector("dialog");
+    if (d.open)
+      d.close();
+    else
+      d.showModal();
+  }
+  render() {
+    return this.html`
+      <img class="preview" src="${this.props.src}" />
+      <dialog>
+        <img src="${this.props.src}"/>
+      </dialog>
+    `;
+  }
+});
+tonic_default.add(class PostForm extends tonic_default {
+  #pk = null;
+  #type = -1;
+  click(ev) {
+    if (tonic_default.match(ev.target, "#submit")) {
+      this.querySelector("dialog").showModal();
+    }
+    if (tonic_default.match(ev.target, "#abort")) {
+      this.querySelector("dialog").close();
+    }
+  }
+  render() {
+    let identity = this.html`
+    `;
+    return this.html`
+      <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
+      <button id="submit">Skicka</button>
+      <dialog>
+        ${identity}
+        <br />
+        <button id="abort">Avbryt</button>
+        <button id="kbk" disabled>Kör bara kör</button>
+      </dialog>
+    `;
+  }
+});
+tonic_default.add(class KeygenButton extends tonic_default {
+  render() {
+    return this.html`
+    <button class="biff">Utfärda Identitet</button>
+    `;
+  }
+  click(ev) {
+    if (tonic_default.match(ev.target, "button"))
+      document.getElementById("keygen").show();
+  }
+});
+tonic_default.add(class ModalDialog extends tonic_default {
+  show() {
+    this.querySelector("dialog").showModal();
+  }
+  close() {
+    this.querySelector("dialog").close();
+  }
+  render() {
+    return this.html`<dialog>${this.children}</dialog>`;
+  }
+  click({ target }) {
+    if (target === this.querySelector("dialog"))
+      this.close();
+  }
+});
+tonic_default.add(class KeyGenerator extends tonic_default {
+  selectedCell = 5;
+  render() {
+    this.props.geohash ||= "u6282";
+    const geoLabel = geoCode(this.props.geohash);
+    const flag = flagOf(this.props.geohash);
+    const astd = (s, a, d) => this.html`
+      <td
+        data-v="${(s | a << 2) + ""}"
+        ${this.selectedCell === (s | a << 2) ? "selected" : ""}
+        ${d ? "data-disabled=true" : ""}>
+        ${emoOf(s, a)}
+      </td>
+    `;
+    return this.html`
+      <div class="flex col xcenter">
+        <h1>Utfärda Identitet</h1>
+        <hr />
+        <table id="as-matrix">
+          <tr>
+            <th>&nbsp;</th>
+            <th colspan="4">Ålder</th>
+          </tr>
+          <tr class="mono">
+            <th>&nbsp;</th>
+            <th>16+</th><th>24+</th><th>32+</th><th>48+</th>
+          </tr>
+          <tr>
+            <th rowspan="6"><span class="r-90">Kön</th>
+            ${astd(0, 0)}${astd(0, 1)}${astd(0, 2)}${astd(0, 3)}
+          </tr>
+          <tr>
+            ${astd(1, 0)}${astd(1, 1)}${astd(1, 2)}${astd(1, 3)}
+          </tr>
+          <tr>
+            ${astd(2, 0)}${astd(2, 1)}${astd(2, 2)}${astd(2, 3)}
+          </tr>
+          <tr>
+            ${astd(3, 0, true)}${astd(3, 1, true)}${astd(3, 2, true)}${astd(3, 3, true)}
+          </tr>
+        </table>
+        <br>
+        <hr />
+        <br>
+        <p><strong>Plats</strong></p>
+        <div class="flex row space-around">
+          <input id="geohash-input" type="text" value="${this.props.geohash}"/>
+          <p class="geo-desc">${flag} ${geoLabel}</p>
+        </div>
+        <button id="btn-gps">Hämta Plats</button>
+
+        <hr />
+        Work in Progress
+        <button id="generate">Generera Nyckel</button>
+      </div>
+    `;
+  }
+  async click(ev) {
+    const cellEl = tonic_default.match(ev.target, "td[data-v]");
+    if (cellEl && !cellEl.dataset.disabled) {
+      ev.preventDefault();
+      this.selectedCell = parseInt(cellEl.dataset.v);
+      return this.reRender((p) => ({ ...p, selectedCell: this.selectedCell }));
+    }
+    if (tonic_default.match(ev.target, "#btn-gps")) {
+      ev.preventDefault();
+      try {
+        const { coords } = await new Promise((resolve, reject) => {
+          if (!navigator.geolocation)
+            reject(new Error("Browser does not support geolocation APIs"));
+          else
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+        const geohash = latlon_geohash_default.encode(coords.latitude, coords.longitude, 6);
+        return this.reRender((p) => ({ ...p, geohash }));
+      } catch (err) {
+        console.error("FetchLocation failed", err);
+      }
+    }
+  }
+});
 /*! Bundled license information:
 
 @noble/hashes/esm/utils.js:
@@ -7652,4 +8744,7 @@ function unpromise() {
 
 @scure/base/lib/esm/index.js:
   (*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
+
+@noble/hashes/esm/utils.js:
+  (*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
 */
