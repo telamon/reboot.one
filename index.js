@@ -1,56 +1,68 @@
 import Tonic from '@socketsupply/tonic'
-import { decodeASL, flagOf } from 'powmem'
+import { nip19 } from 'nostr-tools'
 import {
-  getPublicKey,
-  getEventHash,
-  signEvent,
-  SimplePool,
-  parseReferences,
-  nip19
-} from 'nostr-tools'
+  ProfileFinder,
+  nostrQuery,
+  nostrStream,
+  decoratePOP0101,
+  parseContent,
+  emoOf,
+  geoCode
+} from './tools.js'
+import Geohash from 'latlon-geohash'
+import { flagOf } from 'powmem'
 
-const relays = [
-  // TODO: Replace with european only
-  'wss://relay.f7z.io',
-  'wss://nostr-pub.wellorder.net',
-  'wss://relay.nostr.band',
-  'wss://nostr-pub.wellorder.net',
-  'wss://relay.current.fyi',
-  'wss://relay.damus.io',
-  'wss://relay.snort.social',
-  'wss://nos.lol'
-]
+const pman = new ProfileFinder()
 const TAGS = ['reboot']
-let pool = new SimplePool()
 
 Tonic.add(class GuestBook extends Tonic {
   #posts = []
   render () {
     const posts = this.#posts.map(p => this.html`
-      <book-post event=${p}></book-post>
+      <book-post event=${p} rl="1"></book-post>
     `)
     return this.html`
+      ${this.renderPostDialog()}
+      <div class="flex row center"><button class="post-btn biff" data-parent="">Skapa Inlägg</button></div>
       <h3>Senaste Inlägg (${this.#posts.length + ''}st)</h3>
-      <post-form></post-form>
       ${posts}
+    `
+  }
+
+  renderPostDialog () {
+    return this.html`
+      <dialog id="postDialog">
+        <h2>Identitet</h2>
+        ${this.replyTo ? 'Nytt Inlägg' : 'Re:' + this.replyTo}
+        <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
+        <button id="submit">Skicka</button>
+      </dialog>
     `
   }
 
   disconnected () { this.sub?.unsub() }
   async connected () {
     const filters = [{ kinds: [1], '#t': TAGS }]
-    for await (const event of nQueryStream(filters)) {
-      const { pubkey, tags } = event
+    for await (const event of nostrStream(filters)) {
+      const { tags } = event
       const hashtag = tags.find(t => t[0] === 't' && ~TAGS.indexOf(t[1]))
       if (!hashtag) return
-      const { age, sex, location } = decodeASL(pubkey)
-      event.age = [16, 24, 32, 48][age]
-      event.sex = ['F', 'P', 'IB', 'R'][sex] // ['👩', '👨', '🧑', '🤖'][sex]
-      event.flag = flagOf(location)
+      decoratePOP0101(event)
       const idx = this.#posts.findIndex(p => p.created_at < event.created_at)
       if (!~idx) this.#posts.push(event)
       else this.#posts.splice(idx, 0, event)
       this.reRender()
+    }
+  }
+
+  click (ev) {
+    const postButton = Tonic.match(ev.target, '.post-btn')
+    if (postButton) {
+      this.replyTo = postButton.dataset.parent
+      this.querySelector('#postDialog').showModal()
+    } else {
+      console.log(ev.target)
+      this.querySelector('#postDialog').close()
     }
   }
 })
@@ -73,8 +85,12 @@ Tonic.add(class BookPost extends Tonic {
       content = content.replace(ref.text, () => this.html`<p-ref ref="${ref}"></p-ref>`)
     } */
     const iattachments = images.map(src => this.html`<post-img src="${src}"></post-img>`)
+
+    replies = replies.map(p => this.html`
+      <book-post event=${decoratePOP0101(p)}></book-post>
+    `)
     return this.html`
-      <div class="post flex column">
+      <div class="post flex column" style="--depth: ${(event.depth || 0) + ''};">
         <div class="flex row start">
           <div class="gutter flex column">
             <div class="portrait"><a href="https://iris.to/${nip19.npubEncode(event.pubkey)}" target="_blank">${picture}</a></div>
@@ -93,20 +109,37 @@ Tonic.add(class BookPost extends Tonic {
             </div>
           </div>
         </div>
+        <div class="replies">${replies}</div>
       </div>
     `
   }
 
   async * render () {
     yield this.html`Loading...`
-    const { event } = this.props
-    yield this.populate(event, null)
+    let replies = []
+    const { event, rl } = this.props
     let profile = undefined
+    yield this.populate(event, profile, replies)
     try {
       profile = await pman.profileOf(event.pubkey)
+      yield this.populate(event, profile, replies)
     } catch (error) { console.error('profileOf:Error:', error) }
-    // Attempt fetching replies
-    const replies = await nman.list(event.id)
+
+    if (rl) {
+      // Lazy workaround for lack of node-tree
+      try {
+        replies = await nostrQuery([{ kinds: [1], '#e': [event.id]}])
+        replies.sort((a, b) => b.created_at < a.created_at) // Time ASC
+        for (const e of replies) {
+          e.depth = 0
+          for (const [type, id] of e.tags.reverse()) {
+            if (type !== 'e') continue
+            e.depth++
+            if (e.id === id) break
+          }
+        }
+      } catch (error) { console.error('replies:Error:', error) }
+    }
     return this.populate(event, profile, replies)
   }
 })
@@ -141,40 +174,6 @@ Tonic.add(class PostForm extends Tonic {
 
   render () {
     let identity = this.html`
-      <h3>Skapa Identitet</h3>
-      <div>
-        <label for="sex">
-          Kön
-          <select name="sex" id="sex">
-            <option>Kvinna</option>
-            <option selected>Man</option>
-            <option>Icke-binär</option>
-          </select>
-        </label>
-        <br/>
-        <label for="age">
-          Ålder
-          <select name="age" id="age">
-            <option>16+</option>
-            <option selected>24+</option>
-            <option>32+</option>
-            <option>48+</option>
-          </select>
-        </label>
-        <br/>
-        <label for="location">
-          Plats
-          <select name="location" id="location">
-            <option>Stockholm</option>
-            <option selected>Göteborg</option>
-            <option>Malmö</option>
-            <option>Använd GPS</option>
-          </select>
-        </label>
-        <br/>
-        <br/>
-        <button id="generate">Generera Nyckel</button>
-      </div>
     `
     return this.html`
       <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
@@ -189,133 +188,104 @@ Tonic.add(class PostForm extends Tonic {
   }
 })
 
-function parseContent (content) {
-  const links = []
-  const images = []
-  content = content.replace(/(https:\/\/\S+)/g, (_, url) => {
-    try {
-      const u = new URL(url)
-      if (u.pathname.match(/jpe?g|png|webp|gif/)) images.push(url)
-      else links.push(url)
-    } catch (err) { console.warn('ParseURLError:', err) }
-    return '\n'
-  }).trim()
-  return { content, links, images }
-}
+Tonic.add(class KeygenButton extends Tonic {
+  render () {
+    return this.html`
+    <button class="biff">Utfärda Identitet</button>
+    `
+  }
+  click (ev) {
+    if (Tonic.match(ev.target, 'button')) document.getElementById('keygen').show()
+  }
+})
 
-/**
- * Naive black magic
- */
-class ProfileFinder {
-  profiles = {}
-  queue = [] // TODO: use Set
-  #p = null
+Tonic.add(class ModalDialog extends Tonic {
+  show () {
+    this.querySelector('dialog').showModal()
+  }
+  close () {
+    this.querySelector('dialog').close()
+  }
+  render () { return this.html`<dialog>${this.children}</dialog>` }
+  click ({ target }) { if (target === this.querySelector('dialog')) this.close() }
+})
 
-  /** @type {(string) => Promise<Profile>} */
-  async profileOf (key, _retry = 0) {
-    if (!key || _retry > 5) return null
-    if (this.has(key)) return this.contentOf(key)
-    if (!~this.queue.indexOf(key)) this.queue.push(key)
-    await this.#lookup().catch(err => console.error(err))
-    return this.has(key) ? this.contentOf(key) : this.profileOf(key, ++_retry) // reque until found
+Tonic.add(class KeyGenerator extends Tonic {
+  selectedCell = 5
+
+  render () {
+    this.props.geohash ||= 'u6282' // gbg
+    const geoLabel = geoCode(this.props.geohash)
+    const flag = flagOf(this.props.geohash)
+    const astd = (s, a, d) => this.html`
+      <td
+        data-v="${(s | a << 2) + ''}"
+        ${this.selectedCell === (s | a << 2) ? 'selected' : ''}
+        ${d ? 'data-disabled=true' : ''}>
+        ${emoOf(s, a)}
+      </td>
+    `
+    return this.html`
+      <div class="flex col xcenter">
+        <h1>Utfärda Identitet</h1>
+        <hr />
+        <table id="as-matrix">
+          <tr>
+            <th>&nbsp;</th>
+            <th colspan="4">Ålder</th>
+          </tr>
+          <tr class="mono">
+            <th>&nbsp;</th>
+            <th>16+</th><th>24+</th><th>32+</th><th>48+</th>
+          </tr>
+          <tr>
+            <th rowspan="6"><span class="r-90">Kön</th>
+            ${astd(0, 0)}${astd(0, 1)}${astd(0, 2)}${astd(0, 3)}
+          </tr>
+          <tr>
+            ${astd(1, 0)}${astd(1, 1)}${astd(1, 2)}${astd(1, 3)}
+          </tr>
+          <tr>
+            ${astd(2, 0)}${astd(2, 1)}${astd(2, 2)}${astd(2, 3)}
+          </tr>
+          <tr>
+            ${astd(3, 0, true)}${astd(3, 1, true)}${astd(3, 2, true)}${astd(3, 3, true)}
+          </tr>
+        </table>
+        <br>
+        <hr />
+        <br>
+        <p><strong>Plats</strong></p>
+        <div class="flex row space-around">
+          <input id="geohash-input" type="text" value="${this.props.geohash}"/>
+          <p class="geo-desc">${flag} ${geoLabel}</p>
+        </div>
+        <button id="btn-gps">Hämta Plats</button>
+
+        <hr />
+        Work in Progress
+        <button id="generate">Generera Nyckel</button>
+      </div>
+    `
   }
 
-  getEvent (key) {
-    if (!this.profiles[key]) {
-     const j = localStorage.getItem('p' + key)
-     if (j) this.profiles[key] = JSON.parse(j)
+  async click (ev) {
+    const cellEl = Tonic.match(ev.target, 'td[data-v]')
+    if (cellEl && !cellEl.dataset.disabled) {
+      ev.preventDefault()
+      this.selectedCell = parseInt(cellEl.dataset.v)
+      return this.reRender(p => ({ ...p, selectedCell: this.selectedCell }))
     }
-    return this.profiles[key]
-  }
-  setEvent (key, ev) {
-    this.profiles[key] = ev
-    localStorage.setItem('p' + key, JSON.stringify(ev))
-  }
-  has (key) { return !!this.getEvent(key) }
-  contentOf (key) { return JSON.parse(this.getEvent(key).content) }
-
-  async #lookup () {
-    if (this.#p) return this.#p
-    const authors = [ ...this.queue ]
-    // const n = authors.length
-    this.queue = []
-    this.#p = new Promise(resolve => setTimeout(resolve, 300)) // Let Buffer
-      .then(() => new Promise((resolve) => {
-        // console.info('Sub k0: ' , authors.join())
-        const sub = pool.sub(relays, [
-          { kinds: [0], authors }
-        ])
-        sub.on('event', event => {
-          if (event.kind !== 0) return
-          const prev = this.getEvent(event.pubkey)
-          if (!prev || prev.created_at < event.created_at) {
-            this.setEvent(event.pubkey, event)
-            authors.splice(authors.indexOf(event.pubkey), 1)
-          }
+    if (Tonic.match(ev.target, '#btn-gps')) {
+      ev.preventDefault()
+      try {
+        const { coords } = await new Promise((resolve, reject) => {
+          if (!navigator.geolocation) reject(new Error('Browser does not support geolocation APIs'))
+          else navigator.geolocation.getCurrentPosition(resolve, reject)
         })
-        sub.on('eose', () => {
-          // console.info('unsub() resolved:', n - authors.length, 'remain:', authors.join())
-          for (const a of authors) {
-            if (!~this.queue.indexOf(a)) this.queue.push(a)
-          }
-          sub.unsub()
-          this.#p = null
-          resolve()
-        })
-      }))
-    return this.#p
+        const geohash = Geohash.encode(coords.latitude, coords.longitude, 6)
+        return this.reRender(p => ({...p, geohash }))
+      } catch (err) { console.error('FetchLocation failed', err) }
+    }
   }
-}
-const pman = new ProfileFinder()
-
-class NoteTracker {
-  #notes = []
-  #lastSync = 0
-  #ns = 'root'
-  /** Attempt to fetch replies for given note-id */
-  async list (noteId) {
-    const subEvents = await nQuery([{ kinds: [1], '#e': [noteId]}])
-    console.log('SubNotes', subEvents)
-    return subEvents
-  }
-}
-
-const nman = new NoteTracker()
-
-async function nQuery (filters = []) {
-  const events = []
-  for await (const event of nQueryStream(filters)) events.push(event)
-  return events
-}
-
-/**
- * Converts pesky EventEmitters into
- * easily iterated Async Generators
- */
-async function * nQueryStream (filters = []) {
-  const sub = pool.sub(relays, filters)
-  let [ep, eset] = unpromise() // TODO: Timeout 30s
-  sub.on('eose', () => eset(null))
-  sub.on('event', ev => {
-    const next = unpromise()
-    const set = eset
-    ep = next[0]
-    eset = next[1]
-    set(ev)
-  })
-  while (true) {
-    const event = await ep
-    if (!event) break
-    yield event
-  }
-  sub.unsub()
-}
-// Borrowed from piconet
-function unpromise () {
-  let set, abort
-  return [
-    new Promise((resolve, reject) => { set = resolve; abort = reject }),
-    set,
-    abort
-  ]
-}
+})

@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "esbuild": "^0.18.17",
-    "esbuild-cli": "^0.0.1"
+    "esbuild-cli": "^0.0.1",
+    "latlon-geohash": "^2.0.0"
   },
   "dependencies": {
     "@noble/curves": "^1.0.0",

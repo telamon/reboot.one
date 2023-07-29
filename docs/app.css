@@ -47,6 +47,16 @@ section#propaganda p { color: var(--lov); font-size: larger; }
   background-repeat: no-repeat;
   background-position: center center;
 }*/
+
+hr {
+  display: block;
+  width: 66%;
+  border: none;
+  border-bottom: 2px dashed var(--xorcery);
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
 #logo {
   background-image: linear-gradient(to bottom, #000, #171516 51%);
   background-image: url('/glitch-eof.png');
@@ -107,6 +117,29 @@ footer, footer a {
   nav { flex-direction: column; }
   nav .sep { display: none; }
 }
+
+button {
+  border: 1px solid var(--xorcery);
+  background: black;
+  color: var(--xorcery);
+  padding: 0.5em 1.5em;
+  font-family: monospace;
+  margin: 1em 0;
+}
+button.biff {
+  font-size: 1.3em;
+  border: none;
+  background: var(--xorcery);
+  color: white;
+}
+
+dialog {
+  background: #000;
+  border: 2px outset var(--xorcery);
+  color: #eee;
+  min-width: 80vw;
+}
+dialog h2 { color: var(--xorcery); }
 /*
 counter d:first-child {
   border: 1px solid var(--counterborder);
@@ -131,12 +164,21 @@ counter d:first-child {
 
 /*guestbook*/
 guest-book { display: block; }
-guest-book .post { margin: 2em 0; max-width: 500px; overflow-x: hidden; }
+guest-book .post {
+  margin: 2em 0;
+  max-width: 500px;
+  overflow-x: hidden;
+  border-left: 1px dashed var(--xorcery);
+  padding-left: 1em;
+  margin-left: calc(1em * var(--depth));
+}
 guest-book .post .portrait img,
 guest-book .post .portrait .placeholder {
-  border-radius: 5px;
-  border: 1px solid #ff00ff;
+  border-radius: 4px;
+  border: 1px solid var(--xorcery);
   max-width: 3em;
+  box-shadow: 0 0 9px #d42be2a8;
+  margin-top: 1em;
 }
 guest-book .post .portrait .placeholder { width: 3em; height: 3em; }
 guest-book .gutter { padding-right: 1em; }
@@ -162,6 +204,36 @@ guest-book .post time { color: #888; }
   guest-book .post .portrait .placeholder { max-width: 2em; max-height: 2em; }
 }
 
+.r90 { transform: rotate(90deg); display: inline-block; }
+.r-90 { transform: rotate(-90deg); display: inline-block; }
+
+table#as-matrix {
+  border-collapse: collapse;
+  margin-right: 2em;
+}
+table#as-matrix td {
+  border: 1px solid var(--xorcery);
+  padding: 0.5em;
+  text-align: center;
+  font-size: x-large;
+}
+table#as-matrix td[selected] { background-color: var(--xorcery); }
+table#as-matrix td[data-disabled=true] { background-color: var(--xorcery); opacity: 0.6 }
+table#as-matrix tr.mono th { font-family: monospace; }
+
+#geohash-input {
+  background: black;
+  color: #fff;
+  outline: none;
+  border: 1px solid var(--xorcery);
+  font-size: x-large;
+  font-weight: bold;
+  width: 5em;
+  text-align: center;
+}
+.geo-desc {
+  margin-left: 2em;
+}
 /* picoflex.css */
 row, column, column-reverse, row-reverse, .flex {display:flex;}
 row, .row {flex-direction: row;}
