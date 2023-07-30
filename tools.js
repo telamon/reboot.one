@@ -8,6 +8,8 @@ import {
   nip19
 } from 'nostr-tools'
 import Geohash from 'latlon-geohash'
+import { schnorr } from '@noble/curves/secp256k1'
+import { bytesToHex } from '@noble/hashes/utils'
 
 const pool = new SimplePool()
 const relays = [
@@ -34,7 +36,7 @@ export function decoratePOP0101 (event) {
 
 /**
  * Performs an awaitable nostr-query/subscription.
- * @returns {import("nostr-tools").Event[]} of events after EOSE
+ * @returns {Promise<import("nostr-tools").Event[]>} of events after EOSE
  */
 export async function nostrQuery (filters = []) {
   const events = []
@@ -129,21 +131,23 @@ export class ProfileFinder {
 
   getEvent (key) {
     if (!this.profiles[key]) {
-     const j = localStorage.getItem('p' + key)
-     if (j) this.profiles[key] = JSON.parse(j)
+      const j = globalThis.localStorage.getItem('p' + key)
+      if (j) this.profiles[key] = JSON.parse(j)
     }
     return this.profiles[key]
   }
+
   setEvent (key, ev) {
     this.profiles[key] = ev
-    localStorage.setItem('p' + key, JSON.stringify(ev))
+    globalThis.localStorage.setItem('p' + key, JSON.stringify(ev))
   }
+
   has (key) { return !!this.getEvent(key) }
   contentOf (key) { return JSON.parse(this.getEvent(key).content) }
 
   async #lookup () {
     if (this.#p) return this.#p
-    const authors = [ ...this.queue ]
+    const authors = [...this.queue]
     // const n = authors.length
     this.queue = []
     this.#p = new Promise(resolve => setTimeout(resolve, 300)) // Let Buffer
@@ -226,31 +230,36 @@ class NoteTracker {
 const nman = new NoteTracker()
 */
 
-
+/**
+ * @param {string} hash Geohash
+ * @returns {string} Closest Landmark
+ */
 export function geoCode (hash) {
+  const flag = flagOf(hash)
+  if (flag !== '🇸🇪') return 'Utlandet'
   // GPT: please provide an array of sweden's 10 largest cities and their latitude and longitude in ES6
   const locations = [
-    /* { name: "Stockholm urban area", coordinates: [59.310087557972, 18.046331211663] },*/
-    { name: "Stockholm", coordinates: [59.33, 18.07] },
-    { name: "Göteborg", coordinates: [57.72, 12.01] },
-    { name: "Malmö", coordinates: [55.61, 13.02] },
-    { name: "Uppsala", coordinates: [59.86, 17.64] },
-    { name: "Norrköping", coordinates: [58.6, 16.17] },
-    { name: "Västerås", coordinates: [59.620000000000005, 16.54] },
-    { name: "Umeå", coordinates: [63.83, 20.240000000000002] },
-    { name: "Örebro", coordinates: [59.28, 15.22] },
-    { name: "Linköping", coordinates: [58.410000000000004, 15.63] },
-    { name: "Helsingborg", coordinates: [56.050000000000004, 12.700000000000001] },
-    { name: "Jonkoping", coordinates: [57.78, 14.17] },
-    { name: "Lund", coordinates: [55.71, 13.200000000000001] },
-    { name: "Gävle", coordinates: [60.69, 17.13] },
-    { name: "Södertälje", coordinates: [59.2, 17.63] },
-    { name: "Borås", coordinates: [57.730000000000004, 12.94] },
-    { name: "Halmstad", coordinates: [56.67, 12.86] },
-    { name: "Karlstad", coordinates: [59.38, 13.51] },
-    { name: "Eskilstuna", coordinates: [59.348700525963, 16.44903294272] },
-    { name: "Täby", coordinates: [59.433333333333, 18.083333333333] }
-  ].map(({ name, coordinates}) => {
+    /* { name: "Stockholm urban area", coordinates: [59.310087557972, 18.046331211663] }, */
+    { name: 'Stockholm', coordinates: [59.33, 18.07] },
+    { name: 'Göteborg', coordinates: [57.72, 12.01] },
+    { name: 'Malmö', coordinates: [55.61, 13.02] },
+    { name: 'Uppsala', coordinates: [59.86, 17.64] },
+    { name: 'Norrköping', coordinates: [58.6, 16.17] },
+    { name: 'Västerås', coordinates: [59.620000000000005, 16.54] },
+    { name: 'Umeå', coordinates: [63.83, 20.240000000000002] },
+    { name: 'Örebro', coordinates: [59.28, 15.22] },
+    { name: 'Linköping', coordinates: [58.410000000000004, 15.63] },
+    { name: 'Helsingborg', coordinates: [56.050000000000004, 12.700000000000001] },
+    { name: 'Jonkoping', coordinates: [57.78, 14.17] },
+    { name: 'Lund', coordinates: [55.71, 13.200000000000001] },
+    { name: 'Gävle', coordinates: [60.69, 17.13] },
+    { name: 'Södertälje', coordinates: [59.2, 17.63] },
+    { name: 'Borås', coordinates: [57.730000000000004, 12.94] },
+    { name: 'Halmstad', coordinates: [56.67, 12.86] },
+    { name: 'Karlstad', coordinates: [59.38, 13.51] },
+    { name: 'Eskilstuna', coordinates: [59.348700525963, 16.44903294272] },
+    { name: 'Täby', coordinates: [59.433333333333, 18.083333333333] }
+  ].map(({ name, coordinates }) => {
     return {
       name,
       coordinates,
@@ -261,7 +270,47 @@ export function geoCode (hash) {
   const sorted = locations
     .map(f => [f, xorDistance(src, f.packed)])
     .sort((a, b) => a[1] - b[1])
-  const [location, distance] = sorted[0]
-  // if (distance > 9000) return 'Utlandet'
+  const [location] = sorted[0]
   return location.name
 }
+
+/** @param {string} text Hex-string */
+export async function shareIt (text) {
+  if (navigator.share) {
+    await navigator.share({ text })
+    return 0
+  }
+  // Clipboard fallback
+  await navigator.clipboard.writeText(text)
+  return 1
+}
+
+// TODO: prob unexport?
+export async function getSecret () {
+  return globalThis.localStorage.getItem('_secret')
+}
+export async function getPub () {
+  // check if nip07 - Screw it. If people wanna nip07 they can use another client for now.
+  // check localStorage
+  const secret = await getSecret()
+  if (secret) return bytesToHex(schnorr.getPublicKey(secret))
+}
+
+export async function signNostrEvent (event) {
+  // check if nip07
+  // check if localStorage
+}
+
+/** @param {string|Uint8Array} secret Hex-string */
+export async function storeSecret (secret) {
+  if (typeof secret !== 'string') secret = bytesToHex(secret)
+  // const pub = schnorr.getPublicKey(secret)
+  globalThis.localStorage.setItem('_secret', secret)
+  // await tabSec.put(pub, secret)
+}
+
+/* Out of scope w/o https://cdn.jsdelivr.net/npm/idb@7/+esm
+export async function listSecrets () {
+  const secrets = await tabSec.getMany()
+}
+*/

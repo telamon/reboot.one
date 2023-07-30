@@ -5,16 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "esbuild --bundle index.js --format=esm --outfile=docs/index.b.js --servedir=docs/",
-    "build": "esbuild --bundle index.js --format=esm --outfile=docs/index.b.js"
+    "build": "esbuild --bundle index.js --format=esm --outfile=docs/index.b.js",
+    "lint": "standard --fix"
   },
   "devDependencies": {
     "esbuild": "^0.18.17",
     "esbuild-cli": "^0.0.1",
-    "latlon-geohash": "^2.0.0"
+    "latlon-geohash": "^2.0.0",
+    "standard": "^17.1.0"
   },
   "dependencies": {
     "@noble/curves": "^1.0.0",
     "@socketsupply/tonic": "^15.1.1",
+    "browser-level": "^1.0.1",
     "nostr-tools": "^1.13.1",
     "powmem": "^1.1.2"
   }

@@ -1,7 +1,9 @@
 :root {
   --counterborder: #0f0000;
   --xorcery: #8a2be2;
+  --blood: #e2452b;
   --lov: #b0f;
+  --tox: #2be2af;
 }
 
 nav {
@@ -118,13 +120,15 @@ footer, footer a {
   nav .sep { display: none; }
 }
 
-button {
-  border: 1px solid var(--xorcery);
+button, a[role="button"] {
+  --prime: var(--xorcery);
+  border: 1px solid var(--prime);
   background: black;
-  color: var(--xorcery);
+  color: var(--prime);
   padding: 0.5em 1.5em;
   font-family: monospace;
-  margin: 1em 0;
+  margin: 1em 4px;
+  text-decoration: none;
 }
 button.biff {
   font-size: 1.3em;
@@ -132,7 +136,18 @@ button.biff {
   background: var(--xorcery);
   color: white;
 }
+button.glitch, a[role="button"].glitch { --prime: var(--blood); }
+button.go, a[role="button"].go { --prime: var(--tox); }
 
+pre.bq {
+  --prime: #888;
+  border: 1px solid var(--prime);
+  padding: 4px 8px;
+  color: var(--prime);
+  font-size: large;
+  overflow-x: scroll;
+  max-width: 60vw;
+}
 dialog {
   background: #000;
   border: 2px outset var(--xorcery);
@@ -140,6 +155,8 @@ dialog {
   min-width: 80vw;
 }
 dialog h2 { color: var(--xorcery); }
+img.asciiloader { filter: sepia(100%) hue-rotate(214deg); }
+.sublm { color: #888; }
 /*
 counter d:first-child {
   border: 1px solid var(--counterborder);

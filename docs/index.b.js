@@ -7964,6 +7964,27 @@ var GHU = GHM.split("").reduce((h, l, i) => {
   return h;
 }, {});
 var SANE_DEFAULT = 15;
+function roll(age, sex, location, geobits = SANE_DEFAULT, maxTries = 5e5) {
+  const nbits = geobits + 4;
+  const buf = new Uint8Array(roundByte(nbits));
+  const prefix = packGeo(location, geobits, buf);
+  shift(prefix, sex & 2);
+  shift(prefix, sex & 1);
+  shift(prefix, age & 2);
+  shift(prefix, age & 1);
+  const mask = nbits % 8 ? (1 << nbits % 8) - 1 : 255;
+  const nBytes = prefix.length;
+  for (let i = 0; i < maxTries; i++) {
+    const sk = schnorr.utils.randomPrivateKey();
+    const pk = schnorr.getPublicKey(sk);
+    let v = true;
+    for (let n = 0; v && n < nBytes; n++) {
+      v = n + 1 === nBytes ? (pk[n] & mask) === (prefix[n] & mask) : v = pk[n] === prefix[n];
+    }
+    if (v)
+      return bytesToHex(sk);
+  }
+}
 function decodeASL(publicKey, geobits = SANE_DEFAULT) {
   if (typeof publicKey === "string")
     publicKey = hexToBytes(publicKey);
@@ -8361,7 +8382,7 @@ var ProfileFinder = class {
   }
   getEvent(key) {
     if (!this.profiles[key]) {
-      const j = localStorage.getItem("p" + key);
+      const j = globalThis.localStorage.getItem("p" + key);
       if (j)
         this.profiles[key] = JSON.parse(j);
     }
@@ -8369,7 +8390,7 @@ var ProfileFinder = class {
   }
   setEvent(key, ev) {
     this.profiles[key] = ev;
-    localStorage.setItem("p" + key, JSON.stringify(ev));
+    globalThis.localStorage.setItem("p" + key, JSON.stringify(ev));
   }
   has(key) {
     return !!this.getEvent(key);
@@ -8409,8 +8430,11 @@ var ProfileFinder = class {
   }
 };
 function geoCode(hash3) {
+  const flag = flagOf(hash3);
+  if (flag !== "\u{1F1F8}\u{1F1EA}")
+    return "Utlandet";
   const locations = [
-    /* { name: "Stockholm urban area", coordinates: [59.310087557972, 18.046331211663] },*/
+    /* { name: "Stockholm urban area", coordinates: [59.310087557972, 18.046331211663] }, */
     { name: "Stockholm", coordinates: [59.33, 18.07] },
     { name: "G\xF6teborg", coordinates: [57.72, 12.01] },
     { name: "Malm\xF6", coordinates: [55.61, 13.02] },
@@ -8439,8 +8463,24 @@ function geoCode(hash3) {
   });
   const src = packGeo(hash3);
   const sorted = locations.map((f2) => [f2, xorDistance(src, f2.packed)]).sort((a, b) => a[1] - b[1]);
-  const [location, distance] = sorted[0];
+  const [location] = sorted[0];
   return location.name;
+}
+async function shareIt(text) {
+  if (navigator.share) {
+    await navigator.share({ text });
+    return 0;
+  }
+  await navigator.clipboard.writeText(text);
+  return 1;
+}
+async function getSecret() {
+  return globalThis.localStorage.getItem("_secret");
+}
+async function storeSecret(secret) {
+  if (typeof secret !== "string")
+    secret = bytesToHex(secret);
+  globalThis.localStorage.setItem("_secret", secret);
 }
 
 // index.js
@@ -8507,7 +8547,7 @@ tonic_default.add(class BookPost extends tonic_default {
     const time = new Date(event.created_at * 1e3);
     const pad = (n) => n.toString().padStart(2, "0");
     const tstr = `${pad(time.getHours())}:${pad(time.getMinutes())} ${pad(time.getDate())}-${pad(time.getMonth())}-${pad(time.getFullYear())}`;
-    let { content, images } = parseContent(event.content);
+    const { content, images } = parseContent(event.content);
     const iattachments = images.map((src) => this.html`<post-img src="${src}"></post-img>`);
     replies = replies.map((p) => this.html`
       <book-post event=${decoratePOP0101(p)}></book-post>
@@ -8540,7 +8580,7 @@ tonic_default.add(class BookPost extends tonic_default {
     yield this.html`Loading...`;
     let replies = [];
     const { event, rl } = this.props;
-    let profile = void 0;
+    let profile;
     yield this.populate(event, profile, replies);
     try {
       profile = await pman.profileOf(event.pubkey);
@@ -8598,7 +8638,7 @@ tonic_default.add(class PostForm extends tonic_default {
     }
   }
   render() {
-    let identity = this.html`
+    const identity = this.html`
     `;
     return this.html`
       <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
@@ -8639,23 +8679,30 @@ tonic_default.add(class ModalDialog extends tonic_default {
   }
 });
 tonic_default.add(class KeyGenerator extends tonic_default {
-  selectedCell = 5;
+  async connected() {
+    const secret = await getSecret();
+    this.reRender((p) => ({ ...p, secret }));
+  }
   render() {
-    this.props.geohash ||= "u6282";
-    const geoLabel = geoCode(this.props.geohash);
-    const flag = flagOf(this.props.geohash);
-    const astd = (s, a, d) => this.html`
-      <td
-        data-v="${(s | a << 2) + ""}"
-        ${this.selectedCell === (s | a << 2) ? "selected" : ""}
-        ${d ? "data-disabled=true" : ""}>
-        ${emoOf(s, a)}
-      </td>
-    `;
-    return this.html`
-      <div class="flex col xcenter">
+    this.props.geohash ||= "u628";
+    this.props.hashRate ||= 0;
+    this.props.selectedCell ||= 5;
+    const { geohash, hashRate, isMining, secret, ulock, selectedCell } = this.props;
+    const state = isMining ? 1 : secret ? 2 : 0;
+    let content;
+    if (state === 0) {
+      const geoLabel = geoCode(geohash);
+      const flag = flagOf(geohash);
+      const astd = (s, a, d) => this.html`
+        <td
+          data-v="${(s | a << 2) + ""}"
+          ${selectedCell === (s | a << 2) ? "selected" : ""}
+          ${d ? "data-disabled=true" : ""}>
+          ${emoOf(s, a)}
+        </td>
+      `;
+      content = this.html`
         <h1>Utfärda Identitet</h1>
-        <hr />
         <table id="as-matrix">
           <tr>
             <th>&nbsp;</th>
@@ -8675,25 +8722,88 @@ tonic_default.add(class KeyGenerator extends tonic_default {
           <tr>
             ${astd(2, 0)}${astd(2, 1)}${astd(2, 2)}${astd(2, 3)}
           </tr>
-          <tr>
+          <!-- <tr>
             ${astd(3, 0, true)}${astd(3, 1, true)}${astd(3, 2, true)}${astd(3, 3, true)}
-          </tr>
+          </tr> -->
         </table>
         <br>
         <hr />
         <br>
         <p><strong>Plats</strong></p>
         <div class="flex row space-around">
-          <input id="geohash-input" type="text" value="${this.props.geohash}"/>
+          <input id="geohash-input" type="text"
+            ${ulock ? "" : 'disabled="true"'}
+            value="${geohash}"/>
           <p class="geo-desc">${flag} ${geoLabel}</p>
         </div>
         <button id="btn-gps">Hämta Plats</button>
-
         <hr />
-        Work in Progress
-        <button id="generate">Generera Nyckel</button>
+        <div class="flex row">
+          <button id="btn-close" class="glitch">Stäng</button>
+          <button id="btn-generate">Generera</button>
+        </div>
+      `;
+    } else if (state === 1) {
+      content = this.html`
+        <h1>Söker...</h1>
+        <img class="asciiloader" src="https://camo.githubusercontent.com/cab6fe7bb1021d845cb67eae7c618dd09ca6ec53f028a5349cf3ceae47d6f889/687474703a2f2f692e696d6775722e636f6d2f6c6e636270426d2e676966"/>
+        <pre><code>${hashRate.toFixed(2)} nycklar/s</code></pre>
+        <button id="btn-generate" class="glitch">Avbryt</button>
+      `;
+    } else {
+      const phex = bytesToHex(schnorr.getPublicKey(secret));
+      const nsec = nip19_exports.nsecEncode(secret);
+      const npub = nip19_exports.npubEncode(phex);
+      const { sex, age, location } = decodeASL(phex);
+      const slur = ["sassy", "stilig", "ball", "odefinierad"][sex];
+      content = this.html`
+        <h1>Identitet Utfärdad</h1>
+        <!-- <h4>${emoOf(sex, age)} ${flagOf(location)} ${geoCode(location)}</h4> -->
+        <p>
+          Grattis, du har funnit en ${slur} nyckel:<br/>
+        </p>
+        <div class="flex col">
+          <div>⚿ Hemligheten <small class="sublm">(håll hårt)</small></div>
+          <pre class="bq sk"><code>${nsec}</code></pre>
+          <div class="flex row end xcenter">
+            <a role="button"
+              href="data:text/plain,${secret}"
+              download="secret-${phex.slice(0, 6)}.txt">
+              Spara
+            </a>
+            <a role="button"
+              href="https://iris.to/#${nsec}"
+              target="_blank">
+              iris
+            </a>
+          </div>
+          <br/>
+          <hr/>
+          <br/>
+          <br/>
+          <div>⚿ Publik <small class="sublm">(ge bort till kompis)</small></div>
+          <pre class="bq pk"><code>${npub}</code></pre>
+          <div class="flex row end xcenter">
+            <a role="button" data-share="${npub}">Dela</a>
+          </div>
+        </div>
+        <div class="flex row center">
+          <button id="btn-erase" class="glitch">Radera</button>
+          <button id="btn-close">Stäng</button>
+        </div>
+      `;
+    }
+    return this.html`
+      <div class="flex col xcenter">
+        ${content}
       </div>
     `;
+  }
+  change(ev) {
+    console.log("onchange", ev.target);
+    if (tonic_default.match(ev.target, "#geohash-input")) {
+      return this.reRender((p) => ({ ...p, geohash: ev.target.value }));
+    }
   }
   async click(ev) {
     const cellEl = tonic_default.match(ev.target, "td[data-v]");
@@ -8715,7 +8825,74 @@ tonic_default.add(class KeyGenerator extends tonic_default {
         return this.reRender((p) => ({ ...p, geohash }));
       } catch (err) {
         console.error("FetchLocation failed", err);
+        return this.reRender((p) => ({ ...p, ulock: true }));
       }
+    }
+    if (tonic_default.match(ev.target, "#btn-generate"))
+      return this.toggleGenerate(ev);
+    if (tonic_default.match(ev.target, "[data-share]")) {
+      ev.preventDefault();
+      try {
+        const code = await shareIt(ev.target.dataset.share);
+        if (code === 1)
+          globalThis.alert("Copied to clipboard");
+      } catch (error) {
+        console.error("Share Failed", error);
+      }
+    }
+    if (tonic_default.match(ev.target, "#btn-close")) {
+      ev.preventDefault();
+      document.getElementById("keygen").close();
+    }
+    if (tonic_default.match(ev.target, "#btn-erase")) {
+      if (window.confirm("Har du sparat backup?\nTryck p\xE5 OK f\xF6r att radera allt och ladda om")) {
+        window.localStorage.clear();
+        window.location.reload();
+      }
+    }
+  }
+  toggleGenerate(event) {
+    event?.preventDefault();
+    const setMiningState = (isMining) => this.reRender((p) => ({ ...p, isMining }));
+    if (this.props.isMining) {
+      console.log("KEYGEN: STOP");
+      setMiningState(false);
+    } else {
+      console.log("KEYGEN: START");
+      const { selectedCell, geohash } = this.props;
+      const sex = selectedCell & 3;
+      const age = selectedCell >> 2 & 3;
+      const bits = 12;
+      const mute = true;
+      console.log("Generating", age, sex, geohash, mute, bits);
+      let secret = null;
+      const start = performance.now();
+      let keysTested = 0;
+      const testCount = 1e3;
+      setMiningState(true);
+      const rollLoop = () => setTimeout(() => {
+        if (!secret && this.props.isMining) {
+          secret = roll(age, sex, geohash, bits, testCount);
+          keysTested += testCount;
+          const hashRate = keysTested / (performance.now() - start);
+          this.reRender((p) => ({ ...p, hashRate: hashRate * 1e3 }));
+        }
+        if (!secret && this.props.isMining)
+          rollLoop();
+        else {
+          if (secret) {
+            console.log(
+              "Secret Found!",
+              bytesToHex(schnorr.getPublicKey(secret)),
+              nip19_exports.nsecEncode(secret)
+            );
+            storeSecret(secret).then(() => console.log("Secret stored")).catch((err) => console.error("Failed storing secret", err));
+            this.reRender((p) => ({ ...p, isMining: false, secret }));
+          } else
+            setMiningState(false);
+        }
+      }, 30);
+      rollLoop();
     }
   }
 });
