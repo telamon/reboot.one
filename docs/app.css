@@ -133,12 +133,12 @@ button, a[role="button"] {
 button.biff {
   font-size: 1.3em;
   border: none;
-  background: var(--xorcery);
+  background: var(--prime);
   color: white;
 }
 button.glitch, a[role="button"].glitch { --prime: var(--blood); }
 button.go, a[role="button"].go { --prime: var(--tox); }
-
+button[disabled] { --prime: #888; }
 pre.bq {
   --prime: #888;
   border: 1px solid var(--prime);
@@ -190,14 +190,21 @@ guest-book .post {
   margin-left: calc(1em * var(--depth));
 }
 guest-book .post .portrait img,
-guest-book .post .portrait .placeholder {
+guest-book .post .portrait .placeholder,
+post-form author .placeholder,
+post-form author img {
   border-radius: 4px;
   border: 1px solid var(--xorcery);
   max-width: 3em;
   box-shadow: 0 0 9px #d42be2a8;
+}
+guest-book .post .portrait img,
+guest-book .post .portrait .placeholder {
   margin-top: 1em;
 }
-guest-book .post .portrait .placeholder { width: 3em; height: 3em; }
+
+guest-book .post .portrait .placeholder,
+post-form author .placeholder { width: 3em; height: 3em; }
 guest-book .gutter { padding-right: 1em; }
 guest-book .alias { font-size: larger; }
 guest-book .post .content {
@@ -251,6 +258,24 @@ table#as-matrix tr.mono th { font-family: monospace; }
 .geo-desc {
   margin-left: 2em;
 }
+
+author {
+  display: block;
+  border: 1px solid var(--xorcery);
+  padding: 1em;
+}
+textarea, input[type=text] {
+  background: none;
+  color: white;
+  border: 1px dashed #888;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}
+textarea:focus, input[type=text]:focus {
+  border: 1px dashed var(--xorcery);
+  outline: none;
+}
+
 /* picoflex.css */
 row, column, column-reverse, row-reverse, .flex {display:flex;}
 row, .row {flex-direction: row;}

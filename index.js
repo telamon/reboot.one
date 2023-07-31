@@ -18,7 +18,7 @@ import { schnorr } from '@noble/curves/secp256k1'
 import { bytesToHex } from '@noble/hashes/utils'
 
 const pman = new ProfileFinder()
-const TAGS = ['reboot']
+const TAGS = ['reboot', 'powmem']
 
 Tonic.add(class GuestBook extends Tonic {
   #posts = []
@@ -27,8 +27,7 @@ Tonic.add(class GuestBook extends Tonic {
       <book-post event=${p} rl="1"></book-post>
     `)
     return this.html`
-      ${this.renderPostDialog()}
-      <div class="flex row center"><button class="post-btn biff" data-parent="">Skapa Inlägg</button></div>
+      <post-form></post-form>
       <h3>Senaste Inlägg (${this.#posts.length + ''}st)</h3>
       ${posts}
     `
@@ -37,10 +36,6 @@ Tonic.add(class GuestBook extends Tonic {
   renderPostDialog () {
     return this.html`
       <dialog id="postDialog">
-        <h2>Identitet</h2>
-        ${this.replyTo ? 'Nytt Inlägg' : 'Re:' + this.replyTo}
-        <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
-        <button id="submit">Skicka</button>
       </dialog>
     `
   }
@@ -61,13 +56,113 @@ Tonic.add(class GuestBook extends Tonic {
   }
 
   click (ev) {
-    const postButton = Tonic.match(ev.target, '.post-btn')
-    if (postButton) {
-      this.replyTo = postButton.dataset.parent
-      this.querySelector('#postDialog').showModal()
-    } else {
-      console.log(ev.target)
-      this.querySelector('#postDialog').close()
+  }
+})
+
+async function fileToDataURL (file) {
+  return new Promise(resolve => {
+    const fr = new globalThis.FileReader()
+    fr.onloadend = () => resolve(fr.result)
+    fr.readAsDataURL(file)
+  })
+}
+Tonic.add(class PostForm extends Tonic {
+  async * render () {
+    yield this.html`
+      <sub>Loading...</sub>
+      <author class="flex row space-between xcenter wrap">
+        <div class="placeholder" style="background-color: #888"></div>
+      </author>
+    `
+    const secret = await getSecret()
+    let authorProfile = this.html`
+      generera id först
+    `
+    if (secret) {
+      const pubkey = bytesToHex(schnorr.getPublicKey(secret))
+      const profile = {
+        display_name: '',
+        picture: this.props.inputPicture ? await fileToDataURL(this.props.inputPicture) : null
+      }
+      // const profile = await pman.profileOf(pubkey)
+      const name = this.props.inputName || profile.display_name || profile.name || profile.username
+      const color = pubkey.slice(0, 6)
+      const picture = profile.picture
+        ? this.html`<div class="portrait"><img src="${profile?.picture}" /></div>`
+        : this.html`<div class="placeholder" style="background-color: #${color}"></div> `
+      const asl = decodeASL(pubkey)
+      const flag = flagOf(asl.location)
+      const location = geoCode(asl.location)
+      const sex = ['Kvinna', 'Man', 'Ickebinär', 'Robot'][asl.sex]
+      const age = ['16', '24', '32', '48'][asl.age]
+      const saveEnabled = this.props.profileDirty ? '' : 'disabled'
+      authorProfile = this.html`
+        <sub>Inloggad som</sub>
+        <author class="flex row space-between xcenter wrap">
+          <div class="flex column">
+            ${picture}
+            <input type="hidden" id="inp-profile-url" value="${profile.picture}"/>
+          </div>
+            <input type="file" id="inp-profile-upload" style="display: none" />
+            <label>
+              <input type="text" id="inp-profile-name" value="${name}" placeholder="${'Anonym-' + pubkey.slice(0, 4)}"/>
+            </label>
+          <div class="flex column xcenter">
+            <div>
+              ${age}+ ${sex} ${flag} ${location}
+            </div>
+            <small>${pubkey.slice(0, 24)}</small>
+          </div>
+          <div>
+            <button id="btn-save-profile" class="go" ${saveEnabled}>spara</button>
+          </div>
+        </author>
+      `
+    }
+
+    const attrD = !secret ? 'disabled=true' : ''
+    return this.html`
+      <div id="post-form">
+        ${authorProfile}
+        <br/>
+        <h1>Gästboken</h1>
+        <!-- ${this.replyTo ? 'Nytt Inlägg' : 'Re:' + this.replyTo} -->
+          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
+        <!--<button id="submit" ${attrD}>Skicka</button>-->
+        <div class="flex row center"><button class="post-btn biff" data-parent="">Skapa Inlägg</button></div>
+      </div>
+    `
+  }
+
+  click (ev) {
+    if (
+      Tonic.match(ev.target, 'div.portrait img') ||
+      Tonic.match(ev.target, '.placeholder')
+    ) {
+      ev.preventDefault()
+      this.querySelector('#inp-profile-upload').click()
+    }
+
+    if (Tonic.match(ev.target, '#btn-save-profile')) {
+      ev.preventDefault()
+      this.reRender(p => ({ ...p, profileDirty: false, inputName: null, inputPicture: null }))
+    }
+  }
+
+  change (ev) {
+    const { target } = ev
+    if (Tonic.match(target, '#inp-profile-upload')) {
+      ev.preventDefault()
+      // ev.target payload => nostr.build
+      console.log('picture upload', ev)
+      const [file] = target.files
+      if (!file) return
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return
+      this.reRender(p => ({ ...p, profileDirty: true, inputPicture: file }))
+    }
+    if (Tonic.match(target, '#inp-profile-name')) {
+      ev.preventDefault()
+      this.reRender(p => ({ ...p, profileDirty: true, inputName: ev.target.value }))
     }
   }
 })
@@ -166,46 +261,6 @@ Tonic.add(class PostImg extends Tonic {
   }
 })
 
-Tonic.add(class PostForm extends Tonic {
-  #pk = null
-  #type = -1
-  click (ev) {
-    if (Tonic.match(ev.target, '#submit')) {
-      this.querySelector('dialog').showModal()
-    }
-    if (Tonic.match(ev.target, '#abort')) {
-      this.querySelector('dialog').close()
-    }
-  }
-
-  render () {
-    const identity = this.html`
-    `
-    return this.html`
-      <textarea id="note-area" rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
-      <button id="submit">Skicka</button>
-      <dialog>
-        ${identity}
-        <br />
-        <button id="abort">Avbryt</button>
-        <button id="kbk" disabled>Kör bara kör</button>
-      </dialog>
-    `
-  }
-})
-
-Tonic.add(class KeygenButton extends Tonic {
-  render () {
-    return this.html`
-    <button class="biff">Utfärda Identitet</button>
-    `
-  }
-
-  click (ev) {
-    if (Tonic.match(ev.target, 'button')) document.getElementById('keygen').show()
-  }
-})
-
 Tonic.add(class ModalDialog extends Tonic {
   show () {
     this.querySelector('dialog').showModal()
@@ -284,7 +339,7 @@ Tonic.add(class KeyGenerator extends Tonic {
         <hr />
         <div class="flex row">
           <button id="btn-close" class="glitch">Stäng</button>
-          <button id="btn-generate">Generera</button>
+          <button id="btn-generate" class="go">Generera</button>
         </div>
       `
     } else if (state === 1) {
@@ -333,7 +388,7 @@ Tonic.add(class KeyGenerator extends Tonic {
         </div>
         <div class="flex row center">
           <button id="btn-erase" class="glitch">Radera</button>
-          <button id="btn-close">Stäng</button>
+          <button id="btn-close" class="go">Stäng</button>
         </div>
       `
     }
@@ -438,4 +493,9 @@ Tonic.add(class KeyGenerator extends Tonic {
       rollLoop()
     }
   }
+})
+
+Tonic.add(class KeygenButton extends Tonic {
+  render () { return this.html`<button class="biff">Utfärda Identitet</button>` }
+  click (ev) { if (Tonic.match(ev.target, 'button')) document.getElementById('keygen').show(true) }
 })

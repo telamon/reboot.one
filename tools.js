@@ -18,7 +18,7 @@ const relays = [
   'wss://nostr-pub.wellorder.net',
   'wss://relay.nostr.band',
   'wss://nostr-pub.wellorder.net',
-  'wss://relay.current.fyi',
+  // 'wss://relay.current.fyi', // Offline
   'wss://relay.damus.io',
   'wss://relay.snort.social',
   'wss://nos.lol'
