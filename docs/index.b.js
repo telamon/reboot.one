@@ -8485,7 +8485,7 @@ async function storeSecret(secret) {
 
 // index.js
 var pman = new ProfileFinder();
-var TAGS = ["reboot", "powmem"];
+var TAGS = ["reboot", "reroll"];
 tonic_default.add(class GuestBook extends tonic_default {
   #posts = [];
   render() {
@@ -8543,7 +8543,14 @@ tonic_default.add(class PostForm extends tonic_default {
     `;
     const secret = await getSecret();
     let authorProfile = this.html`
-      generera id först
+      <sub>Logga in</sub>
+      <author class="flex row space-between xcenter wrap">
+        <button id="btn-p-gen">generera</button>
+        <div>
+          <input type="text" id="inp-sk-import" placeholder="Klistra in din nsec..."/>
+          <button>importera</button>
+        </div>
+      </author>
     `;
     if (secret) {
       const pubkey = bytesToHex(schnorr.getPublicKey(secret));
@@ -8573,7 +8580,7 @@ tonic_default.add(class PostForm extends tonic_default {
             </label>
           <div class="flex column xcenter">
             <div>
-              ${age}+ ${sex} ${flag} ${location}
+              ${age}+ ${sex} <span title="${asl.location}">${flag}</span> ${location}
             </div>
             <small>${pubkey.slice(0, 24)}</small>
           </div>
@@ -8600,6 +8607,10 @@ tonic_default.add(class PostForm extends tonic_default {
     if (tonic_default.match(ev.target, "div.portrait img") || tonic_default.match(ev.target, ".placeholder")) {
       ev.preventDefault();
       this.querySelector("#inp-profile-upload").click();
+    }
+    if (tonic_default.match(ev.target, "#btn-p-gen")) {
+      ev.preventDefault();
+      document.getElementById("keygen").show(true);
     }
     if (tonic_default.match(ev.target, "#btn-save-profile")) {
       ev.preventDefault();
@@ -8934,7 +8945,7 @@ tonic_default.add(class KeyGenerator extends tonic_default {
               bytesToHex(schnorr.getPublicKey(secret)),
               nip19_exports.nsecEncode(secret)
             );
-            storeSecret(secret).then(() => console.log("Secret stored")).catch((err) => console.error("Failed storing secret", err));
+            storeSecret(secret).then(() => console.log("Secret stored")).catch((err) => console.error("Failed storing secret", err)).then(() => document.querySelector("post-form").reRender());
             this.reRender((p) => ({ ...p, isMining: false, secret }));
           } else
             setMiningState(false);

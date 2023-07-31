@@ -18,7 +18,7 @@ import { schnorr } from '@noble/curves/secp256k1'
 import { bytesToHex } from '@noble/hashes/utils'
 
 const pman = new ProfileFinder()
-const TAGS = ['reboot', 'powmem']
+const TAGS = ['reboot', 'reroll']
 
 Tonic.add(class GuestBook extends Tonic {
   #posts = []
@@ -76,7 +76,14 @@ Tonic.add(class PostForm extends Tonic {
     `
     const secret = await getSecret()
     let authorProfile = this.html`
-      generera id först
+      <sub>Logga in</sub>
+      <author class="flex row space-between xcenter wrap">
+        <button id="btn-p-gen">generera</button>
+        <div>
+          <input type="text" id="inp-sk-import" placeholder="Klistra in din nsec..."/>
+          <button>importera</button>
+        </div>
+      </author>
     `
     if (secret) {
       const pubkey = bytesToHex(schnorr.getPublicKey(secret))
@@ -109,7 +116,7 @@ Tonic.add(class PostForm extends Tonic {
             </label>
           <div class="flex column xcenter">
             <div>
-              ${age}+ ${sex} ${flag} ${location}
+              ${age}+ ${sex} <span title="${asl.location}">${flag}</span> ${location}
             </div>
             <small>${pubkey.slice(0, 24)}</small>
           </div>
@@ -142,7 +149,10 @@ Tonic.add(class PostForm extends Tonic {
       ev.preventDefault()
       this.querySelector('#inp-profile-upload').click()
     }
-
+    if (Tonic.match(ev.target, '#btn-p-gen')) {
+      ev.preventDefault()
+      document.getElementById('keygen').show(true)
+    }
     if (Tonic.match(ev.target, '#btn-save-profile')) {
       ev.preventDefault()
       this.reRender(p => ({ ...p, profileDirty: false, inputName: null, inputPicture: null }))
@@ -486,6 +496,7 @@ Tonic.add(class KeyGenerator extends Tonic {
             storeSecret(secret)
               .then(() => console.log('Secret stored'))
               .catch(err => console.error('Failed storing secret', err))
+              .then(() => document.querySelector('post-form').reRender())
             this.reRender(p => ({ ...p, isMining: false, secret }))
           } else setMiningState(false)
         }
