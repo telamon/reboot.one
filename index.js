@@ -10,14 +10,15 @@ import {
   geoCode,
   shareIt,
   storeSecret,
-  getSecret
+  getSecret,
+  updateProfileNP
 } from './tools.js'
 import Geohash from 'latlon-geohash'
 import { decodeASL, flagOf, roll } from 'powmem'
 import { schnorr } from '@noble/curves/secp256k1'
 import { bytesToHex } from '@noble/hashes/utils'
 
-const pman = new ProfileFinder()
+const pman = ProfileFinder.singleton()
 const TAGS = ['reboot', 'reroll']
 
 Tonic.add(class GuestBook extends Tonic {
@@ -102,7 +103,8 @@ Tonic.add(class PostForm extends Tonic {
       const location = geoCode(asl.location)
       const sex = ['Kvinna', 'Man', 'Ickebinär', 'Robot'][asl.sex]
       const age = ['16', '24', '32', '48'][asl.age]
-      const saveEnabled = this.props.profileDirty ? '' : 'disabled'
+      const { profileDirty, saving } = this.props
+      const saveEnabled = profileDirty && !saving ? '' : 'disabled'
       authorProfile = this.html`
         <sub>Inloggad som</sub>
         <author class="flex row space-between xcenter wrap">
@@ -118,10 +120,12 @@ Tonic.add(class PostForm extends Tonic {
             <div>
               ${age}+ ${sex} <span title="${asl.location}">${flag}</span> ${location}
             </div>
-            <small>${pubkey.slice(0, 24)}</small>
+            <small class="subl">${pubkey.slice(0, 24)}</small>
           </div>
           <div>
-            <button id="btn-save-profile" class="go" ${saveEnabled}>spara</button>
+            <button id="btn-save-profile" class="go" ${saveEnabled} ${saving && 'aria-busy=true'}>
+              ${saving ? 'sparar' : 'spara'}
+            </button>
           </div>
         </author>
       `
@@ -141,7 +145,7 @@ Tonic.add(class PostForm extends Tonic {
     `
   }
 
-  click (ev) {
+  async click (ev) {
     if (
       Tonic.match(ev.target, 'div.portrait img') ||
       Tonic.match(ev.target, '.placeholder')
@@ -155,7 +159,12 @@ Tonic.add(class PostForm extends Tonic {
     }
     if (Tonic.match(ev.target, '#btn-save-profile')) {
       ev.preventDefault()
-      this.reRender(p => ({ ...p, profileDirty: false, inputName: null, inputPicture: null }))
+      this.reRender(p => ({ ...p, saving: true }))
+      await updateProfileNP(
+        this.querySelector('#inp-profile-name').value,
+        this.props.inputPicture
+      )
+      this.reRender(p => ({ ...p, profileDirty: false, inputName: null, inputPicture: null, saving: false}))
     }
   }
 
@@ -469,7 +478,7 @@ Tonic.add(class KeyGenerator extends Tonic {
       const { selectedCell, geohash } = this.props
       const sex = selectedCell & 0b11
       const age = (selectedCell >> 2) & 0b11
-      const bits = 12
+      const bits = 15
       const mute = true
       console.log('Generating', age, sex, geohash, mute, bits)
       let secret = null

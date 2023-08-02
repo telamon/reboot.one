@@ -116,6 +116,10 @@ export function emoOf (sex, age = 1) {
  * Naive black magic
  */
 export class ProfileFinder {
+  static _i
+  /** @returns {ProfileFinder} */
+  static singleton () { return (ProfileFinder._i ||= new ProfileFinder()) }
+
   profiles = {}
   queue = [] // TODO: use Set
   #p = null
@@ -314,3 +318,10 @@ export async function listSecrets () {
   const secrets = await tabSec.getMany()
 }
 */
+
+export async function updateProfileNP(name, picture) {
+  const pman = ProfileFinder.singleton()
+  const pkhex = await getPub()
+  const profile = await pman.profileOf(pkhex)
+  console.log('Update profile', name, picture, pkhex, profile)
+}
