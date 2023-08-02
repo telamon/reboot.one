@@ -5,7 +5,8 @@ import {
   signEvent,
   SimplePool,
   parseReferences,
-  nip19
+  nip19,
+  getSignature
 } from 'nostr-tools'
 import Geohash from 'latlon-geohash'
 import { schnorr } from '@noble/curves/secp256k1'
@@ -124,6 +125,7 @@ export class ProfileFinder {
   queue = [] // TODO: use Set
   #p = null
 
+  async profileOfQuick (key) { return this.profileOf(key, 5) }
   /** @type {(string) => Promise<Profile>} */
   async profileOf (key, _retry = 0) {
     if (!key || _retry > 5) return null
@@ -319,9 +321,54 @@ export async function listSecrets () {
 }
 */
 
-export async function updateProfileNP(name, picture) {
+export async function updateProfileNP (name, file) {
   const pman = ProfileFinder.singleton()
-  const pkhex = await getPub()
-  const profile = await pman.profileOf(pkhex)
-  console.log('Update profile', name, picture, pkhex, profile)
+  const pubkey = await getPub()
+  const profile = await pman.profileOfQuick(pubkey, 4)
+  let picture = profile?.picture || ''
+  if (file) {
+    picture = await nostrBuildUpload(file)
+  }
+
+  // TODO: copy over defaults to event:
+  const content = {
+    // about: '',
+    // banner: '',
+    name,
+    display_name: name,
+    username: name,
+    picture
+    // TODO: Hammer of Thor
+    // lud06: 'lnurl1dp68gurn8ghj7ampd3kx2ar0veekzar0wd5xjtnrdakj7tnhv4kxctttdehhwm30d3h82unvwqhhgun4wd68jcm0d4nx7un58quq8vas75'
+    // website: "https://pure.xorcery.co",
+    // nip05: "telamon@xorcery.co",
+    // nip05valid: true,
+    // lud16: ''
+  }
+  const event = {
+    kind: 0,
+    pubkey,
+    created_at: Math.floor(Date.now() / 1000),
+    content: JSON.stringify(content),
+    tags: []
+  }
+  event.id = getEventHash(event)
+  event.sig = getSignature(event, await getSecret())
+  console.log('Update profile', name, picture, pubkey, profile, 'new event', event)
+  const pubs = await Promise.race(pool.publish(relays, event))
+  console.log('Pool response', pubs)
+  return true
+}
+
+export async function nostrBuildUpload (file) {
+  const formData = new FormData()
+  formData.append('fileToUpload', file)
+  console.info('Uploading file to nostr.build')
+  const res = await fetch('https://nostr.build/api/upload/iris.php', {
+    method: 'POST',
+    body: formData
+  })
+  const url = await res.json()
+  console.info('Upload successful', url)
+  return url
 }

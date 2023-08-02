@@ -88,15 +88,12 @@ Tonic.add(class PostForm extends Tonic {
     `
     if (secret) {
       const pubkey = bytesToHex(schnorr.getPublicKey(secret))
-      const profile = {
-        display_name: '',
-        picture: this.props.inputPicture ? await fileToDataURL(this.props.inputPicture) : null
-      }
-      // const profile = await pman.profileOf(pubkey)
+      const profile = (await pman.profileOfQuick(pubkey)) || {}
       const name = this.props.inputName || profile.display_name || profile.name || profile.username
       const color = pubkey.slice(0, 6)
+      const purl = this.props.inputPicture ? await fileToDataURL(this.props.inputPicture) : profile.picture
       const picture = profile.picture
-        ? this.html`<div class="portrait"><img src="${profile?.picture}" /></div>`
+        ? this.html`<div class="portrait"><img src="${purl}" /></div>`
         : this.html`<div class="placeholder" style="background-color: #${color}"></div> `
       const asl = decodeASL(pubkey)
       const flag = flagOf(asl.location)
