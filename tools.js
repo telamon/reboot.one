@@ -1,12 +1,11 @@
 import { decodeASL, flagOf, xorDistance, packGeo } from 'powmem'
 import {
-  getPublicKey,
-  getEventHash,
-  signEvent,
   SimplePool,
-  parseReferences,
+  getEventHash,
+  getSignature,
   nip19,
-  getSignature
+  signEvent,
+  parseReferences,
 } from 'nostr-tools'
 import Geohash from 'latlon-geohash'
 import { schnorr } from '@noble/curves/secp256k1'
@@ -136,7 +135,7 @@ export class ProfileFinder {
   }
 
   getEvent (key) {
-    if (!this.profiles[key]) {
+    if (false && !this.profiles[key]) {
       const j = globalThis.localStorage.getItem('p' + key)
       if (j) this.profiles[key] = JSON.parse(j)
     }
@@ -371,4 +370,22 @@ export async function nostrBuildUpload (file) {
   const url = await res.json()
   console.info('Upload successful', url)
   return url
+}
+
+export async function postNote (text, extraTags = []) {
+  const pubkey = await getPub()
+  const content = text
+  const event = {
+    kind: 1,
+    pubkey,
+    created_at: Math.floor(Date.now() / 1000),
+    content: JSON.stringify(content),
+    tags: [...extraTags]
+  }
+  event.id = getEventHash(event)
+  event.sig = getSignature(event, await getSecret())
+  console.log('PostNote', event)
+  const pubs = await Promise.race(pool.publish(relays, event))
+  console.log('Pool response', pubs)
+  return true
 }

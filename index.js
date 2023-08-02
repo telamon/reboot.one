@@ -11,7 +11,8 @@ import {
   shareIt,
   storeSecret,
   getSecret,
-  updateProfileNP
+  updateProfileNP,
+  postNote
 } from './tools.js'
 import Geohash from 'latlon-geohash'
 import { decodeASL, flagOf, roll } from 'powmem'
@@ -127,17 +128,17 @@ Tonic.add(class PostForm extends Tonic {
         </author>
       `
     }
-
-    const attrD = !secret ? 'disabled=true' : ''
+    const { isPosting } = this.props
+    const attrD = !secret || isPosting ? 'disabled=true' : ''
     return this.html`
       <div id="post-form">
         ${authorProfile}
         <br/>
         <h1>Gästboken</h1>
         <!-- ${this.replyTo ? 'Nytt Inlägg' : 'Re:' + this.replyTo} -->
-          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
-        <!--<button id="submit" ${attrD}>Skicka</button>-->
-        <div class="flex row center"><button class="post-btn biff" data-parent="">Skapa Inlägg</button></div>
+          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Lämmna en kommentar här eller tagga med #reboot för att synas"></textarea>
+        <!--<button id="submit">Skicka</button>-->
+        <div class="flex row center"><button class="post-btn biff" ${attrD} ${isPosting ? 'aria-busy=true' : ''}>Skapa Inlägg</button></div>
       </div>
     `
   }
@@ -161,7 +162,16 @@ Tonic.add(class PostForm extends Tonic {
         this.querySelector('#inp-profile-name').value,
         this.props.inputPicture
       )
-      this.reRender(p => ({ ...p, profileDirty: false, inputName: null, inputPicture: null, saving: false}))
+      this.reRender(p => ({ ...p, profileDirty: false, inputName: null, inputPicture: null, saving: false }))
+    }
+    if (Tonic.match(ev.target, 'button.post-btn')) {
+      ev.preventDefault()
+      console.log('Post button')
+      this.reRender(p => ({ ...p, isPosting: true }))
+      await postNote(this.querySelector('#note-area').value, [
+        ['t', 'reboot']
+      ])
+      this.reRender(p => ({ ...p, isPosting: false }))
     }
   }
 
@@ -179,6 +189,9 @@ Tonic.add(class PostForm extends Tonic {
     if (Tonic.match(target, '#inp-profile-name')) {
       ev.preventDefault()
       this.reRender(p => ({ ...p, profileDirty: true, inputName: ev.target.value }))
+    }
+    if (Tonic.match(target, '#note-area')) {
+      this.querySelector('button.post-btn').disabled = !target.value?.length
     }
   }
 })
