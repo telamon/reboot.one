@@ -8787,7 +8787,7 @@ var ProfileFinder = class _ProfileFinder {
     return this.has(key) ? this.contentOf(key) : this.profileOf(key, ++_retry);
   }
   getEvent(key) {
-    if (!this.profiles[key]) {
+    if (false) {
       const j = globalThis.localStorage.getItem("p" + key);
       if (j)
         this.profiles[key] = JSON.parse(j);
@@ -8941,6 +8941,23 @@ async function nostrBuildUpload(file) {
   console.info("Upload successful", url);
   return url;
 }
+async function postNote(text, extraTags = []) {
+  const pubkey = await getPub();
+  const content = text;
+  const event = {
+    kind: 1,
+    pubkey,
+    created_at: Math.floor(Date.now() / 1e3),
+    content: JSON.stringify(content),
+    tags: [...extraTags]
+  };
+  event.id = getEventHash(event);
+  event.sig = getSignature(event, await getSecret());
+  console.log("PostNote", event);
+  const pubs = await Promise.race(pool.publish(relays, event));
+  console.log("Pool response", pubs);
+  return true;
+}
 
 // index.js
 var pman = ProfileFinder.singleton();
@@ -9050,16 +9067,17 @@ tonic_default.add(class PostForm extends tonic_default {
         </author>
       `;
     }
-    const attrD = !secret ? "disabled=true" : "";
+    const { isPosting } = this.props;
+    const attrD = !secret || isPosting ? "disabled=true" : "";
     return this.html`
       <div id="post-form">
         ${authorProfile}
         <br/>
         <h1>Gästboken</h1>
         <!-- ${this.replyTo ? "Nytt Inl\xE4gg" : "Re:" + this.replyTo} -->
-          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Work in progress... klicka på något av porträtten nedan för att komma vidare"></textarea>
-        <!--<button id="submit" ${attrD}>Skicka</button>-->
-        <div class="flex row center"><button class="post-btn biff" data-parent="">Skapa Inlägg</button></div>
+          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Lämmna en kommentar här eller tagga med #reboot för att synas"></textarea>
+        <!--<button id="submit">Skicka</button>-->
+        <div class="flex row center"><button class="post-btn biff" ${attrD} ${isPosting ? "aria-busy=true" : ""}>Skapa Inlägg</button></div>
       </div>
     `;
   }
@@ -9081,6 +9099,15 @@ tonic_default.add(class PostForm extends tonic_default {
       );
       this.reRender((p) => ({ ...p, profileDirty: false, inputName: null, inputPicture: null, saving: false }));
     }
+    if (tonic_default.match(ev.target, "button.post-btn")) {
+      ev.preventDefault();
+      console.log("Post button");
+      this.reRender((p) => ({ ...p, isPosting: true }));
+      await postNote(this.querySelector("#note-area").value, [
+        ["t", "reboot"]
+      ]);
+      this.reRender((p) => ({ ...p, isPosting: false }));
+    }
   }
   change(ev) {
     const { target } = ev;
@@ -9097,6 +9124,9 @@ tonic_default.add(class PostForm extends tonic_default {
     if (tonic_default.match(target, "#inp-profile-name")) {
       ev.preventDefault();
       this.reRender((p) => ({ ...p, profileDirty: true, inputName: ev.target.value }));
+    }
+    if (tonic_default.match(target, "#note-area")) {
+      this.querySelector("button.post-btn").disabled = !target.value?.length;
     }
   }
 });
