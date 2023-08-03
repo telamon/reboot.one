@@ -8941,14 +8941,13 @@ async function nostrBuildUpload(file) {
   console.info("Upload successful", url);
   return url;
 }
-async function postNote(text, extraTags = []) {
+async function postNote(content, extraTags = []) {
   const pubkey = await getPub();
-  const content = text;
   const event = {
     kind: 1,
     pubkey,
     created_at: Math.floor(Date.now() / 1e3),
-    content: JSON.stringify(content),
+    content,
     tags: [...extraTags]
   };
   event.id = getEventHash(event);

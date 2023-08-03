@@ -372,14 +372,16 @@ export async function nostrBuildUpload (file) {
   return url
 }
 
-export async function postNote (text, extraTags = []) {
+/**
+ * Post a kind 1 text note
+ */
+export async function postNote (content, extraTags = []) {
   const pubkey = await getPub()
-  const content = text
   const event = {
     kind: 1,
     pubkey,
     created_at: Math.floor(Date.now() / 1000),
-    content: JSON.stringify(content),
+    content,
     tags: [...extraTags]
   }
   event.id = getEventHash(event)
