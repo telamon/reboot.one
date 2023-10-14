@@ -494,6 +494,13 @@ var Hash = class {
     return this._cloneInto();
   }
 };
+var isPlainObject = (obj) => Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object;
+function checkOpts(defaults, opts) {
+  if (opts !== void 0 && (typeof opts !== "object" || !isPlainObject(opts)))
+    throw new Error("Options should be object or undefined");
+  const merged = Object.assign(defaults, opts);
+  return merged;
+}
 function wrapConstructor(hashCons) {
   const hashC = (msg) => hashCons().update(toBytes(msg)).digest();
   const tmp = hashCons();
@@ -513,9 +520,9 @@ function randomBytes(bytesLength = 32) {
 function setBigUint64(view, byteOffset, value, isLE3) {
   if (typeof view.setBigUint64 === "function")
     return view.setBigUint64(byteOffset, value, isLE3);
-  const _32n3 = BigInt(32);
+  const _32n2 = BigInt(32);
   const _u32_max = BigInt(4294967295);
-  const wh = Number(value >> _32n3 & _u32_max);
+  const wh = Number(value >> _32n2 & _u32_max);
   const wl = Number(value & _u32_max);
   const h = isLE3 ? 4 : 0;
   const l = isLE3 ? 0 : 4;
@@ -2025,7 +2032,7 @@ function weierstrass(curveDef) {
       return true;
     return false;
   }
-  function getSharedSecret(privateA, publicB, isCompressed = true) {
+  function getSharedSecret2(privateA, publicB, isCompressed = true) {
     if (isProbPub(privateA))
       throw new Error("first arg must be private key");
     if (!isProbPub(publicB))
@@ -2052,7 +2059,7 @@ function weierstrass(curveDef) {
   function prepSig(msgHash, privateKey, opts = defaultSigOpts) {
     if (["recovered", "canonical"].some((k) => k in opts))
       throw new Error("sign() legacy options not supported");
-    const { hash: hash3, randomBytes: randomBytes3 } = CURVE2;
+    const { hash: hash3, randomBytes: randomBytes2 } = CURVE2;
     let { lowS, prehash, extraEntropy: ent } = opts;
     if (lowS == null)
       lowS = true;
@@ -2063,7 +2070,7 @@ function weierstrass(curveDef) {
     const d = normPrivateKeyToScalar(privateKey);
     const seedArgs = [int2octets(d), int2octets(h1int)];
     if (ent != null) {
-      const e = ent === true ? randomBytes3(Fp2.BYTES) : ent;
+      const e = ent === true ? randomBytes2(Fp2.BYTES) : ent;
       seedArgs.push(ensureBytes("extraEntropy", e, Fp2.BYTES));
     }
     const seed = concatBytes2(...seedArgs);
@@ -2147,7 +2154,7 @@ function weierstrass(curveDef) {
   return {
     CURVE: CURVE2,
     getPublicKey: getPublicKey4,
-    getSharedSecret,
+    getSharedSecret: getSharedSecret2,
     sign,
     verify,
     ProjectivePoint: Point4,
@@ -2684,7 +2691,7 @@ var base58xmr = {
     return Uint8Array.from(res);
   }
 };
-var base58check = (sha2563) => chain(checksum(4, (data) => sha2563(sha2563(data))), base58);
+var base58check = (sha2562) => chain(checksum(4, (data) => sha2562(sha2562(data))), base58);
 var BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join(""));
 var POLYMOD_GENERATORS = [996825010, 642813549, 513874426, 1027748829, 705979059];
 function bech32Polymod(pre) {
@@ -4834,180 +4841,20 @@ zero
 zone
 zoo`.split("\n");
 
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/_assert.js
-function number2(n) {
-  if (!Number.isSafeInteger(n) || n < 0)
-    throw new Error(`Wrong positive integer: ${n}`);
-}
-function bool2(b) {
-  if (typeof b !== "boolean")
-    throw new Error(`Expected boolean, not ${b}`);
-}
-function bytes2(b, ...lengths) {
-  if (!(b instanceof Uint8Array))
-    throw new TypeError("Expected Uint8Array");
-  if (lengths.length > 0 && !lengths.includes(b.length))
-    throw new TypeError(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
-}
-function hash2(hash3) {
-  if (typeof hash3 !== "function" || typeof hash3.create !== "function")
-    throw new Error("Hash should be wrapped by utils.wrapConstructor");
-  number2(hash3.outputLen);
-  number2(hash3.blockLen);
-}
-function exists2(instance, checkFinished = true) {
-  if (instance.destroyed)
-    throw new Error("Hash instance has been destroyed");
-  if (checkFinished && instance.finished)
-    throw new Error("Hash#digest() has already been called");
-}
-function output2(out, instance) {
-  bytes2(out);
-  const min = instance.outputLen;
-  if (out.length < min) {
-    throw new Error(`digestInto() expects output buffer of length at least ${min}`);
-  }
-}
-var assert2 = {
-  number: number2,
-  bool: bool2,
-  bytes: bytes2,
-  hash: hash2,
-  exists: exists2,
-  output: output2
-};
-var assert_default2 = assert2;
-
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/crypto.js
-var crypto3 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
-
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/utils.js
-var createView2 = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
-var rotr2 = (word, shift2) => word << 32 - shift2 | word >>> shift2;
-var isLE2 = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
-if (!isLE2)
-  throw new Error("Non little-endian hardware is not supported");
-var hexes3 = Array.from({ length: 256 }, (v, i) => i.toString(16).padStart(2, "0"));
-function utf8ToBytes3(str2) {
-  if (typeof str2 !== "string") {
-    throw new TypeError(`utf8ToBytes expected string, got ${typeof str2}`);
-  }
-  return new TextEncoder().encode(str2);
-}
-function toBytes2(data) {
-  if (typeof data === "string")
-    data = utf8ToBytes3(data);
-  if (!(data instanceof Uint8Array))
-    throw new TypeError(`Expected input type is Uint8Array (got ${typeof data})`);
-  return data;
-}
-var Hash2 = class {
-  // Safe version that clones internal state
-  clone() {
-    return this._cloneInto();
-  }
-};
-var isPlainObject = (obj) => Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object;
-function checkOpts(defaults, opts) {
-  if (opts !== void 0 && (typeof opts !== "object" || !isPlainObject(opts)))
-    throw new TypeError("Options should be object or undefined");
-  const merged = Object.assign(defaults, opts);
-  return merged;
-}
-function wrapConstructor2(hashConstructor) {
-  const hashC = (message) => hashConstructor().update(toBytes2(message)).digest();
-  const tmp = hashConstructor();
-  hashC.outputLen = tmp.outputLen;
-  hashC.blockLen = tmp.blockLen;
-  hashC.create = () => hashConstructor();
-  return hashC;
-}
-function randomBytes2(bytesLength = 32) {
-  if (crypto3 && typeof crypto3.getRandomValues === "function") {
-    return crypto3.getRandomValues(new Uint8Array(bytesLength));
-  }
-  throw new Error("crypto.getRandomValues must be defined");
-}
-
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/hmac.js
-var HMAC2 = class extends Hash2 {
-  constructor(hash3, _key) {
-    super();
-    this.finished = false;
-    this.destroyed = false;
-    assert_default2.hash(hash3);
-    const key = toBytes2(_key);
-    this.iHash = hash3.create();
-    if (typeof this.iHash.update !== "function")
-      throw new TypeError("Expected instance of class which extends utils.Hash");
-    this.blockLen = this.iHash.blockLen;
-    this.outputLen = this.iHash.outputLen;
-    const blockLen = this.blockLen;
-    const pad = new Uint8Array(blockLen);
-    pad.set(key.length > blockLen ? hash3.create().update(key).digest() : key);
-    for (let i = 0; i < pad.length; i++)
-      pad[i] ^= 54;
-    this.iHash.update(pad);
-    this.oHash = hash3.create();
-    for (let i = 0; i < pad.length; i++)
-      pad[i] ^= 54 ^ 92;
-    this.oHash.update(pad);
-    pad.fill(0);
-  }
-  update(buf) {
-    assert_default2.exists(this);
-    this.iHash.update(buf);
-    return this;
-  }
-  digestInto(out) {
-    assert_default2.exists(this);
-    assert_default2.bytes(out, this.outputLen);
-    this.finished = true;
-    this.iHash.digestInto(out);
-    this.oHash.update(out);
-    this.oHash.digestInto(out);
-    this.destroy();
-  }
-  digest() {
-    const out = new Uint8Array(this.oHash.outputLen);
-    this.digestInto(out);
-    return out;
-  }
-  _cloneInto(to) {
-    to || (to = Object.create(Object.getPrototypeOf(this), {}));
-    const { oHash, iHash, finished, destroyed, blockLen, outputLen } = this;
-    to = to;
-    to.finished = finished;
-    to.destroyed = destroyed;
-    to.blockLen = blockLen;
-    to.outputLen = outputLen;
-    to.oHash = oHash._cloneInto(to.oHash);
-    to.iHash = iHash._cloneInto(to.iHash);
-    return to;
-  }
-  destroy() {
-    this.destroyed = true;
-    this.oHash.destroy();
-    this.iHash.destroy();
-  }
-};
-var hmac2 = (hash3, key, message) => new HMAC2(hash3, key).update(message).digest();
-hmac2.create = (hash3, key) => new HMAC2(hash3, key);
-
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/pbkdf2.js
+// node_modules/@noble/hashes/esm/pbkdf2.js
 function pbkdf2Init(hash3, _password, _salt, _opts) {
-  assert_default2.hash(hash3);
+  assert_default.hash(hash3);
   const opts = checkOpts({ dkLen: 32, asyncTick: 10 }, _opts);
   const { c, dkLen, asyncTick } = opts;
-  assert_default2.number(c);
-  assert_default2.number(dkLen);
-  assert_default2.number(asyncTick);
+  assert_default.number(c);
+  assert_default.number(dkLen);
+  assert_default.number(asyncTick);
   if (c < 1)
     throw new Error("PBKDF2: iterations (c) should be >= 1");
-  const password = toBytes2(_password);
-  const salt2 = toBytes2(_salt);
+  const password = toBytes(_password);
+  const salt2 = toBytes(_salt);
   const DK = new Uint8Array(dkLen);
-  const PRF = hmac2.create(hash3, password);
+  const PRF = hmac.create(hash3, password);
   const PRFSalt = PRF._cloneInto().update(salt2);
   return { c, dkLen, asyncTick, DK, PRF, PRFSalt };
 }
@@ -5023,7 +4870,7 @@ function pbkdf2(hash3, password, salt2, opts) {
   const { c, dkLen, DK, PRF, PRFSalt } = pbkdf2Init(hash3, password, salt2, opts);
   let prfW;
   const arr = new Uint8Array(4);
-  const view = createView2(arr);
+  const view = createView(arr);
   const u = new Uint8Array(PRF.outputLen);
   for (let ti = 1, pos = 0; pos < dkLen; ti++, pos += PRF.outputLen) {
     const Ti = DK.subarray(pos, pos + PRF.outputLen);
@@ -5039,274 +4886,7 @@ function pbkdf2(hash3, password, salt2, opts) {
   return pbkdf2Output(PRF, PRFSalt, DK, prfW, u);
 }
 
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/_sha2.js
-function setBigUint642(view, byteOffset, value, isLE3) {
-  if (typeof view.setBigUint64 === "function")
-    return view.setBigUint64(byteOffset, value, isLE3);
-  const _32n3 = BigInt(32);
-  const _u32_max = BigInt(4294967295);
-  const wh = Number(value >> _32n3 & _u32_max);
-  const wl = Number(value & _u32_max);
-  const h = isLE3 ? 4 : 0;
-  const l = isLE3 ? 0 : 4;
-  view.setUint32(byteOffset + h, wh, isLE3);
-  view.setUint32(byteOffset + l, wl, isLE3);
-}
-var SHA22 = class extends Hash2 {
-  constructor(blockLen, outputLen, padOffset, isLE3) {
-    super();
-    this.blockLen = blockLen;
-    this.outputLen = outputLen;
-    this.padOffset = padOffset;
-    this.isLE = isLE3;
-    this.finished = false;
-    this.length = 0;
-    this.pos = 0;
-    this.destroyed = false;
-    this.buffer = new Uint8Array(blockLen);
-    this.view = createView2(this.buffer);
-  }
-  update(data) {
-    assert_default2.exists(this);
-    const { view, buffer, blockLen } = this;
-    data = toBytes2(data);
-    const len = data.length;
-    for (let pos = 0; pos < len; ) {
-      const take = Math.min(blockLen - this.pos, len - pos);
-      if (take === blockLen) {
-        const dataView = createView2(data);
-        for (; blockLen <= len - pos; pos += blockLen)
-          this.process(dataView, pos);
-        continue;
-      }
-      buffer.set(data.subarray(pos, pos + take), this.pos);
-      this.pos += take;
-      pos += take;
-      if (this.pos === blockLen) {
-        this.process(view, 0);
-        this.pos = 0;
-      }
-    }
-    this.length += data.length;
-    this.roundClean();
-    return this;
-  }
-  digestInto(out) {
-    assert_default2.exists(this);
-    assert_default2.output(out, this);
-    this.finished = true;
-    const { buffer, view, blockLen, isLE: isLE3 } = this;
-    let { pos } = this;
-    buffer[pos++] = 128;
-    this.buffer.subarray(pos).fill(0);
-    if (this.padOffset > blockLen - pos) {
-      this.process(view, 0);
-      pos = 0;
-    }
-    for (let i = pos; i < blockLen; i++)
-      buffer[i] = 0;
-    setBigUint642(view, blockLen - 8, BigInt(this.length * 8), isLE3);
-    this.process(view, 0);
-    const oview = createView2(out);
-    const len = this.outputLen;
-    if (len % 4)
-      throw new Error("_sha2: outputLen should be aligned to 32bit");
-    const outLen = len / 4;
-    const state = this.get();
-    if (outLen > state.length)
-      throw new Error("_sha2: outputLen bigger than state");
-    for (let i = 0; i < outLen; i++)
-      oview.setUint32(4 * i, state[i], isLE3);
-  }
-  digest() {
-    const { buffer, outputLen } = this;
-    this.digestInto(buffer);
-    const res = buffer.slice(0, outputLen);
-    this.destroy();
-    return res;
-  }
-  _cloneInto(to) {
-    to || (to = new this.constructor());
-    to.set(...this.get());
-    const { blockLen, buffer, length, finished, destroyed, pos } = this;
-    to.length = length;
-    to.pos = pos;
-    to.finished = finished;
-    to.destroyed = destroyed;
-    if (length % blockLen)
-      to.buffer.set(buffer);
-    return to;
-  }
-};
-
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/sha256.js
-var Chi2 = (a, b, c) => a & b ^ ~a & c;
-var Maj2 = (a, b, c) => a & b ^ a & c ^ b & c;
-var SHA256_K2 = new Uint32Array([
-  1116352408,
-  1899447441,
-  3049323471,
-  3921009573,
-  961987163,
-  1508970993,
-  2453635748,
-  2870763221,
-  3624381080,
-  310598401,
-  607225278,
-  1426881987,
-  1925078388,
-  2162078206,
-  2614888103,
-  3248222580,
-  3835390401,
-  4022224774,
-  264347078,
-  604807628,
-  770255983,
-  1249150122,
-  1555081692,
-  1996064986,
-  2554220882,
-  2821834349,
-  2952996808,
-  3210313671,
-  3336571891,
-  3584528711,
-  113926993,
-  338241895,
-  666307205,
-  773529912,
-  1294757372,
-  1396182291,
-  1695183700,
-  1986661051,
-  2177026350,
-  2456956037,
-  2730485921,
-  2820302411,
-  3259730800,
-  3345764771,
-  3516065817,
-  3600352804,
-  4094571909,
-  275423344,
-  430227734,
-  506948616,
-  659060556,
-  883997877,
-  958139571,
-  1322822218,
-  1537002063,
-  1747873779,
-  1955562222,
-  2024104815,
-  2227730452,
-  2361852424,
-  2428436474,
-  2756734187,
-  3204031479,
-  3329325298
-]);
-var IV2 = new Uint32Array([
-  1779033703,
-  3144134277,
-  1013904242,
-  2773480762,
-  1359893119,
-  2600822924,
-  528734635,
-  1541459225
-]);
-var SHA256_W2 = new Uint32Array(64);
-var SHA2562 = class extends SHA22 {
-  constructor() {
-    super(64, 32, 8, false);
-    this.A = IV2[0] | 0;
-    this.B = IV2[1] | 0;
-    this.C = IV2[2] | 0;
-    this.D = IV2[3] | 0;
-    this.E = IV2[4] | 0;
-    this.F = IV2[5] | 0;
-    this.G = IV2[6] | 0;
-    this.H = IV2[7] | 0;
-  }
-  get() {
-    const { A, B, C, D, E, F, G: G2, H } = this;
-    return [A, B, C, D, E, F, G2, H];
-  }
-  // prettier-ignore
-  set(A, B, C, D, E, F, G2, H) {
-    this.A = A | 0;
-    this.B = B | 0;
-    this.C = C | 0;
-    this.D = D | 0;
-    this.E = E | 0;
-    this.F = F | 0;
-    this.G = G2 | 0;
-    this.H = H | 0;
-  }
-  process(view, offset) {
-    for (let i = 0; i < 16; i++, offset += 4)
-      SHA256_W2[i] = view.getUint32(offset, false);
-    for (let i = 16; i < 64; i++) {
-      const W15 = SHA256_W2[i - 15];
-      const W2 = SHA256_W2[i - 2];
-      const s0 = rotr2(W15, 7) ^ rotr2(W15, 18) ^ W15 >>> 3;
-      const s1 = rotr2(W2, 17) ^ rotr2(W2, 19) ^ W2 >>> 10;
-      SHA256_W2[i] = s1 + SHA256_W2[i - 7] + s0 + SHA256_W2[i - 16] | 0;
-    }
-    let { A, B, C, D, E, F, G: G2, H } = this;
-    for (let i = 0; i < 64; i++) {
-      const sigma1 = rotr2(E, 6) ^ rotr2(E, 11) ^ rotr2(E, 25);
-      const T1 = H + sigma1 + Chi2(E, F, G2) + SHA256_K2[i] + SHA256_W2[i] | 0;
-      const sigma0 = rotr2(A, 2) ^ rotr2(A, 13) ^ rotr2(A, 22);
-      const T2 = sigma0 + Maj2(A, B, C) | 0;
-      H = G2;
-      G2 = F;
-      F = E;
-      E = D + T1 | 0;
-      D = C;
-      C = B;
-      B = A;
-      A = T1 + T2 | 0;
-    }
-    A = A + this.A | 0;
-    B = B + this.B | 0;
-    C = C + this.C | 0;
-    D = D + this.D | 0;
-    E = E + this.E | 0;
-    F = F + this.F | 0;
-    G2 = G2 + this.G | 0;
-    H = H + this.H | 0;
-    this.set(A, B, C, D, E, F, G2, H);
-  }
-  roundClean() {
-    SHA256_W2.fill(0);
-  }
-  destroy() {
-    this.set(0, 0, 0, 0, 0, 0, 0, 0);
-    this.buffer.fill(0);
-  }
-};
-var SHA2242 = class extends SHA2562 {
-  constructor() {
-    super();
-    this.A = 3238371032 | 0;
-    this.B = 914150663 | 0;
-    this.C = 812702999 | 0;
-    this.D = 4144912697 | 0;
-    this.E = 4290775857 | 0;
-    this.F = 1750603025 | 0;
-    this.G = 1694076839 | 0;
-    this.H = 3204075428 | 0;
-    this.outputLen = 28;
-  }
-};
-var sha2562 = wrapConstructor2(() => new SHA2562());
-var sha2242 = wrapConstructor2(() => new SHA2242());
-
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/_u64.js
+// node_modules/@noble/hashes/esm/_u64.js
 var U32_MASK64 = BigInt(2 ** 32 - 1);
 var _32n = BigInt(32);
 function fromBig(n, le = false) {
@@ -5372,7 +4952,7 @@ var u64 = {
 };
 var u64_default = u64;
 
-// node_modules/@scure/bip39/node_modules/@noble/hashes/esm/sha512.js
+// node_modules/@noble/hashes/esm/sha512.js
 var [SHA512_Kh, SHA512_Kl] = u64_default.split([
   "0x428a2f98d728ae22",
   "0x7137449123ef65cd",
@@ -5457,7 +5037,7 @@ var [SHA512_Kh, SHA512_Kl] = u64_default.split([
 ].map((n) => BigInt(n)));
 var SHA512_W_H = new Uint32Array(80);
 var SHA512_W_L = new Uint32Array(80);
-var SHA512 = class extends SHA22 {
+var SHA512 = class extends SHA2 {
   constructor() {
     super(128, 64, 16, false);
     this.Ah = 1779033703 | 0;
@@ -5635,10 +5215,10 @@ var SHA384 = class extends SHA512 {
     this.outputLen = 48;
   }
 };
-var sha512 = wrapConstructor2(() => new SHA512());
-var sha512_224 = wrapConstructor2(() => new SHA512_224());
-var sha512_256 = wrapConstructor2(() => new SHA512_256());
-var sha384 = wrapConstructor2(() => new SHA384());
+var sha512 = wrapConstructor(() => new SHA512());
+var sha512_224 = wrapConstructor(() => new SHA512_224());
+var sha512_256 = wrapConstructor(() => new SHA512_256());
+var sha384 = wrapConstructor(() => new SHA384());
 
 // node_modules/@scure/bip39/esm/index.js
 var isJapanese = (wordlist2) => wordlist2[0] === "\u3042\u3044\u3053\u304F\u3057\u3093";
@@ -5655,17 +5235,17 @@ function normalize2(str2) {
   return { nfkd: norm, words };
 }
 function assertEntropy(entropy) {
-  assert_default2.bytes(entropy, 16, 20, 24, 28, 32);
+  assert_default.bytes(entropy, 16, 20, 24, 28, 32);
 }
 function generateMnemonic(wordlist2, strength = 128) {
-  assert_default2.number(strength);
+  assert_default.number(strength);
   if (strength % 32 !== 0 || strength > 256)
     throw new TypeError("Invalid entropy");
-  return entropyToMnemonic(randomBytes2(strength / 8), wordlist2);
+  return entropyToMnemonic(randomBytes(strength / 8), wordlist2);
 }
 var calcChecksum = (entropy) => {
   const bitsLeft = 8 - entropy.length / 4;
-  return new Uint8Array([sha2562(entropy)[0] >> bitsLeft << bitsLeft]);
+  return new Uint8Array([sha256(entropy)[0] >> bitsLeft << bitsLeft]);
 };
 function getCoder(wordlist2) {
   if (!Array.isArray(wordlist2) || wordlist2.length !== 2048 || typeof wordlist2[0] !== "string")
@@ -5785,340 +5365,6 @@ var RIPEMD160 = class extends SHA2 {
 };
 var ripemd160 = wrapConstructor(() => new RIPEMD160());
 
-// node_modules/@noble/hashes/esm/_u64.js
-var U32_MASK642 = BigInt(2 ** 32 - 1);
-var _32n2 = BigInt(32);
-function fromBig2(n, le = false) {
-  if (le)
-    return { h: Number(n & U32_MASK642), l: Number(n >> _32n2 & U32_MASK642) };
-  return { h: Number(n >> _32n2 & U32_MASK642) | 0, l: Number(n & U32_MASK642) | 0 };
-}
-function split2(lst, le = false) {
-  let Ah = new Uint32Array(lst.length);
-  let Al = new Uint32Array(lst.length);
-  for (let i = 0; i < lst.length; i++) {
-    const { h, l } = fromBig2(lst[i], le);
-    [Ah[i], Al[i]] = [h, l];
-  }
-  return [Ah, Al];
-}
-var toBig2 = (h, l) => BigInt(h >>> 0) << _32n2 | BigInt(l >>> 0);
-var shrSH2 = (h, l, s) => h >>> s;
-var shrSL2 = (h, l, s) => h << 32 - s | l >>> s;
-var rotrSH2 = (h, l, s) => h >>> s | l << 32 - s;
-var rotrSL2 = (h, l, s) => h << 32 - s | l >>> s;
-var rotrBH2 = (h, l, s) => h << 64 - s | l >>> s - 32;
-var rotrBL2 = (h, l, s) => h >>> s - 32 | l << 64 - s;
-var rotr32H2 = (h, l) => l;
-var rotr32L2 = (h, l) => h;
-var rotlSH2 = (h, l, s) => h << s | l >>> 32 - s;
-var rotlSL2 = (h, l, s) => l << s | h >>> 32 - s;
-var rotlBH2 = (h, l, s) => l << s - 32 | h >>> 64 - s;
-var rotlBL2 = (h, l, s) => h << s - 32 | l >>> 64 - s;
-function add2(Ah, Al, Bh, Bl) {
-  const l = (Al >>> 0) + (Bl >>> 0);
-  return { h: Ah + Bh + (l / 2 ** 32 | 0) | 0, l: l | 0 };
-}
-var add3L2 = (Al, Bl, Cl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
-var add3H2 = (low, Ah, Bh, Ch) => Ah + Bh + Ch + (low / 2 ** 32 | 0) | 0;
-var add4L2 = (Al, Bl, Cl, Dl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
-var add4H2 = (low, Ah, Bh, Ch, Dh) => Ah + Bh + Ch + Dh + (low / 2 ** 32 | 0) | 0;
-var add5L2 = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
-var add5H2 = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
-var u642 = {
-  fromBig: fromBig2,
-  split: split2,
-  toBig: toBig2,
-  shrSH: shrSH2,
-  shrSL: shrSL2,
-  rotrSH: rotrSH2,
-  rotrSL: rotrSL2,
-  rotrBH: rotrBH2,
-  rotrBL: rotrBL2,
-  rotr32H: rotr32H2,
-  rotr32L: rotr32L2,
-  rotlSH: rotlSH2,
-  rotlSL: rotlSL2,
-  rotlBH: rotlBH2,
-  rotlBL: rotlBL2,
-  add: add2,
-  add3L: add3L2,
-  add3H: add3H2,
-  add4L: add4L2,
-  add4H: add4H2,
-  add5H: add5H2,
-  add5L: add5L2
-};
-var u64_default2 = u642;
-
-// node_modules/@noble/hashes/esm/sha512.js
-var [SHA512_Kh2, SHA512_Kl2] = u64_default2.split([
-  "0x428a2f98d728ae22",
-  "0x7137449123ef65cd",
-  "0xb5c0fbcfec4d3b2f",
-  "0xe9b5dba58189dbbc",
-  "0x3956c25bf348b538",
-  "0x59f111f1b605d019",
-  "0x923f82a4af194f9b",
-  "0xab1c5ed5da6d8118",
-  "0xd807aa98a3030242",
-  "0x12835b0145706fbe",
-  "0x243185be4ee4b28c",
-  "0x550c7dc3d5ffb4e2",
-  "0x72be5d74f27b896f",
-  "0x80deb1fe3b1696b1",
-  "0x9bdc06a725c71235",
-  "0xc19bf174cf692694",
-  "0xe49b69c19ef14ad2",
-  "0xefbe4786384f25e3",
-  "0x0fc19dc68b8cd5b5",
-  "0x240ca1cc77ac9c65",
-  "0x2de92c6f592b0275",
-  "0x4a7484aa6ea6e483",
-  "0x5cb0a9dcbd41fbd4",
-  "0x76f988da831153b5",
-  "0x983e5152ee66dfab",
-  "0xa831c66d2db43210",
-  "0xb00327c898fb213f",
-  "0xbf597fc7beef0ee4",
-  "0xc6e00bf33da88fc2",
-  "0xd5a79147930aa725",
-  "0x06ca6351e003826f",
-  "0x142929670a0e6e70",
-  "0x27b70a8546d22ffc",
-  "0x2e1b21385c26c926",
-  "0x4d2c6dfc5ac42aed",
-  "0x53380d139d95b3df",
-  "0x650a73548baf63de",
-  "0x766a0abb3c77b2a8",
-  "0x81c2c92e47edaee6",
-  "0x92722c851482353b",
-  "0xa2bfe8a14cf10364",
-  "0xa81a664bbc423001",
-  "0xc24b8b70d0f89791",
-  "0xc76c51a30654be30",
-  "0xd192e819d6ef5218",
-  "0xd69906245565a910",
-  "0xf40e35855771202a",
-  "0x106aa07032bbd1b8",
-  "0x19a4c116b8d2d0c8",
-  "0x1e376c085141ab53",
-  "0x2748774cdf8eeb99",
-  "0x34b0bcb5e19b48a8",
-  "0x391c0cb3c5c95a63",
-  "0x4ed8aa4ae3418acb",
-  "0x5b9cca4f7763e373",
-  "0x682e6ff3d6b2b8a3",
-  "0x748f82ee5defb2fc",
-  "0x78a5636f43172f60",
-  "0x84c87814a1f0ab72",
-  "0x8cc702081a6439ec",
-  "0x90befffa23631e28",
-  "0xa4506cebde82bde9",
-  "0xbef9a3f7b2c67915",
-  "0xc67178f2e372532b",
-  "0xca273eceea26619c",
-  "0xd186b8c721c0c207",
-  "0xeada7dd6cde0eb1e",
-  "0xf57d4f7fee6ed178",
-  "0x06f067aa72176fba",
-  "0x0a637dc5a2c898a6",
-  "0x113f9804bef90dae",
-  "0x1b710b35131c471b",
-  "0x28db77f523047d84",
-  "0x32caab7b40c72493",
-  "0x3c9ebe0a15c9bebc",
-  "0x431d67c49c100d4c",
-  "0x4cc5d4becb3e42b6",
-  "0x597f299cfc657e2a",
-  "0x5fcb6fab3ad6faec",
-  "0x6c44198c4a475817"
-].map((n) => BigInt(n)));
-var SHA512_W_H2 = new Uint32Array(80);
-var SHA512_W_L2 = new Uint32Array(80);
-var SHA5122 = class extends SHA2 {
-  constructor() {
-    super(128, 64, 16, false);
-    this.Ah = 1779033703 | 0;
-    this.Al = 4089235720 | 0;
-    this.Bh = 3144134277 | 0;
-    this.Bl = 2227873595 | 0;
-    this.Ch = 1013904242 | 0;
-    this.Cl = 4271175723 | 0;
-    this.Dh = 2773480762 | 0;
-    this.Dl = 1595750129 | 0;
-    this.Eh = 1359893119 | 0;
-    this.El = 2917565137 | 0;
-    this.Fh = 2600822924 | 0;
-    this.Fl = 725511199 | 0;
-    this.Gh = 528734635 | 0;
-    this.Gl = 4215389547 | 0;
-    this.Hh = 1541459225 | 0;
-    this.Hl = 327033209 | 0;
-  }
-  // prettier-ignore
-  get() {
-    const { Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl } = this;
-    return [Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl];
-  }
-  // prettier-ignore
-  set(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl) {
-    this.Ah = Ah | 0;
-    this.Al = Al | 0;
-    this.Bh = Bh | 0;
-    this.Bl = Bl | 0;
-    this.Ch = Ch | 0;
-    this.Cl = Cl | 0;
-    this.Dh = Dh | 0;
-    this.Dl = Dl | 0;
-    this.Eh = Eh | 0;
-    this.El = El | 0;
-    this.Fh = Fh | 0;
-    this.Fl = Fl | 0;
-    this.Gh = Gh | 0;
-    this.Gl = Gl | 0;
-    this.Hh = Hh | 0;
-    this.Hl = Hl | 0;
-  }
-  process(view, offset) {
-    for (let i = 0; i < 16; i++, offset += 4) {
-      SHA512_W_H2[i] = view.getUint32(offset);
-      SHA512_W_L2[i] = view.getUint32(offset += 4);
-    }
-    for (let i = 16; i < 80; i++) {
-      const W15h = SHA512_W_H2[i - 15] | 0;
-      const W15l = SHA512_W_L2[i - 15] | 0;
-      const s0h = u64_default2.rotrSH(W15h, W15l, 1) ^ u64_default2.rotrSH(W15h, W15l, 8) ^ u64_default2.shrSH(W15h, W15l, 7);
-      const s0l = u64_default2.rotrSL(W15h, W15l, 1) ^ u64_default2.rotrSL(W15h, W15l, 8) ^ u64_default2.shrSL(W15h, W15l, 7);
-      const W2h = SHA512_W_H2[i - 2] | 0;
-      const W2l = SHA512_W_L2[i - 2] | 0;
-      const s1h = u64_default2.rotrSH(W2h, W2l, 19) ^ u64_default2.rotrBH(W2h, W2l, 61) ^ u64_default2.shrSH(W2h, W2l, 6);
-      const s1l = u64_default2.rotrSL(W2h, W2l, 19) ^ u64_default2.rotrBL(W2h, W2l, 61) ^ u64_default2.shrSL(W2h, W2l, 6);
-      const SUMl = u64_default2.add4L(s0l, s1l, SHA512_W_L2[i - 7], SHA512_W_L2[i - 16]);
-      const SUMh = u64_default2.add4H(SUMl, s0h, s1h, SHA512_W_H2[i - 7], SHA512_W_H2[i - 16]);
-      SHA512_W_H2[i] = SUMh | 0;
-      SHA512_W_L2[i] = SUMl | 0;
-    }
-    let { Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl } = this;
-    for (let i = 0; i < 80; i++) {
-      const sigma1h = u64_default2.rotrSH(Eh, El, 14) ^ u64_default2.rotrSH(Eh, El, 18) ^ u64_default2.rotrBH(Eh, El, 41);
-      const sigma1l = u64_default2.rotrSL(Eh, El, 14) ^ u64_default2.rotrSL(Eh, El, 18) ^ u64_default2.rotrBL(Eh, El, 41);
-      const CHIh = Eh & Fh ^ ~Eh & Gh;
-      const CHIl = El & Fl ^ ~El & Gl;
-      const T1ll = u64_default2.add5L(Hl, sigma1l, CHIl, SHA512_Kl2[i], SHA512_W_L2[i]);
-      const T1h = u64_default2.add5H(T1ll, Hh, sigma1h, CHIh, SHA512_Kh2[i], SHA512_W_H2[i]);
-      const T1l = T1ll | 0;
-      const sigma0h = u64_default2.rotrSH(Ah, Al, 28) ^ u64_default2.rotrBH(Ah, Al, 34) ^ u64_default2.rotrBH(Ah, Al, 39);
-      const sigma0l = u64_default2.rotrSL(Ah, Al, 28) ^ u64_default2.rotrBL(Ah, Al, 34) ^ u64_default2.rotrBL(Ah, Al, 39);
-      const MAJh = Ah & Bh ^ Ah & Ch ^ Bh & Ch;
-      const MAJl = Al & Bl ^ Al & Cl ^ Bl & Cl;
-      Hh = Gh | 0;
-      Hl = Gl | 0;
-      Gh = Fh | 0;
-      Gl = Fl | 0;
-      Fh = Eh | 0;
-      Fl = El | 0;
-      ({ h: Eh, l: El } = u64_default2.add(Dh | 0, Dl | 0, T1h | 0, T1l | 0));
-      Dh = Ch | 0;
-      Dl = Cl | 0;
-      Ch = Bh | 0;
-      Cl = Bl | 0;
-      Bh = Ah | 0;
-      Bl = Al | 0;
-      const All = u64_default2.add3L(T1l, sigma0l, MAJl);
-      Ah = u64_default2.add3H(All, T1h, sigma0h, MAJh);
-      Al = All | 0;
-    }
-    ({ h: Ah, l: Al } = u64_default2.add(this.Ah | 0, this.Al | 0, Ah | 0, Al | 0));
-    ({ h: Bh, l: Bl } = u64_default2.add(this.Bh | 0, this.Bl | 0, Bh | 0, Bl | 0));
-    ({ h: Ch, l: Cl } = u64_default2.add(this.Ch | 0, this.Cl | 0, Ch | 0, Cl | 0));
-    ({ h: Dh, l: Dl } = u64_default2.add(this.Dh | 0, this.Dl | 0, Dh | 0, Dl | 0));
-    ({ h: Eh, l: El } = u64_default2.add(this.Eh | 0, this.El | 0, Eh | 0, El | 0));
-    ({ h: Fh, l: Fl } = u64_default2.add(this.Fh | 0, this.Fl | 0, Fh | 0, Fl | 0));
-    ({ h: Gh, l: Gl } = u64_default2.add(this.Gh | 0, this.Gl | 0, Gh | 0, Gl | 0));
-    ({ h: Hh, l: Hl } = u64_default2.add(this.Hh | 0, this.Hl | 0, Hh | 0, Hl | 0));
-    this.set(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl);
-  }
-  roundClean() {
-    SHA512_W_H2.fill(0);
-    SHA512_W_L2.fill(0);
-  }
-  destroy() {
-    this.buffer.fill(0);
-    this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  }
-};
-var SHA512_2242 = class extends SHA5122 {
-  constructor() {
-    super();
-    this.Ah = 2352822216 | 0;
-    this.Al = 424955298 | 0;
-    this.Bh = 1944164710 | 0;
-    this.Bl = 2312950998 | 0;
-    this.Ch = 502970286 | 0;
-    this.Cl = 855612546 | 0;
-    this.Dh = 1738396948 | 0;
-    this.Dl = 1479516111 | 0;
-    this.Eh = 258812777 | 0;
-    this.El = 2077511080 | 0;
-    this.Fh = 2011393907 | 0;
-    this.Fl = 79989058 | 0;
-    this.Gh = 1067287976 | 0;
-    this.Gl = 1780299464 | 0;
-    this.Hh = 286451373 | 0;
-    this.Hl = 2446758561 | 0;
-    this.outputLen = 28;
-  }
-};
-var SHA512_2562 = class extends SHA5122 {
-  constructor() {
-    super();
-    this.Ah = 573645204 | 0;
-    this.Al = 4230739756 | 0;
-    this.Bh = 2673172387 | 0;
-    this.Bl = 3360449730 | 0;
-    this.Ch = 596883563 | 0;
-    this.Cl = 1867755857 | 0;
-    this.Dh = 2520282905 | 0;
-    this.Dl = 1497426621 | 0;
-    this.Eh = 2519219938 | 0;
-    this.El = 2827943907 | 0;
-    this.Fh = 3193839141 | 0;
-    this.Fl = 1401305490 | 0;
-    this.Gh = 721525244 | 0;
-    this.Gl = 746961066 | 0;
-    this.Hh = 246885852 | 0;
-    this.Hl = 2177182882 | 0;
-    this.outputLen = 32;
-  }
-};
-var SHA3842 = class extends SHA5122 {
-  constructor() {
-    super();
-    this.Ah = 3418070365 | 0;
-    this.Al = 3238371032 | 0;
-    this.Bh = 1654270250 | 0;
-    this.Bl = 914150663 | 0;
-    this.Ch = 2438529370 | 0;
-    this.Cl = 812702999 | 0;
-    this.Dh = 355462360 | 0;
-    this.Dl = 4144912697 | 0;
-    this.Eh = 1731405415 | 0;
-    this.El = 4290775857 | 0;
-    this.Fh = 2394180231 | 0;
-    this.Fl = 1750603025 | 0;
-    this.Gh = 3675008525 | 0;
-    this.Gl = 1694076839 | 0;
-    this.Hh = 1203062813 | 0;
-    this.Hl = 3204075428 | 0;
-    this.outputLen = 48;
-  }
-};
-var sha5122 = wrapConstructor(() => new SHA5122());
-var sha512_2242 = wrapConstructor(() => new SHA512_2242());
-var sha512_2562 = wrapConstructor(() => new SHA512_2562());
-var sha3842 = wrapConstructor(() => new SHA3842());
-
 // node_modules/@scure/bip32/lib/esm/index.js
 var Point2 = secp256k1.ProjectivePoint;
 var base58check2 = base58check(sha256);
@@ -6178,7 +5424,7 @@ var HDKey = class _HDKey {
     if (8 * seed.length < 128 || 8 * seed.length > 512) {
       throw new Error(`HDKey: wrong seed length=${seed.length}. Should be between 128 and 512 bits; 256 bits is advised)`);
     }
-    const I2 = hmac(sha5122, MASTER_SECRET, seed);
+    const I2 = hmac(sha512, MASTER_SECRET, seed);
     return new _HDKey({
       versions,
       chainCode: I2.slice(32),
@@ -6284,7 +5530,7 @@ var HDKey = class _HDKey {
     } else {
       data = concatBytes(this.pubKey, data);
     }
-    const I2 = hmac(sha5122, this.chainCode, data);
+    const I2 = hmac(sha512, this.chainCode, data);
     const childTweak = bytesToNumber(I2.slice(0, 32));
     const chainCode = I2.slice(32);
     if (!secp256k1.utils.isValidPrivateKey(childTweak)) {
@@ -6360,6 +5606,606 @@ var HDKey = class _HDKey {
   }
 };
 
+// node_modules/@noble/ciphers/esm/utils.js
+var u8a3 = (a) => a instanceof Uint8Array;
+var u32 = (arr) => new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
+var isLE2 = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+if (!isLE2)
+  throw new Error("Non little-endian hardware is not supported");
+function utf8ToBytes3(str2) {
+  if (typeof str2 !== "string")
+    throw new Error(`utf8ToBytes expected string, got ${typeof str2}`);
+  return new Uint8Array(new TextEncoder().encode(str2));
+}
+function toBytes2(data) {
+  if (typeof data === "string")
+    data = utf8ToBytes3(data);
+  if (!u8a3(data))
+    throw new Error(`expected Uint8Array, got ${typeof data}`);
+  return data;
+}
+var isPlainObject2 = (obj) => Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object;
+function checkOpts2(defaults, opts) {
+  if (opts !== void 0 && (typeof opts !== "object" || !isPlainObject2(opts)))
+    throw new Error("options must be object or undefined");
+  const merged = Object.assign(defaults, opts);
+  return merged;
+}
+function ensureBytes2(b, len) {
+  if (!(b instanceof Uint8Array))
+    throw new Error("Uint8Array expected");
+  if (typeof len === "number") {
+    if (b.length !== len)
+      throw new Error(`Uint8Array length ${len} expected`);
+  }
+}
+
+// node_modules/@noble/ciphers/esm/_assert.js
+function number2(n) {
+  if (!Number.isSafeInteger(n) || n < 0)
+    throw new Error(`Wrong positive integer: ${n}`);
+}
+function bool2(b) {
+  if (typeof b !== "boolean")
+    throw new Error(`Expected boolean, not ${b}`);
+}
+function bytes2(b, ...lengths) {
+  if (!(b instanceof Uint8Array))
+    throw new Error("Expected Uint8Array");
+  if (lengths.length > 0 && !lengths.includes(b.length))
+    throw new Error(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
+}
+function hash2(hash3) {
+  if (typeof hash3 !== "function" || typeof hash3.create !== "function")
+    throw new Error("hash must be wrapped by utils.wrapConstructor");
+  number2(hash3.outputLen);
+  number2(hash3.blockLen);
+}
+function exists2(instance, checkFinished = true) {
+  if (instance.destroyed)
+    throw new Error("Hash instance has been destroyed");
+  if (checkFinished && instance.finished)
+    throw new Error("Hash#digest() has already been called");
+}
+function output2(out, instance) {
+  bytes2(out);
+  const min = instance.outputLen;
+  if (out.length < min) {
+    throw new Error(`digestInto() expects output buffer of length at least ${min}`);
+  }
+}
+var assert2 = { number: number2, bool: bool2, bytes: bytes2, hash: hash2, exists: exists2, output: output2 };
+var assert_default2 = assert2;
+
+// node_modules/@noble/ciphers/esm/_poly1305.js
+var u8to16 = (a, i) => a[i++] & 255 | (a[i++] & 255) << 8;
+var Poly1305 = class {
+  constructor(key) {
+    this.blockLen = 16;
+    this.outputLen = 16;
+    this.buffer = new Uint8Array(16);
+    this.r = new Uint16Array(10);
+    this.h = new Uint16Array(10);
+    this.pad = new Uint16Array(8);
+    this.pos = 0;
+    this.finished = false;
+    key = toBytes2(key);
+    ensureBytes2(key, 32);
+    const t0 = u8to16(key, 0);
+    const t1 = u8to16(key, 2);
+    const t2 = u8to16(key, 4);
+    const t3 = u8to16(key, 6);
+    const t4 = u8to16(key, 8);
+    const t5 = u8to16(key, 10);
+    const t6 = u8to16(key, 12);
+    const t7 = u8to16(key, 14);
+    this.r[0] = t0 & 8191;
+    this.r[1] = (t0 >>> 13 | t1 << 3) & 8191;
+    this.r[2] = (t1 >>> 10 | t2 << 6) & 7939;
+    this.r[3] = (t2 >>> 7 | t3 << 9) & 8191;
+    this.r[4] = (t3 >>> 4 | t4 << 12) & 255;
+    this.r[5] = t4 >>> 1 & 8190;
+    this.r[6] = (t4 >>> 14 | t5 << 2) & 8191;
+    this.r[7] = (t5 >>> 11 | t6 << 5) & 8065;
+    this.r[8] = (t6 >>> 8 | t7 << 8) & 8191;
+    this.r[9] = t7 >>> 5 & 127;
+    for (let i = 0; i < 8; i++)
+      this.pad[i] = u8to16(key, 16 + 2 * i);
+  }
+  process(data, offset, isLast = false) {
+    const hibit = isLast ? 0 : 1 << 11;
+    const { h, r } = this;
+    const r0 = r[0];
+    const r1 = r[1];
+    const r2 = r[2];
+    const r3 = r[3];
+    const r4 = r[4];
+    const r5 = r[5];
+    const r6 = r[6];
+    const r7 = r[7];
+    const r8 = r[8];
+    const r9 = r[9];
+    const t0 = u8to16(data, offset + 0);
+    const t1 = u8to16(data, offset + 2);
+    const t2 = u8to16(data, offset + 4);
+    const t3 = u8to16(data, offset + 6);
+    const t4 = u8to16(data, offset + 8);
+    const t5 = u8to16(data, offset + 10);
+    const t6 = u8to16(data, offset + 12);
+    const t7 = u8to16(data, offset + 14);
+    let h0 = h[0] + (t0 & 8191);
+    let h1 = h[1] + ((t0 >>> 13 | t1 << 3) & 8191);
+    let h2 = h[2] + ((t1 >>> 10 | t2 << 6) & 8191);
+    let h3 = h[3] + ((t2 >>> 7 | t3 << 9) & 8191);
+    let h4 = h[4] + ((t3 >>> 4 | t4 << 12) & 8191);
+    let h5 = h[5] + (t4 >>> 1 & 8191);
+    let h6 = h[6] + ((t4 >>> 14 | t5 << 2) & 8191);
+    let h7 = h[7] + ((t5 >>> 11 | t6 << 5) & 8191);
+    let h8 = h[8] + ((t6 >>> 8 | t7 << 8) & 8191);
+    let h9 = h[9] + (t7 >>> 5 | hibit);
+    let c = 0;
+    let d0 = c + h0 * r0 + h1 * (5 * r9) + h2 * (5 * r8) + h3 * (5 * r7) + h4 * (5 * r6);
+    c = d0 >>> 13;
+    d0 &= 8191;
+    d0 += h5 * (5 * r5) + h6 * (5 * r4) + h7 * (5 * r3) + h8 * (5 * r2) + h9 * (5 * r1);
+    c += d0 >>> 13;
+    d0 &= 8191;
+    let d1 = c + h0 * r1 + h1 * r0 + h2 * (5 * r9) + h3 * (5 * r8) + h4 * (5 * r7);
+    c = d1 >>> 13;
+    d1 &= 8191;
+    d1 += h5 * (5 * r6) + h6 * (5 * r5) + h7 * (5 * r4) + h8 * (5 * r3) + h9 * (5 * r2);
+    c += d1 >>> 13;
+    d1 &= 8191;
+    let d2 = c + h0 * r2 + h1 * r1 + h2 * r0 + h3 * (5 * r9) + h4 * (5 * r8);
+    c = d2 >>> 13;
+    d2 &= 8191;
+    d2 += h5 * (5 * r7) + h6 * (5 * r6) + h7 * (5 * r5) + h8 * (5 * r4) + h9 * (5 * r3);
+    c += d2 >>> 13;
+    d2 &= 8191;
+    let d3 = c + h0 * r3 + h1 * r2 + h2 * r1 + h3 * r0 + h4 * (5 * r9);
+    c = d3 >>> 13;
+    d3 &= 8191;
+    d3 += h5 * (5 * r8) + h6 * (5 * r7) + h7 * (5 * r6) + h8 * (5 * r5) + h9 * (5 * r4);
+    c += d3 >>> 13;
+    d3 &= 8191;
+    let d4 = c + h0 * r4 + h1 * r3 + h2 * r2 + h3 * r1 + h4 * r0;
+    c = d4 >>> 13;
+    d4 &= 8191;
+    d4 += h5 * (5 * r9) + h6 * (5 * r8) + h7 * (5 * r7) + h8 * (5 * r6) + h9 * (5 * r5);
+    c += d4 >>> 13;
+    d4 &= 8191;
+    let d5 = c + h0 * r5 + h1 * r4 + h2 * r3 + h3 * r2 + h4 * r1;
+    c = d5 >>> 13;
+    d5 &= 8191;
+    d5 += h5 * r0 + h6 * (5 * r9) + h7 * (5 * r8) + h8 * (5 * r7) + h9 * (5 * r6);
+    c += d5 >>> 13;
+    d5 &= 8191;
+    let d6 = c + h0 * r6 + h1 * r5 + h2 * r4 + h3 * r3 + h4 * r2;
+    c = d6 >>> 13;
+    d6 &= 8191;
+    d6 += h5 * r1 + h6 * r0 + h7 * (5 * r9) + h8 * (5 * r8) + h9 * (5 * r7);
+    c += d6 >>> 13;
+    d6 &= 8191;
+    let d7 = c + h0 * r7 + h1 * r6 + h2 * r5 + h3 * r4 + h4 * r3;
+    c = d7 >>> 13;
+    d7 &= 8191;
+    d7 += h5 * r2 + h6 * r1 + h7 * r0 + h8 * (5 * r9) + h9 * (5 * r8);
+    c += d7 >>> 13;
+    d7 &= 8191;
+    let d8 = c + h0 * r8 + h1 * r7 + h2 * r6 + h3 * r5 + h4 * r4;
+    c = d8 >>> 13;
+    d8 &= 8191;
+    d8 += h5 * r3 + h6 * r2 + h7 * r1 + h8 * r0 + h9 * (5 * r9);
+    c += d8 >>> 13;
+    d8 &= 8191;
+    let d9 = c + h0 * r9 + h1 * r8 + h2 * r7 + h3 * r6 + h4 * r5;
+    c = d9 >>> 13;
+    d9 &= 8191;
+    d9 += h5 * r4 + h6 * r3 + h7 * r2 + h8 * r1 + h9 * r0;
+    c += d9 >>> 13;
+    d9 &= 8191;
+    c = (c << 2) + c | 0;
+    c = c + d0 | 0;
+    d0 = c & 8191;
+    c = c >>> 13;
+    d1 += c;
+    h[0] = d0;
+    h[1] = d1;
+    h[2] = d2;
+    h[3] = d3;
+    h[4] = d4;
+    h[5] = d5;
+    h[6] = d6;
+    h[7] = d7;
+    h[8] = d8;
+    h[9] = d9;
+  }
+  finalize() {
+    const { h, pad } = this;
+    const g = new Uint16Array(10);
+    let c = h[1] >>> 13;
+    h[1] &= 8191;
+    for (let i = 2; i < 10; i++) {
+      h[i] += c;
+      c = h[i] >>> 13;
+      h[i] &= 8191;
+    }
+    h[0] += c * 5;
+    c = h[0] >>> 13;
+    h[0] &= 8191;
+    h[1] += c;
+    c = h[1] >>> 13;
+    h[1] &= 8191;
+    h[2] += c;
+    g[0] = h[0] + 5;
+    c = g[0] >>> 13;
+    g[0] &= 8191;
+    for (let i = 1; i < 10; i++) {
+      g[i] = h[i] + c;
+      c = g[i] >>> 13;
+      g[i] &= 8191;
+    }
+    g[9] -= 1 << 13;
+    let mask = (c ^ 1) - 1;
+    for (let i = 0; i < 10; i++)
+      g[i] &= mask;
+    mask = ~mask;
+    for (let i = 0; i < 10; i++)
+      h[i] = h[i] & mask | g[i];
+    h[0] = (h[0] | h[1] << 13) & 65535;
+    h[1] = (h[1] >>> 3 | h[2] << 10) & 65535;
+    h[2] = (h[2] >>> 6 | h[3] << 7) & 65535;
+    h[3] = (h[3] >>> 9 | h[4] << 4) & 65535;
+    h[4] = (h[4] >>> 12 | h[5] << 1 | h[6] << 14) & 65535;
+    h[5] = (h[6] >>> 2 | h[7] << 11) & 65535;
+    h[6] = (h[7] >>> 5 | h[8] << 8) & 65535;
+    h[7] = (h[8] >>> 8 | h[9] << 5) & 65535;
+    let f2 = h[0] + pad[0];
+    h[0] = f2 & 65535;
+    for (let i = 1; i < 8; i++) {
+      f2 = (h[i] + pad[i] | 0) + (f2 >>> 16) | 0;
+      h[i] = f2 & 65535;
+    }
+  }
+  update(data) {
+    assert_default2.exists(this);
+    const { buffer, blockLen } = this;
+    data = toBytes2(data);
+    const len = data.length;
+    for (let pos = 0; pos < len; ) {
+      const take = Math.min(blockLen - this.pos, len - pos);
+      if (take === blockLen) {
+        for (; blockLen <= len - pos; pos += blockLen)
+          this.process(data, pos);
+        continue;
+      }
+      buffer.set(data.subarray(pos, pos + take), this.pos);
+      this.pos += take;
+      pos += take;
+      if (this.pos === blockLen) {
+        this.process(buffer, 0, false);
+        this.pos = 0;
+      }
+    }
+    return this;
+  }
+  destroy() {
+    this.h.fill(0);
+    this.r.fill(0);
+    this.buffer.fill(0);
+    this.pad.fill(0);
+  }
+  digestInto(out) {
+    assert_default2.exists(this);
+    assert_default2.output(out, this);
+    this.finished = true;
+    const { buffer, h } = this;
+    let { pos } = this;
+    if (pos) {
+      buffer[pos++] = 1;
+      for (; pos < 16; pos++)
+        buffer[pos] = 0;
+      this.process(buffer, 0, true);
+    }
+    this.finalize();
+    let opos = 0;
+    for (let i = 0; i < 8; i++) {
+      out[opos++] = h[i] >>> 0;
+      out[opos++] = h[i] >>> 8;
+    }
+    return out;
+  }
+  digest() {
+    const { buffer, outputLen } = this;
+    this.digestInto(buffer);
+    const res = buffer.slice(0, outputLen);
+    this.destroy();
+    return res;
+  }
+};
+function wrapConstructorWithKey(hashCons) {
+  const hashC = (msg, key) => hashCons(key).update(toBytes2(msg)).digest();
+  const tmp = hashCons(new Uint8Array(32));
+  hashC.outputLen = tmp.outputLen;
+  hashC.blockLen = tmp.blockLen;
+  hashC.create = (key) => hashCons(key);
+  return hashC;
+}
+var poly1305 = wrapConstructorWithKey((key) => new Poly1305(key));
+
+// node_modules/@noble/ciphers/esm/_salsa.js
+var sigma16 = utf8ToBytes3("expand 16-byte k");
+var sigma32 = utf8ToBytes3("expand 32-byte k");
+var sigma16_32 = u32(sigma16);
+var sigma32_32 = u32(sigma32);
+var isAligned32 = (b) => !(b.byteOffset % 4);
+var salsaBasic = (opts) => {
+  const { core, rounds, counterRight, counterLen, allow128bitKeys, extendNonceFn, blockLen } = checkOpts2({ rounds: 20, counterRight: false, counterLen: 8, allow128bitKeys: true, blockLen: 64 }, opts);
+  assert_default2.number(counterLen);
+  assert_default2.number(rounds);
+  assert_default2.number(blockLen);
+  assert_default2.bool(counterRight);
+  assert_default2.bool(allow128bitKeys);
+  const blockLen32 = blockLen / 4;
+  if (blockLen % 4 !== 0)
+    throw new Error("Salsa/ChaCha: blockLen must be aligned to 4 bytes");
+  return (key, nonce, data, output3, counter = 0) => {
+    assert_default2.bytes(key);
+    assert_default2.bytes(nonce);
+    assert_default2.bytes(data);
+    if (!output3)
+      output3 = new Uint8Array(data.length);
+    assert_default2.bytes(output3);
+    assert_default2.number(counter);
+    if (counter < 0 || counter >= 2 ** 32 - 1)
+      throw new Error("Salsa/ChaCha: counter overflow");
+    if (output3.length < data.length) {
+      throw new Error(`Salsa/ChaCha: output (${output3.length}) is shorter than data (${data.length})`);
+    }
+    const toClean = [];
+    let k, sigma;
+    if (key.length === 32) {
+      k = key;
+      sigma = sigma32_32;
+    } else if (key.length === 16 && allow128bitKeys) {
+      k = new Uint8Array(32);
+      k.set(key);
+      k.set(key, 16);
+      sigma = sigma16_32;
+      toClean.push(k);
+    } else
+      throw new Error(`Salsa/ChaCha: invalid 32-byte key, got length=${key.length}`);
+    if (extendNonceFn) {
+      if (nonce.length <= 16)
+        throw new Error(`Salsa/ChaCha: extended nonce must be bigger than 16 bytes`);
+      k = extendNonceFn(sigma, k, nonce.subarray(0, 16), new Uint8Array(32));
+      toClean.push(k);
+      nonce = nonce.subarray(16);
+    }
+    const nonceLen = 16 - counterLen;
+    if (nonce.length !== nonceLen)
+      throw new Error(`Salsa/ChaCha: nonce must be ${nonceLen} or 16 bytes`);
+    if (nonceLen !== 12) {
+      const nc = new Uint8Array(12);
+      nc.set(nonce, counterRight ? 0 : 12 - nonce.length);
+      toClean.push(nonce = nc);
+    }
+    const block = new Uint8Array(blockLen);
+    const b32 = u32(block);
+    const k32 = u32(k);
+    const n32 = u32(nonce);
+    const d32 = isAligned32(data) && u32(data);
+    const o32 = isAligned32(output3) && u32(output3);
+    toClean.push(b32);
+    const len = data.length;
+    for (let pos = 0, ctr = counter; pos < len; ctr++) {
+      core(sigma, k32, n32, b32, ctr, rounds);
+      if (ctr >= 2 ** 32 - 1)
+        throw new Error("Salsa/ChaCha: counter overflow");
+      const take = Math.min(blockLen, len - pos);
+      if (take === blockLen && o32 && d32) {
+        const pos32 = pos / 4;
+        if (pos % 4 !== 0)
+          throw new Error("Salsa/ChaCha: invalid block position");
+        for (let j = 0; j < blockLen32; j++)
+          o32[pos32 + j] = d32[pos32 + j] ^ b32[j];
+        pos += blockLen;
+        continue;
+      }
+      for (let j = 0; j < take; j++)
+        output3[pos + j] = data[pos + j] ^ block[j];
+      pos += take;
+    }
+    for (let i = 0; i < toClean.length; i++)
+      toClean[i].fill(0);
+    return output3;
+  };
+};
+
+// node_modules/@noble/ciphers/esm/chacha.js
+var rotl2 = (a, b) => a << b | a >>> 32 - b;
+function chachaCore(c, k, n, out, cnt, rounds = 20) {
+  let y00 = c[0], y01 = c[1], y02 = c[2], y03 = c[3];
+  let y04 = k[0], y05 = k[1], y06 = k[2], y07 = k[3];
+  let y08 = k[4], y09 = k[5], y10 = k[6], y11 = k[7];
+  let y12 = cnt, y13 = n[0], y14 = n[1], y15 = n[2];
+  let x00 = y00, x01 = y01, x02 = y02, x03 = y03, x04 = y04, x05 = y05, x06 = y06, x07 = y07, x08 = y08, x09 = y09, x10 = y10, x11 = y11, x12 = y12, x13 = y13, x14 = y14, x15 = y15;
+  for (let i = 0; i < rounds; i += 2) {
+    x00 = x00 + x04 | 0;
+    x12 = rotl2(x12 ^ x00, 16);
+    x08 = x08 + x12 | 0;
+    x04 = rotl2(x04 ^ x08, 12);
+    x00 = x00 + x04 | 0;
+    x12 = rotl2(x12 ^ x00, 8);
+    x08 = x08 + x12 | 0;
+    x04 = rotl2(x04 ^ x08, 7);
+    x01 = x01 + x05 | 0;
+    x13 = rotl2(x13 ^ x01, 16);
+    x09 = x09 + x13 | 0;
+    x05 = rotl2(x05 ^ x09, 12);
+    x01 = x01 + x05 | 0;
+    x13 = rotl2(x13 ^ x01, 8);
+    x09 = x09 + x13 | 0;
+    x05 = rotl2(x05 ^ x09, 7);
+    x02 = x02 + x06 | 0;
+    x14 = rotl2(x14 ^ x02, 16);
+    x10 = x10 + x14 | 0;
+    x06 = rotl2(x06 ^ x10, 12);
+    x02 = x02 + x06 | 0;
+    x14 = rotl2(x14 ^ x02, 8);
+    x10 = x10 + x14 | 0;
+    x06 = rotl2(x06 ^ x10, 7);
+    x03 = x03 + x07 | 0;
+    x15 = rotl2(x15 ^ x03, 16);
+    x11 = x11 + x15 | 0;
+    x07 = rotl2(x07 ^ x11, 12);
+    x03 = x03 + x07 | 0;
+    x15 = rotl2(x15 ^ x03, 8);
+    x11 = x11 + x15 | 0;
+    x07 = rotl2(x07 ^ x11, 7);
+    x00 = x00 + x05 | 0;
+    x15 = rotl2(x15 ^ x00, 16);
+    x10 = x10 + x15 | 0;
+    x05 = rotl2(x05 ^ x10, 12);
+    x00 = x00 + x05 | 0;
+    x15 = rotl2(x15 ^ x00, 8);
+    x10 = x10 + x15 | 0;
+    x05 = rotl2(x05 ^ x10, 7);
+    x01 = x01 + x06 | 0;
+    x12 = rotl2(x12 ^ x01, 16);
+    x11 = x11 + x12 | 0;
+    x06 = rotl2(x06 ^ x11, 12);
+    x01 = x01 + x06 | 0;
+    x12 = rotl2(x12 ^ x01, 8);
+    x11 = x11 + x12 | 0;
+    x06 = rotl2(x06 ^ x11, 7);
+    x02 = x02 + x07 | 0;
+    x13 = rotl2(x13 ^ x02, 16);
+    x08 = x08 + x13 | 0;
+    x07 = rotl2(x07 ^ x08, 12);
+    x02 = x02 + x07 | 0;
+    x13 = rotl2(x13 ^ x02, 8);
+    x08 = x08 + x13 | 0;
+    x07 = rotl2(x07 ^ x08, 7);
+    x03 = x03 + x04 | 0;
+    x14 = rotl2(x14 ^ x03, 16);
+    x09 = x09 + x14 | 0;
+    x04 = rotl2(x04 ^ x09, 12);
+    x03 = x03 + x04 | 0;
+    x14 = rotl2(x14 ^ x03, 8);
+    x09 = x09 + x14 | 0;
+    x04 = rotl2(x04 ^ x09, 7);
+  }
+  let oi = 0;
+  out[oi++] = y00 + x00 | 0;
+  out[oi++] = y01 + x01 | 0;
+  out[oi++] = y02 + x02 | 0;
+  out[oi++] = y03 + x03 | 0;
+  out[oi++] = y04 + x04 | 0;
+  out[oi++] = y05 + x05 | 0;
+  out[oi++] = y06 + x06 | 0;
+  out[oi++] = y07 + x07 | 0;
+  out[oi++] = y08 + x08 | 0;
+  out[oi++] = y09 + x09 | 0;
+  out[oi++] = y10 + x10 | 0;
+  out[oi++] = y11 + x11 | 0;
+  out[oi++] = y12 + x12 | 0;
+  out[oi++] = y13 + x13 | 0;
+  out[oi++] = y14 + x14 | 0;
+  out[oi++] = y15 + x15 | 0;
+}
+function hchacha(c, key, src, out) {
+  const k32 = u32(key);
+  const i32 = u32(src);
+  const o32 = u32(out);
+  let x00 = c[0], x01 = c[1], x02 = c[2], x03 = c[3];
+  let x04 = k32[0], x05 = k32[1], x06 = k32[2], x07 = k32[3];
+  let x08 = k32[4], x09 = k32[5], x10 = k32[6], x11 = k32[7];
+  let x12 = i32[0], x13 = i32[1], x14 = i32[2], x15 = i32[3];
+  for (let i = 0; i < 20; i += 2) {
+    x00 = x00 + x04 | 0;
+    x12 = rotl2(x12 ^ x00, 16);
+    x08 = x08 + x12 | 0;
+    x04 = rotl2(x04 ^ x08, 12);
+    x00 = x00 + x04 | 0;
+    x12 = rotl2(x12 ^ x00, 8);
+    x08 = x08 + x12 | 0;
+    x04 = rotl2(x04 ^ x08, 7);
+    x01 = x01 + x05 | 0;
+    x13 = rotl2(x13 ^ x01, 16);
+    x09 = x09 + x13 | 0;
+    x05 = rotl2(x05 ^ x09, 12);
+    x01 = x01 + x05 | 0;
+    x13 = rotl2(x13 ^ x01, 8);
+    x09 = x09 + x13 | 0;
+    x05 = rotl2(x05 ^ x09, 7);
+    x02 = x02 + x06 | 0;
+    x14 = rotl2(x14 ^ x02, 16);
+    x10 = x10 + x14 | 0;
+    x06 = rotl2(x06 ^ x10, 12);
+    x02 = x02 + x06 | 0;
+    x14 = rotl2(x14 ^ x02, 8);
+    x10 = x10 + x14 | 0;
+    x06 = rotl2(x06 ^ x10, 7);
+    x03 = x03 + x07 | 0;
+    x15 = rotl2(x15 ^ x03, 16);
+    x11 = x11 + x15 | 0;
+    x07 = rotl2(x07 ^ x11, 12);
+    x03 = x03 + x07 | 0;
+    x15 = rotl2(x15 ^ x03, 8);
+    x11 = x11 + x15 | 0;
+    x07 = rotl2(x07 ^ x11, 7);
+    x00 = x00 + x05 | 0;
+    x15 = rotl2(x15 ^ x00, 16);
+    x10 = x10 + x15 | 0;
+    x05 = rotl2(x05 ^ x10, 12);
+    x00 = x00 + x05 | 0;
+    x15 = rotl2(x15 ^ x00, 8);
+    x10 = x10 + x15 | 0;
+    x05 = rotl2(x05 ^ x10, 7);
+    x01 = x01 + x06 | 0;
+    x12 = rotl2(x12 ^ x01, 16);
+    x11 = x11 + x12 | 0;
+    x06 = rotl2(x06 ^ x11, 12);
+    x01 = x01 + x06 | 0;
+    x12 = rotl2(x12 ^ x01, 8);
+    x11 = x11 + x12 | 0;
+    x06 = rotl2(x06 ^ x11, 7);
+    x02 = x02 + x07 | 0;
+    x13 = rotl2(x13 ^ x02, 16);
+    x08 = x08 + x13 | 0;
+    x07 = rotl2(x07 ^ x08, 12);
+    x02 = x02 + x07 | 0;
+    x13 = rotl2(x13 ^ x02, 8);
+    x08 = x08 + x13 | 0;
+    x07 = rotl2(x07 ^ x08, 7);
+    x03 = x03 + x04 | 0;
+    x14 = rotl2(x14 ^ x03, 16);
+    x09 = x09 + x14 | 0;
+    x04 = rotl2(x04 ^ x09, 12);
+    x03 = x03 + x04 | 0;
+    x14 = rotl2(x14 ^ x03, 8);
+    x09 = x09 + x14 | 0;
+    x04 = rotl2(x04 ^ x09, 7);
+  }
+  o32[0] = x00;
+  o32[1] = x01;
+  o32[2] = x02;
+  o32[3] = x03;
+  o32[4] = x12;
+  o32[5] = x13;
+  o32[6] = x14;
+  o32[7] = x15;
+  return out;
+}
+var xchacha20 = /* @__PURE__ */ salsaBasic({
+  core: chachaCore,
+  counterRight: false,
+  counterLen: 8,
+  extendNonceFn: hchacha,
+  allow128bitKeys: false
+});
+
 // node_modules/nostr-tools/lib/esm/nostr.mjs
 var __defProp2 = Object.defineProperty;
 var __export2 = (target, all) => {
@@ -6420,11 +6266,7 @@ function insertEventIntoDescendingList(sortedArray, event) {
       }
     }
   if (sortedArray[position]?.id !== event.id) {
-    return [
-      ...sortedArray.slice(0, position),
-      event,
-      ...sortedArray.slice(position)
-    ];
+    return [...sortedArray.slice(0, position), event, ...sortedArray.slice(position)];
   }
   return sortedArray;
 }
@@ -6456,11 +6298,7 @@ function insertEventIntoAscendingList(sortedArray, event) {
       }
     }
   if (sortedArray[position]?.id !== event.id) {
-    return [
-      ...sortedArray.slice(0, position),
-      event,
-      ...sortedArray.slice(position)
-    ];
+    return [...sortedArray.slice(0, position), event, ...sortedArray.slice(position)];
   }
   return sortedArray;
 }
@@ -6533,6 +6371,7 @@ var MessageQueue = class {
     return prev.value;
   }
 };
+var verifiedSymbol = Symbol("verified");
 function getBlankEvent(kind = 255) {
   return {
     kind,
@@ -6542,23 +6381,17 @@ function getBlankEvent(kind = 255) {
   };
 }
 function finishEvent(t, privateKey) {
-  let event = t;
+  const event = t;
   event.pubkey = getPublicKey(privateKey);
   event.id = getEventHash(event);
   event.sig = getSignature(event, privateKey);
+  event[verifiedSymbol] = true;
   return event;
 }
 function serializeEvent(evt) {
   if (!validateEvent(evt))
     throw new Error("can't serialize event with wrong or missing properties");
-  return JSON.stringify([
-    0,
-    evt.pubkey,
-    evt.created_at,
-    evt.kind,
-    evt.tags,
-    evt.content
-  ]);
+  return JSON.stringify([0, evt.pubkey, evt.created_at, evt.kind, evt.tags, evt.content]);
 }
 function getEventHash(event) {
   let eventHash = sha256(utf8Encoder.encode(serializeEvent(event)));
@@ -6592,10 +6425,16 @@ function validateEvent(event) {
   return true;
 }
 function verifySignature(event) {
+  if (typeof event[verifiedSymbol] === "boolean")
+    return event[verifiedSymbol];
+  const hash3 = getEventHash(event);
+  if (hash3 !== event.id) {
+    return event[verifiedSymbol] = false;
+  }
   try {
-    return schnorr.verify(event.sig, getEventHash(event), event.pubkey);
+    return event[verifiedSymbol] = schnorr.verify(event.sig, hash3, event.pubkey);
   } catch (err2) {
-    return false;
+    return event[verifiedSymbol] = false;
   }
 }
 function getSignature(event, key) {
@@ -6618,9 +6457,7 @@ function matchFilter(filter, event) {
     if (f2[0] === "#") {
       let tagName = f2.slice(1);
       let values = filter[`#${tagName}`];
-      if (values && !event.tags.find(
-        ([t, v]) => t === f2.slice(1) && values.indexOf(v) !== -1
-      ))
+      if (values && !event.tags.find(([t, v]) => t === f2.slice(1) && values.indexOf(v) !== -1))
         return false;
     }
   }
@@ -6636,6 +6473,29 @@ function matchFilters(filters, event) {
       return true;
   }
   return false;
+}
+function mergeFilters(...filters) {
+  let result = {};
+  for (let i = 0; i < filters.length; i++) {
+    let filter = filters[i];
+    Object.entries(filter).forEach(([property, values]) => {
+      if (property === "kinds" || property === "ids" || property === "authors" || property[0] === "#") {
+        result[property] = result[property] || [];
+        for (let v = 0; v < values.length; v++) {
+          let value = values[v];
+          if (!result[property].includes(value))
+            result[property].push(value);
+        }
+      }
+    });
+    if (filter.limit && (!result.limit || filter.limit > result.limit))
+      result.limit = filter.limit;
+    if (filter.until && (!result.until || filter.until > result.until))
+      result.until = filter.until;
+    if (filter.since && (!result.since || filter.since < result.since))
+      result.since = filter.since;
+  }
+  return result;
 }
 var fakejson_exports = {};
 __export2(fakejson_exports, {
@@ -6837,7 +6697,7 @@ function relayInit(url, options = {}) {
       alreadyHaveEvent
     };
     trySend([verb, subid, ...filters]);
-    return {
+    let subscription = {
       sub: (newFilters, newOpts = {}) => sub(newFilters || filters, {
         skipVerification: newOpts.skipVerification || skipVerification,
         alreadyHaveEvent: newOpts.alreadyHaveEvent || alreadyHaveEvent,
@@ -6861,8 +6721,12 @@ function relayInit(url, options = {}) {
         let idx = listeners2[type].indexOf(cb);
         if (idx >= 0)
           listeners2[type].splice(idx, 1);
+      },
+      get events() {
+        return eventsGenerator(subscription);
       }
     };
+    return subscription;
   };
   function _publishEvent(event, type) {
     return new Promise((resolve, reject) => {
@@ -6941,8 +6805,8 @@ function relayInit(url, options = {}) {
       listeners = newListeners();
       subListeners = {};
       pubListeners = {};
-      if (ws.readyState === WebSocket.OPEN) {
-        ws?.close();
+      if (ws?.readyState === WebSocket.OPEN) {
+        ws.close();
       }
     },
     get status() {
@@ -6950,17 +6814,47 @@ function relayInit(url, options = {}) {
     }
   };
 }
+async function* eventsGenerator(sub) {
+  let nextResolve;
+  const eventQueue = [];
+  const pushToQueue = (event) => {
+    if (nextResolve) {
+      nextResolve(event);
+      nextResolve = void 0;
+    } else {
+      eventQueue.push(event);
+    }
+  };
+  sub.on("event", pushToQueue);
+  try {
+    while (true) {
+      if (eventQueue.length > 0) {
+        yield eventQueue.shift();
+      } else {
+        const event = await new Promise((resolve) => {
+          nextResolve = resolve;
+        });
+        yield event;
+      }
+    }
+  } finally {
+    sub.off("event", pushToQueue);
+  }
+}
 var SimplePool = class {
   _conn;
   _seenOn = {};
+  batchedByKey = {};
   eoseSubTimeout;
   getTimeout;
   seenOnEnabled = true;
+  batchInterval = 100;
   constructor(options = {}) {
     this._conn = {};
     this.eoseSubTimeout = options.eoseSubTimeout || 3400;
     this.getTimeout = options.getTimeout || 3400;
     this.seenOnEnabled = options.seenOnEnabled !== false;
+    this.batchInterval = options.batchInterval || 100;
   }
   close(relays2) {
     relays2.forEach((url) => {
@@ -7000,12 +6894,15 @@ var SimplePool = class {
     let eoseListeners = /* @__PURE__ */ new Set();
     let eosesMissing = relays2.length;
     let eoseSent = false;
-    let eoseTimeout = setTimeout(() => {
-      eoseSent = true;
-      for (let cb of eoseListeners.values())
-        cb();
-    }, this.eoseSubTimeout);
-    relays2.forEach(async (relay) => {
+    let eoseTimeout = setTimeout(
+      () => {
+        eoseSent = true;
+        for (let cb of eoseListeners.values())
+          cb();
+      },
+      opts?.eoseSubTimeout || this.eoseSubTimeout
+    );
+    relays2.filter((r, i, a) => a.indexOf(r) === i).forEach(async (relay) => {
       let r;
       try {
         r = await this.ensureRelay(relay);
@@ -7056,6 +6953,9 @@ var SimplePool = class {
           eventListeners.delete(cb);
         } else if (type === "eose")
           eoseListeners.delete(cb);
+      },
+      get events() {
+        return eventsGenerator(greaterSub);
       }
     };
     return greaterSub;
@@ -7087,6 +6987,47 @@ var SimplePool = class {
       });
     });
   }
+  batchedList(batchKey, relays2, filters) {
+    return new Promise((resolve) => {
+      if (!this.batchedByKey[batchKey]) {
+        this.batchedByKey[batchKey] = [
+          {
+            filters,
+            relays: relays2,
+            resolve,
+            events: []
+          }
+        ];
+        setTimeout(() => {
+          Object.keys(this.batchedByKey).forEach(async (batchKey2) => {
+            const batchedRequests = this.batchedByKey[batchKey2];
+            const filters2 = [];
+            const relays22 = [];
+            batchedRequests.forEach((br) => {
+              filters2.push(...br.filters);
+              relays22.push(...br.relays);
+            });
+            const sub = this.sub(relays22, [mergeFilters(...filters2)]);
+            sub.on("event", (event) => {
+              batchedRequests.forEach((br) => matchFilters(br.filters, event) && br.events.push(event));
+            });
+            sub.on("eose", () => {
+              sub.unsub();
+              batchedRequests.forEach((br) => br.resolve(br.events));
+            });
+            delete this.batchedByKey[batchKey2];
+          });
+        }, this.batchInterval);
+      } else {
+        this.batchedByKey[batchKey].push({
+          filters,
+          relays: relays2,
+          resolve,
+          events: []
+        });
+      }
+    });
+  }
   publish(relays2, event) {
     return relays2.map(async (relay) => {
       let r = await this.ensureRelay(relay);
@@ -7111,6 +7052,14 @@ __export2(nip19_exports, {
 });
 var Bech32MaxSize = 5e3;
 var BECH32_REGEX = /[\x21-\x7E]{1,83}1[023456789acdefghjklmnpqrstuvwxyz]{6,}/;
+function integerToUint8Array(number3) {
+  const uint8Array = new Uint8Array(4);
+  uint8Array[0] = number3 >> 24 & 255;
+  uint8Array[1] = number3 >> 16 & 255;
+  uint8Array[2] = number3 >> 8 & 255;
+  uint8Array[3] = number3 & 255;
+  return uint8Array;
+}
 function decode(nip19) {
   let { prefix, words } = bech32.decode(nip19, Bech32MaxSize);
   let data = new Uint8Array(bech32.fromWords(words));
@@ -7137,12 +7086,15 @@ function decode(nip19) {
         throw new Error("TLV 0 should be 32 bytes");
       if (tlv[2] && tlv[2][0].length !== 32)
         throw new Error("TLV 2 should be 32 bytes");
+      if (tlv[3] && tlv[3][0].length !== 4)
+        throw new Error("TLV 3 should be 4 bytes");
       return {
         type: "nevent",
         data: {
           id: bytesToHex(tlv[0][0]),
           relays: tlv[1] ? tlv[1].map((d) => utf8Decoder.decode(d)) : [],
-          author: tlv[2]?.[0] ? bytesToHex(tlv[2][0]) : void 0
+          author: tlv[2]?.[0] ? bytesToHex(tlv[2][0]) : void 0,
+          kind: tlv[3]?.[0] ? parseInt(bytesToHex(tlv[3][0]), 16) : void 0
         }
       };
     }
@@ -7227,10 +7179,15 @@ function nprofileEncode(profile) {
   return encodeBech32("nprofile", data);
 }
 function neventEncode(event) {
+  let kindArray;
+  if (event.kind != void 0) {
+    kindArray = integerToUint8Array(event.kind);
+  }
   let data = encodeTLV({
     0: [hexToBytes(event.id)],
     1: (event.relays || []).map((url) => utf8Encoder.encode(url)),
-    2: event.author ? [hexToBytes(event.author)] : []
+    2: event.author ? [hexToBytes(event.author)] : [],
+    3: kindArray ? [new Uint8Array(kindArray)] : []
   });
   return encodeBech32("nevent", data);
 }
@@ -7277,18 +7234,8 @@ async function encrypt(privkey, pubkey, text) {
   const normalizedKey = getNormalizedX(key);
   let iv = Uint8Array.from(randomBytes(16));
   let plaintext = utf8Encoder.encode(text);
-  let cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    normalizedKey,
-    { name: "AES-CBC" },
-    false,
-    ["encrypt"]
-  );
-  let ciphertext = await crypto.subtle.encrypt(
-    { name: "AES-CBC", iv },
-    cryptoKey,
-    plaintext
-  );
+  let cryptoKey = await crypto.subtle.importKey("raw", normalizedKey, { name: "AES-CBC" }, false, ["encrypt"]);
+  let ciphertext = await crypto.subtle.encrypt({ name: "AES-CBC", iv }, cryptoKey, plaintext);
   let ctb64 = base64.encode(new Uint8Array(ciphertext));
   let ivb64 = base64.encode(new Uint8Array(iv.buffer));
   return `${ctb64}?iv=${ivb64}`;
@@ -7297,20 +7244,10 @@ async function decrypt(privkey, pubkey, data) {
   let [ctb64, ivb64] = data.split("?iv=");
   let key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
   let normalizedKey = getNormalizedX(key);
-  let cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    normalizedKey,
-    { name: "AES-CBC" },
-    false,
-    ["decrypt"]
-  );
+  let cryptoKey = await crypto.subtle.importKey("raw", normalizedKey, { name: "AES-CBC" }, false, ["decrypt"]);
   let ciphertext = base64.decode(ctb64);
   let iv = base64.decode(ivb64);
-  let plaintext = await crypto.subtle.decrypt(
-    { name: "AES-CBC", iv },
-    cryptoKey,
-    ciphertext
-  );
+  let plaintext = await crypto.subtle.decrypt({ name: "AES-CBC", iv }, cryptoKey, ciphertext);
   let text = utf8Decoder.decode(plaintext);
   return text;
 }
@@ -7451,31 +7388,40 @@ function parse(event) {
 }
 var nip13_exports = {};
 __export2(nip13_exports, {
-  getPow: () => getPow
+  getPow: () => getPow,
+  minePow: () => minePow
 });
-function getPow(id) {
-  return getLeadingZeroBits(hexToBytes(id));
-}
-function getLeadingZeroBits(hash3) {
-  let total, i, bits;
-  for (i = 0, total = 0; i < hash3.length; i++) {
-    bits = msb(hash3[i]);
-    total += bits;
-    if (bits !== 8) {
+function getPow(hex2) {
+  let count = 0;
+  for (let i = 0; i < hex2.length; i++) {
+    const nibble = parseInt(hex2[i], 16);
+    if (nibble === 0) {
+      count += 4;
+    } else {
+      count += Math.clz32(nibble) - 28;
       break;
     }
   }
-  return total;
+  return count;
 }
-function msb(b) {
-  let n = 0;
-  if (b === 0) {
-    return 8;
+function minePow(unsigned, difficulty) {
+  let count = 0;
+  const event = unsigned;
+  const tag = ["nonce", count.toString(), difficulty.toString()];
+  event.tags.push(tag);
+  while (true) {
+    const now = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+    if (now !== event.created_at) {
+      count = 0;
+      event.created_at = now;
+    }
+    tag[1] = (++count).toString();
+    event.id = getEventHash(event);
+    if (getPow(event.id) >= difficulty) {
+      break;
+    }
   }
-  while (b >>= 1) {
-    n++;
-  }
-  return 7 - n;
+  return event;
 }
 var nip18_exports = {};
 __export2(nip18_exports, {
@@ -7484,16 +7430,15 @@ __export2(nip18_exports, {
   getRepostedEventPointer: () => getRepostedEventPointer
 });
 function finishRepostEvent(t, reposted, relayUrl, privateKey) {
-  return finishEvent({
-    kind: 6,
-    tags: [
-      ...t.tags ?? [],
-      ["e", reposted.id, relayUrl],
-      ["p", reposted.pubkey]
-    ],
-    content: t.content === "" ? "" : JSON.stringify(reposted),
-    created_at: t.created_at
-  }, privateKey);
+  return finishEvent(
+    {
+      kind: 6,
+      tags: [...t.tags ?? [], ["e", reposted.id, relayUrl], ["p", reposted.pubkey]],
+      content: t.content === "" ? "" : JSON.stringify(reposted),
+      created_at: t.created_at
+    },
+    privateKey
+  );
 }
 function getRepostedEventPointer(event) {
   if (event.kind !== 6) {
@@ -7565,20 +7510,16 @@ __export2(nip25_exports, {
   getReactedEventPointer: () => getReactedEventPointer
 });
 function finishReactionEvent(t, reacted, privateKey) {
-  const inheritedTags = reacted.tags.filter(
-    (tag) => tag.length >= 2 && (tag[0] === "e" || tag[0] === "p")
+  const inheritedTags = reacted.tags.filter((tag) => tag.length >= 2 && (tag[0] === "e" || tag[0] === "p"));
+  return finishEvent(
+    {
+      ...t,
+      kind: 7,
+      tags: [...t.tags ?? [], ...inheritedTags, ["e", reacted.id], ["p", reacted.pubkey]],
+      content: t.content ?? "+"
+    },
+    privateKey
   );
-  return finishEvent({
-    ...t,
-    kind: 7,
-    tags: [
-      ...t.tags ?? [],
-      ...inheritedTags,
-      ["e", reacted.id],
-      ["p", reacted.pubkey]
-    ],
-    content: t.content ?? "+"
-  }, privateKey);
 }
 function getReactedEventPointer(event) {
   if (event.kind !== 7) {
@@ -7621,12 +7562,8 @@ function createDelegation(privateKey, parameters) {
   let cond = conditions.join("&");
   if (cond === "")
     throw new Error("refusing to create a delegation without any conditions");
-  let sighash = sha256(
-    utf8Encoder.encode(`nostr:delegation:${parameters.pubkey}:${cond}`)
-  );
-  let sig = bytesToHex(
-    schnorr.sign(sighash, privateKey)
-  );
+  let sighash = sha256(utf8Encoder.encode(`nostr:delegation:${parameters.pubkey}:${cond}`));
+  let sig = bytesToHex(schnorr.sign(sighash, privateKey));
   return {
     from: getPublicKey(privateKey),
     to: parameters.pubkey,
@@ -7653,9 +7590,7 @@ function getDelegator(event) {
     else
       return null;
   }
-  let sighash = sha256(
-    utf8Encoder.encode(`nostr:delegation:${event.pubkey}:${cond}`)
-  );
+  let sighash = sha256(utf8Encoder.encode(`nostr:delegation:${event.pubkey}:${cond}`));
   if (!schnorr.verify(sig, sighash, pubkey))
     return null;
   return pubkey;
@@ -7832,6 +7767,71 @@ var authenticate = async ({
   };
   return relay.auth(await sign(e));
 };
+var nip44_exports = {};
+__export2(nip44_exports, {
+  decrypt: () => decrypt2,
+  encrypt: () => encrypt2,
+  getSharedSecret: () => getSharedSecret
+});
+var getSharedSecret = (privkey, pubkey) => sha256(secp256k1.getSharedSecret(privkey, "02" + pubkey).subarray(1, 33));
+function encrypt2(key, text, v = 1) {
+  if (v !== 1) {
+    throw new Error("NIP44: unknown encryption version");
+  }
+  const nonce = randomBytes(24);
+  const plaintext = utf8Encoder.encode(text);
+  const ciphertext = xchacha20(key, nonce, plaintext);
+  const payload = new Uint8Array(25 + ciphertext.length);
+  payload.set([v], 0);
+  payload.set(nonce, 1);
+  payload.set(ciphertext, 25);
+  return base64.encode(payload);
+}
+function decrypt2(key, payload) {
+  let data = base64.decode(payload);
+  if (data[0] !== 1) {
+    throw new Error(`NIP44: unknown encryption version: ${data[0]}`);
+  }
+  const nonce = data.slice(1, 25);
+  const ciphertext = data.slice(25);
+  const plaintext = xchacha20(key, nonce, ciphertext);
+  return utf8Decoder.decode(plaintext);
+}
+var nip47_exports = {};
+__export2(nip47_exports, {
+  makeNwcRequestEvent: () => makeNwcRequestEvent,
+  parseConnectionString: () => parseConnectionString
+});
+function parseConnectionString(connectionString) {
+  const { pathname, searchParams } = new URL(connectionString);
+  const pubkey = pathname;
+  const relay = searchParams.get("relay");
+  const secret = searchParams.get("secret");
+  if (!pubkey || !relay || !secret) {
+    throw new Error("invalid connection string");
+  }
+  return { pubkey, relay, secret };
+}
+async function makeNwcRequestEvent({
+  pubkey,
+  secret,
+  invoice
+}) {
+  const content = {
+    method: "pay_invoice",
+    params: {
+      invoice
+    }
+  };
+  const encryptedContent = await encrypt(secret, pubkey, JSON.stringify(content));
+  const eventTemplate = {
+    kind: 23194,
+    created_at: Math.round(Date.now() / 1e3),
+    content: encryptedContent,
+    tags: [["p", pubkey]]
+  };
+  return finishEvent(eventTemplate, secret);
+}
 var nip57_exports = {};
 __export2(nip57_exports, {
   getZapEndpoint: () => getZapEndpoint,
@@ -7928,18 +7928,12 @@ function makeZapReceipt({
   paidAt
 }) {
   let zr = JSON.parse(zapRequest);
-  let tagsFromZapRequest = zr.tags.filter(
-    ([t]) => t === "e" || t === "p" || t === "a"
-  );
+  let tagsFromZapRequest = zr.tags.filter(([t]) => t === "e" || t === "p" || t === "a");
   let zap = {
     kind: 9735,
     created_at: Math.round(paidAt.getTime() / 1e3),
     content: "",
-    tags: [
-      ...tagsFromZapRequest,
-      ["bolt11", bolt11],
-      ["description", zapRequest]
-    ]
+    tags: [...tagsFromZapRequest, ["bolt11", bolt11], ["description", zapRequest]]
   };
   if (preimage) {
     zap.tags.push(["preimage", preimage]);
@@ -7949,14 +7943,14 @@ function makeZapReceipt({
 var nip98_exports = {};
 __export2(nip98_exports, {
   getToken: () => getToken,
+  unpackEventFromToken: () => unpackEventFromToken,
+  validateEvent: () => validateEvent2,
   validateToken: () => validateToken
 });
 var _authorizationScheme = "Nostr ";
 async function getToken(loginUrl, httpMethod, sign, includeAuthorizationScheme = false) {
   if (!loginUrl || !httpMethod)
     throw new Error("Missing loginUrl or httpMethod");
-  if (httpMethod !== "get" && httpMethod !== "post")
-    throw new Error("Unknown httpMethod");
   const event = getBlankEvent(
     27235
     /* HttpAuth */
@@ -7971,6 +7965,15 @@ async function getToken(loginUrl, httpMethod, sign, includeAuthorizationScheme =
   return authorizationScheme + base64.encode(utf8Encoder.encode(JSON.stringify(signedEvent)));
 }
 async function validateToken(token, url, method) {
+  const event = await unpackEventFromToken(token).catch((error) => {
+    throw error;
+  });
+  const valid = await validateEvent2(event, url, method).catch((error) => {
+    throw error;
+  });
+  return valid;
+}
+async function unpackEventFromToken(token) {
   if (!token) {
     throw new Error("Missing token");
   }
@@ -7980,6 +7983,9 @@ async function validateToken(token, url, method) {
     throw new Error("Invalid token");
   }
   const event = JSON.parse(eventB64);
+  return event;
+}
+async function validateEvent2(event, url, method) {
   if (!event) {
     throw new Error("Invalid nostr event");
   }
@@ -8279,20 +8285,20 @@ var etc = {
   mod: mod2,
   invert: inv,
   hmacSha256Async: async (key, ...msgs) => {
-    const crypto4 = cr();
-    if (!crypto4)
+    const crypto3 = cr();
+    if (!crypto3)
       return err("etc.hmacSha256Async not set");
-    const s = crypto4.subtle;
+    const s = crypto3.subtle;
     const k = await s.importKey("raw", key, { name: "HMAC", hash: { name: "SHA-256" } }, false, ["sign"]);
     return u8n2(await s.sign("HMAC", k, concatB(...msgs)));
   },
   hmacSha256Sync: _hmacSync,
   hashToPrivateKey,
   randomBytes: (len) => {
-    const crypto4 = cr();
-    if (!crypto4)
+    const crypto3 = cr();
+    if (!crypto3)
       err("crypto.getRandomValues must be defined");
-    return crypto4.getRandomValues(u8n2(len));
+    return crypto3.getRandomValues(u8n2(len));
   }
 };
 Object.defineProperties(etc, { hmacSha256Sync: {
@@ -8969,7 +8975,7 @@ tonic_default.add(class GuestBook extends tonic_default {
     `);
     return this.html`
       <post-form></post-form>
-      <h3>Senaste Inlägg (${this.#posts.length + ""}st)</h3>
+      <h3>Latest posts (${this.#posts.length + ""}st)</h3>
       ${posts}
     `;
   }
@@ -9020,10 +9026,10 @@ tonic_default.add(class PostForm extends tonic_default {
     let authorProfile = this.html`
       <sub>Logga in</sub>
       <author class="flex row space-between xcenter wrap">
-        <button id="btn-p-gen">generera</button>
+        <button id="btn-p-gen">generate</button>
         <div>
-          <input type="text" id="inp-sk-import" placeholder="Klistra in din nsec..."/>
-          <button>importera</button>
+          <input type="text" id="inp-sk-import" placeholder="Paste your nsec..."/>
+          <button>import</button>
         </div>
       </author>
     `;
@@ -9037,12 +9043,12 @@ tonic_default.add(class PostForm extends tonic_default {
       const asl = decodeASL(pubkey);
       const flag = flagOf(asl.location);
       const location = geoCode(asl.location);
-      const sex = ["Kvinna", "Man", "Ickebin\xE4r", "Robot"][asl.sex];
+      const sex = ["Female", "Male", "NonBinary", "Robot"][asl.sex];
       const age = ["16", "24", "32", "48"][asl.age];
       const { profileDirty, saving } = this.props;
       const saveEnabled = profileDirty && !saving ? "" : "disabled";
       authorProfile = this.html`
-        <sub>Inloggad som</sub>
+        <sub>Logged in as</sub>
         <author class="flex row space-between xcenter wrap">
           <div class="flex column">
             ${picture}
@@ -9072,10 +9078,10 @@ tonic_default.add(class PostForm extends tonic_default {
       <div id="post-form">
         ${authorProfile}
         <br/>
-        <h1>Gästboken</h1>
-        <!-- ${this.replyTo ? "Nytt Inl\xE4gg" : "Re:" + this.replyTo} -->
-          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Lämmna en kommentar här eller tagga med #reboot för att synas"></textarea>
-        <!--<button id="submit">Skicka</button>-->
+        <h1>Guestbook</h1>
+        <!-- ${this.replyTo ? "New Post" : "Re:" + this.replyTo} -->
+          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Leave a comment here or tag something #reboot using your favourite nostr client"></textarea>
+        <!--<button id="submit">Send</button>-->
         <div class="flex row center"><button class="post-btn biff" ${attrD} ${isPosting ? "aria-busy=true" : ""}>Skapa Inlägg</button></div>
       </div>
     `;
@@ -9282,18 +9288,18 @@ tonic_default.add(class KeyGenerator extends tonic_default {
         <br>
         <hr />
         <br>
-        <p><strong>Plats</strong></p>
+        <p><strong>Location</strong></p>
         <div class="flex row space-around">
           <input id="geohash-input" type="text"
             ${ulock ? "" : 'disabled="true"'}
             value="${geohash}"/>
           <p class="geo-desc">${flag} ${geoLabel}</p>
         </div>
-        <button id="btn-gps">Hämta Plats</button>
+        <button id="btn-gps">Fetch Location</button>
         <hr />
         <div class="flex row">
-          <button id="btn-close" class="glitch">Stäng</button>
-          <button id="btn-generate" class="go">Generera</button>
+          <button id="btn-close" class="glitch">Close</button>
+          <button id="btn-generate" class="go">Generate</button>
         </div>
       `;
     } else if (state === 1) {
@@ -9301,22 +9307,22 @@ tonic_default.add(class KeyGenerator extends tonic_default {
         <h1>Söker...</h1>
         <img class="asciiloader" src="https://camo.githubusercontent.com/cab6fe7bb1021d845cb67eae7c618dd09ca6ec53f028a5349cf3ceae47d6f889/687474703a2f2f692e696d6775722e636f6d2f6c6e636270426d2e676966"/>
         <pre><code>${hashRate.toFixed(2)} nycklar/s</code></pre>
-        <button id="btn-generate" class="glitch">Avbryt</button>
+        <button id="btn-generate" class="glitch">Abort</button>
       `;
     } else {
       const phex = bytesToHex(schnorr.getPublicKey(secret));
       const nsec = nip19_exports.nsecEncode(secret);
       const npub = nip19_exports.npubEncode(phex);
       const { sex, age, location } = decodeASL(phex);
-      const slur = ["sassy", "stilig", "ball", "odefinierad"][sex];
+      const slur = ["sassy", "stylish", "genuine", "undefined"][sex];
       content = this.html`
-        <h1>Identitet Utfärdad</h1>
+        <h1>Identity Found!</h1>
         <!-- <h4>${emoOf(sex, age)} ${flagOf(location)} ${geoCode(location)}</h4> -->
         <p>
-          Grattis, du har funnit en ${slur} nyckel:<br/>
+          Congrats, you've found a ${slur} key:<br/>
         </p>
         <div class="flex col">
-          <div>⚿ Hemligheten <small class="sublm">(håll hårt)</small></div>
+          <div>⚿ Secret <small class="sublm">(hold tight)</small></div>
           <pre class="bq sk"><code>${nsec}</code></pre>
           <div class="flex row end xcenter">
             <a role="button"
@@ -9334,15 +9340,15 @@ tonic_default.add(class KeyGenerator extends tonic_default {
           <hr/>
           <br/>
           <br/>
-          <div>⚿ Publik <small class="sublm">(ge bort till kompis)</small></div>
+          <div>⚿ Public <small class="sublm">(give to buddy)</small></div>
           <pre class="bq pk"><code>${npub}</code></pre>
           <div class="flex row end xcenter">
             <a role="button" data-share="${npub}">Dela</a>
           </div>
         </div>
         <div class="flex row center">
-          <button id="btn-erase" class="glitch">Radera</button>
-          <button id="btn-close" class="go">Stäng</button>
+          <button id="btn-erase" class="glitch">Erase</button>
+          <button id="btn-close" class="go">Close</button>
         </div>
       `;
     }
@@ -9398,7 +9404,7 @@ tonic_default.add(class KeyGenerator extends tonic_default {
       document.getElementById("keygen").close();
     }
     if (tonic_default.match(ev.target, "#btn-erase")) {
-      if (window.confirm("Har du sparat backup?\nTryck p\xE5 OK f\xF6r att radera allt och ladda om")) {
+      if (window.confirm("Backups saved?\nPress OK to erase everything and reboot")) {
         window.localStorage.clear();
         window.location.reload();
       }
@@ -9451,7 +9457,7 @@ tonic_default.add(class KeyGenerator extends tonic_default {
 });
 tonic_default.add(class KeygenButton extends tonic_default {
   render() {
-    return this.html`<button class="biff">Utfärda Identitet</button>`;
+    return this.html`<button class="biff">Generate Key</button>`;
   }
   click(ev) {
     if (tonic_default.match(ev.target, "button"))
@@ -9484,8 +9490,8 @@ tonic_default.add(class KeygenButton extends tonic_default {
 @scure/base/lib/esm/index.js:
   (*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
 
-@noble/hashes/esm/utils.js:
-  (*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
+@noble/ciphers/esm/utils.js:
+  (*! noble-ciphers - MIT License (c) 2023 Paul Miller (paulmillr.com) *)
 
 @noble/secp256k1/index.js:
   (*! noble-secp256k1 - MIT License (c) 2019 Paul Miller (paulmillr.com) *)

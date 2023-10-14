@@ -30,7 +30,7 @@ Tonic.add(class GuestBook extends Tonic {
     `)
     return this.html`
       <post-form></post-form>
-      <h3>Senaste Inlägg (${this.#posts.length + ''}st)</h3>
+      <h3>Latest posts (${this.#posts.length + ''}st)</h3>
       ${posts}
     `
   }
@@ -80,10 +80,10 @@ Tonic.add(class PostForm extends Tonic {
     let authorProfile = this.html`
       <sub>Logga in</sub>
       <author class="flex row space-between xcenter wrap">
-        <button id="btn-p-gen">generera</button>
+        <button id="btn-p-gen">generate</button>
         <div>
-          <input type="text" id="inp-sk-import" placeholder="Klistra in din nsec..."/>
-          <button>importera</button>
+          <input type="text" id="inp-sk-import" placeholder="Paste your nsec..."/>
+          <button>import</button>
         </div>
       </author>
     `
@@ -99,12 +99,12 @@ Tonic.add(class PostForm extends Tonic {
       const asl = decodeASL(pubkey)
       const flag = flagOf(asl.location)
       const location = geoCode(asl.location)
-      const sex = ['Kvinna', 'Man', 'Ickebinär', 'Robot'][asl.sex]
+      const sex = ['Female', 'Male', 'NonBinary', 'Robot'][asl.sex]
       const age = ['16', '24', '32', '48'][asl.age]
       const { profileDirty, saving } = this.props
       const saveEnabled = profileDirty && !saving ? '' : 'disabled'
       authorProfile = this.html`
-        <sub>Inloggad som</sub>
+        <sub>Logged in as</sub>
         <author class="flex row space-between xcenter wrap">
           <div class="flex column">
             ${picture}
@@ -134,10 +134,10 @@ Tonic.add(class PostForm extends Tonic {
       <div id="post-form">
         ${authorProfile}
         <br/>
-        <h1>Gästboken</h1>
-        <!-- ${this.replyTo ? 'Nytt Inlägg' : 'Re:' + this.replyTo} -->
-          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Lämmna en kommentar här eller tagga med #reboot för att synas"></textarea>
-        <!--<button id="submit">Skicka</button>-->
+        <h1>Guestbook</h1>
+        <!-- ${this.replyTo ? 'New Post' : 'Re:' + this.replyTo} -->
+          <textarea id="note-area" ${attrD} rows="8" style="width: 100%;" placeholder="Leave a comment here or tag something #reboot using your favourite nostr client"></textarea>
+        <!--<button id="submit">Send</button>-->
         <div class="flex row center"><button class="post-btn biff" ${attrD} ${isPosting ? 'aria-busy=true' : ''}>Skapa Inlägg</button></div>
       </div>
     `
@@ -357,18 +357,18 @@ Tonic.add(class KeyGenerator extends Tonic {
         <br>
         <hr />
         <br>
-        <p><strong>Plats</strong></p>
+        <p><strong>Location</strong></p>
         <div class="flex row space-around">
           <input id="geohash-input" type="text"
             ${ulock ? '' : 'disabled="true"'}
             value="${geohash}"/>
           <p class="geo-desc">${flag} ${geoLabel}</p>
         </div>
-        <button id="btn-gps">Hämta Plats</button>
+        <button id="btn-gps">Fetch Location</button>
         <hr />
         <div class="flex row">
-          <button id="btn-close" class="glitch">Stäng</button>
-          <button id="btn-generate" class="go">Generera</button>
+          <button id="btn-close" class="glitch">Close</button>
+          <button id="btn-generate" class="go">Generate</button>
         </div>
       `
     } else if (state === 1) {
@@ -376,22 +376,22 @@ Tonic.add(class KeyGenerator extends Tonic {
         <h1>Söker...</h1>
         <img class="asciiloader" src="https://camo.githubusercontent.com/cab6fe7bb1021d845cb67eae7c618dd09ca6ec53f028a5349cf3ceae47d6f889/687474703a2f2f692e696d6775722e636f6d2f6c6e636270426d2e676966"/>
         <pre><code>${hashRate.toFixed(2)} nycklar/s</code></pre>
-        <button id="btn-generate" class="glitch">Avbryt</button>
+        <button id="btn-generate" class="glitch">Abort</button>
       `
     } else { // state 2: Secret found
       const phex = bytesToHex(schnorr.getPublicKey(secret))
       const nsec = nip19.nsecEncode(secret)
       const npub = nip19.npubEncode(phex)
       const { sex, age, location } = decodeASL(phex)
-      const slur = ['sassy', 'stilig', 'ball', 'odefinierad'][sex]
+      const slur = ['sassy', 'stylish', 'genuine', 'undefined'][sex]
       content = this.html`
-        <h1>Identitet Utfärdad</h1>
+        <h1>Identity Found!</h1>
         <!-- <h4>${emoOf(sex, age)} ${flagOf(location)} ${geoCode(location)}</h4> -->
         <p>
-          Grattis, du har funnit en ${slur} nyckel:<br/>
+          Congrats, you've found a ${slur} key:<br/>
         </p>
         <div class="flex col">
-          <div>⚿ Hemligheten <small class="sublm">(håll hårt)</small></div>
+          <div>⚿ Secret <small class="sublm">(hold tight)</small></div>
           <pre class="bq sk"><code>${nsec}</code></pre>
           <div class="flex row end xcenter">
             <a role="button"
@@ -409,15 +409,15 @@ Tonic.add(class KeyGenerator extends Tonic {
           <hr/>
           <br/>
           <br/>
-          <div>⚿ Publik <small class="sublm">(ge bort till kompis)</small></div>
+          <div>⚿ Public <small class="sublm">(give to buddy)</small></div>
           <pre class="bq pk"><code>${npub}</code></pre>
           <div class="flex row end xcenter">
             <a role="button" data-share="${npub}">Dela</a>
           </div>
         </div>
         <div class="flex row center">
-          <button id="btn-erase" class="glitch">Radera</button>
-          <button id="btn-close" class="go">Stäng</button>
+          <button id="btn-erase" class="glitch">Erase</button>
+          <button id="btn-close" class="go">Close</button>
         </div>
       `
     }
@@ -470,7 +470,7 @@ Tonic.add(class KeyGenerator extends Tonic {
     }
 
     if (Tonic.match(ev.target, '#btn-erase')) {
-      if (window.confirm('Har du sparat backup?\nTryck på OK för att radera allt och ladda om')) {
+      if (window.confirm('Backups saved?\nPress OK to erase everything and reboot')) {
         window.localStorage.clear()
         window.location.reload()
       }
@@ -526,6 +526,6 @@ Tonic.add(class KeyGenerator extends Tonic {
 })
 
 Tonic.add(class KeygenButton extends Tonic {
-  render () { return this.html`<button class="biff">Utfärda Identitet</button>` }
+  render () { return this.html`<button class="biff">Generate Key</button>` }
   click (ev) { if (Tonic.match(ev.target, 'button')) document.getElementById('keygen').show(true) }
 })
